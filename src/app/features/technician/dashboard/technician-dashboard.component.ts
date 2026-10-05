@@ -412,8 +412,8 @@ import { PriorityBadge } from '../../../components/priority-badge/priority-badge
                     <!-- Location -->
                     <td class="py-3 px-4">
                       <div class="flex flex-col text-xs text-[#334155]">
-                        <span class="font-medium">{{ ticket.location.building }}</span>
-                        <span class="text-[#64748B]">{{ ticket.location.room || 'General Area' }}</span>
+                        <span class="font-medium">{{ ticket.location?.building || ticket.building }}</span>
+                        <span class="text-[#64748B]">{{ ticket.location?.room || ticket.room || 'General Area' }}</span>
                       </div>
                     </td>
 
@@ -421,9 +421,9 @@ import { PriorityBadge } from '../../../components/priority-badge/priority-badge
                     <td class="py-3 px-4">
                       <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded-full bg-[#E0E7FF] text-[#4338CA] flex items-center justify-center text-[10px] font-bold">
-                          {{ ticket.reporter.name.charAt(0) }}
+                          {{ ticket.reporter?.name?.charAt(0) || ticket.reporterName?.charAt(0) }}
                         </div>
-                        <span class="text-xs text-[#334155] font-medium">{{ ticket.reporter.name }}</span>
+                        <span class="text-xs text-[#334155] font-medium">{{ ticket.reporter?.name || ticket.reporterName }}</span>
                       </div>
                     </td>
 
@@ -498,7 +498,7 @@ export class TechnicianDashboardComponent implements OnInit {
       },
     });
 
-    this.ticketService.getMyTickets({ pageSize: 6, sortBy: 'updatedAt', sortOrder: 'desc' }).subscribe({
+    this.ticketService.getTechnicianTickets({ pageSize: 6, sortBy: 'updatedAt', sortOrder: 'desc' }).subscribe({
       next: (res) => {
         this.recentTickets.set(res.tickets);
         this.loading.set(false);

@@ -73,29 +73,38 @@ export const INITIAL_TICKETS: Ticket[] = [
       {
         id: 'act-1',
         ticketId: 'T-1082',
-        status: 'new',
-        title: 'Ticket Submitted',
-        description: 'Issue reported by Alex Chen via Reporter Portal.',
-        timestamp: '2026-10-24T08:45:00.000Z',
-        actorName: 'Alex Chen'
+        type: 'STATUS_CHANGE',
+        content: 'Issue reported by Alex Chen via Reporter Portal.',
+        author: {
+          id: 'u-1',
+          name: 'Alex Chen',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-24T08:45:00.000Z'
       },
       {
         id: 'act-2',
         ticketId: 'T-1082',
-        status: 'assigned',
-        title: 'Technician Assigned',
-        description: 'Assigned to Marcus Vance (AV & Electronic Systems).',
-        timestamp: '2026-10-24T09:30:00.000Z',
-        actorName: 'Facilities Dispatch'
+        type: 'STATUS_CHANGE',
+        content: 'Assigned to Marcus Vance (AV & Electronic Systems).',
+        author: {
+          id: 'u-1',
+          name: 'Facilities Dispatch',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-24T09:30:00.000Z'
       },
       {
         id: 'act-3',
         ticketId: 'T-1082',
-        status: 'in_progress',
-        title: 'Work In Progress',
-        description: 'Diagnostic completed on projector ballast and power circuit.',
-        timestamp: '2026-10-24T11:15:00.000Z',
-        actorName: 'Marcus Vance'
+        type: 'STATUS_CHANGE',
+        content: 'Diagnostic completed on projector ballast and power circuit.',
+        author: {
+          id: 'u-1',
+          name: 'Marcus Vance',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-24T11:15:00.000Z'
       }
     ],
     additionalDetails: 'Lab is open between 8:00 AM and 6:00 PM on weekdays.',
@@ -136,20 +145,26 @@ export const INITIAL_TICKETS: Ticket[] = [
       {
         id: 'act-4',
         ticketId: 'T-1079',
-        status: 'new',
-        title: 'Ticket Submitted',
-        description: 'Reported by Alex Chen.',
-        timestamp: '2026-10-23T10:15:00.000Z',
-        actorName: 'Alex Chen'
+        type: 'STATUS_CHANGE',
+        content: 'Reported by Alex Chen.',
+        author: {
+          id: 'u-1',
+          name: 'Alex Chen',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-23T10:15:00.000Z'
       },
       {
         id: 'act-5',
         ticketId: 'T-1079',
-        status: 'assigned',
-        title: 'Assigned to Dave Morrison',
-        description: 'Dispatched to Campus Facilities Plumbing Unit.',
-        timestamp: '2026-10-23T11:00:00.000Z',
-        actorName: 'Dispatcher Sarah'
+        type: 'STATUS_CHANGE',
+        content: 'Dispatched to Campus Facilities Plumbing Unit.',
+        author: {
+          id: 'u-1',
+          name: 'Dispatcher Sarah',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-23T11:00:00.000Z'
       }
     ],
     additionalDetails: 'Temporary bucket was placed underneath.',
@@ -174,11 +189,14 @@ export const INITIAL_TICKETS: Ticket[] = [
       {
         id: 'act-6',
         ticketId: 'T-1071',
-        status: 'new',
-        title: 'Ticket Submitted',
-        description: 'Submitted via FixMyCampus Reporter portal.',
-        timestamp: '2026-10-22T18:20:00.000Z',
-        actorName: 'Alex Chen'
+        type: 'STATUS_CHANGE',
+        content: 'Submitted via FixMyCampus Reporter portal.',
+        author: {
+          id: 'u-1',
+          name: 'Alex Chen',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-22T18:20:00.000Z'
       }
     ],
     additionalDetails: 'Resident will be in class until 4 PM.',
@@ -218,38 +236,50 @@ export const INITIAL_TICKETS: Ticket[] = [
       {
         id: 'act-7',
         ticketId: 'T-1065',
-        status: 'new',
-        title: 'Ticket Submitted',
-        description: 'Reported by Alex Chen.',
-        timestamp: '2026-10-19T09:10:00.000Z',
-        actorName: 'Alex Chen'
+        type: 'STATUS_CHANGE',
+        content: 'Reported by Alex Chen.',
+        author: {
+          id: 'u-1',
+          name: 'Alex Chen',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-19T09:10:00.000Z'
       },
       {
         id: 'act-8',
         ticketId: 'T-1065',
-        status: 'assigned',
-        title: 'Assigned to Elena Rostova',
-        description: 'Network Operations triage.',
-        timestamp: '2026-10-19T10:00:00.000Z',
-        actorName: 'IT Operations'
+        type: 'STATUS_CHANGE',
+        content: 'Network Operations triage.',
+        author: {
+          id: 'u-1',
+          name: 'IT Operations',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-19T10:00:00.000Z'
       },
       {
         id: 'act-9',
         ticketId: 'T-1065',
-        status: 'in_progress',
-        title: 'Access Point Maintenance',
-        description: 'Remote telemetry and port testing conducted.',
-        timestamp: '2026-10-19T14:30:00.000Z',
-        actorName: 'Elena Rostova'
+        type: 'STATUS_CHANGE',
+        content: 'Remote telemetry and port testing conducted.',
+        author: {
+          id: 'u-1',
+          name: 'Elena Rostova',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-19T14:30:00.000Z'
       },
       {
         id: 'act-10',
         ticketId: 'T-1065',
-        status: 'resolved',
-        title: 'Issue Resolved',
-        description: 'Firmware updated and verified with RF spectrum analyzer.',
-        timestamp: '2026-10-19T16:15:00.000Z',
-        actorName: 'Elena Rostova'
+        type: 'STATUS_CHANGE',
+        content: 'Firmware updated and verified with RF spectrum analyzer.',
+        author: {
+          id: 'u-1',
+          name: 'Elena Rostova',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-19T16:15:00.000Z'
       }
     ],
     createdAt: '2026-10-19T09:10:00.000Z',
@@ -289,20 +319,26 @@ export const INITIAL_TICKETS: Ticket[] = [
       {
         id: 'act-11',
         ticketId: 'T-1058',
-        status: 'new',
-        title: 'Ticket Submitted',
-        description: 'Reported by Alex Chen.',
-        timestamp: '2026-10-15T11:00:00.000Z',
-        actorName: 'Alex Chen'
+        type: 'STATUS_CHANGE',
+        content: 'Reported by Alex Chen.',
+        author: {
+          id: 'u-1',
+          name: 'Alex Chen',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-15T11:00:00.000Z'
       },
       {
         id: 'act-12',
         ticketId: 'T-1058',
-        status: 'resolved',
-        title: 'Chair Replaced & Resolved',
-        description: 'Replaced with surplus inventory chair.',
-        timestamp: '2026-10-15T15:20:00.000Z',
-        actorName: 'Carlos Mendez'
+        type: 'STATUS_CHANGE',
+        content: 'Replaced with surplus inventory chair.',
+        author: {
+          id: 'u-1',
+          name: 'Carlos Mendez',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-15T15:20:00.000Z'
       }
     ],
     createdAt: '2026-10-15T11:00:00.000Z',
@@ -332,29 +368,38 @@ export const INITIAL_TICKETS: Ticket[] = [
       {
         id: 'act-13',
         ticketId: 'T-1052',
-        status: 'new',
-        title: 'Ticket Submitted',
-        description: 'Reported by Alex Chen.',
-        timestamp: '2026-10-10T07:15:00.000Z',
-        actorName: 'Alex Chen'
+        type: 'STATUS_CHANGE',
+        content: 'Reported by Alex Chen.',
+        author: {
+          id: 'u-1',
+          name: 'Alex Chen',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-10T07:15:00.000Z'
       },
       {
         id: 'act-14',
         ticketId: 'T-1052',
-        status: 'resolved',
-        title: 'Bleed Valve Replaced',
-        description: 'Radiator air vent bleed valve replaced.',
-        timestamp: '2026-10-11T13:40:00.000Z',
-        actorName: 'Bill Thornton'
+        type: 'STATUS_CHANGE',
+        content: 'Radiator air vent bleed valve replaced.',
+        author: {
+          id: 'u-1',
+          name: 'Bill Thornton',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-11T13:40:00.000Z'
       },
       {
         id: 'act-15',
         ticketId: 'T-1052',
-        status: 'closed',
-        title: 'Ticket Closed',
-        description: 'Inspection verified by Alex Chen and automatically closed.',
-        timestamp: '2026-10-13T10:00:00.000Z',
-        actorName: 'System'
+        type: 'STATUS_CHANGE',
+        content: 'Inspection verified by Alex Chen and automatically closed.',
+        author: {
+          id: 'u-1',
+          name: 'System',
+          role: 'SYSTEM'
+        },
+        timestamp: '2026-10-13T10:00:00.000Z'
       }
     ],
     createdAt: '2026-10-10T07:15:00.000Z',

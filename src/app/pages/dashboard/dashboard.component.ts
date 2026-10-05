@@ -94,7 +94,7 @@ export class DashboardComponent implements OnInit {
     }
 
     if (building !== 'all') {
-      list = list.filter((t) => t.building.toLowerCase() === building.toLowerCase());
+      list = list.filter((t) => (t.building || '').toLowerCase() === building.toLowerCase());
     }
 
     this.filteredTickets.set(list);

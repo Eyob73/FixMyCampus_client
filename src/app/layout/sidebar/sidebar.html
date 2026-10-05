@@ -1,5 +1,5 @@
 <!-- Mobile Backdrop Overlay -->
-@if (isOpen()) {
+@if (isOpen) {
   <div
     class="fixed inset-0 bg-black/40 backdrop-blur-xs z-30 lg:hidden transition-opacity"
     (click)="closeSidebar.emit()"
@@ -9,7 +9,7 @@
 <!-- Fixed Sidebar Drawer -->
 <aside
   class="fixed top-0 left-0 h-screen w-64 flex flex-col z-40 bg-white border-r border-[#E2E8F0] shadow-sm transition-transform duration-200 ease-in-out lg:translate-x-0"
-  [ngClass]="isOpen() ? 'translate-x-0' : '-translate-x-full'"
+  [ngClass]="isOpen ? 'translate-x-0' : '-translate-x-full'"
 >
   <div class="w-64 h-full flex flex-col justify-between p-4">
     <!-- Top Brand Header & Navigation Section -->

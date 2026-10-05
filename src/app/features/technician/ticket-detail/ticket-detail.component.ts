@@ -89,7 +89,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
             <p class="text-xs text-[#64748B] flex flex-wrap items-center gap-x-2 gap-y-1">
               <span class="flex items-center gap-1 text-[#334155] font-medium">
                 <span class="material-symbols-outlined text-[15px] text-[#006398]">apartment</span>
-                {{ ticket()!.location.building }} &bull; {{ ticket()!.location.room || 'General Area' }}
+                {{ ticket()!.location?.building }} &bull; {{ ticket()!.location?.room || 'General Area' }}
               </span>
               <span>&bull;</span>
               <span>Reported on {{ formatFullDate(ticket()!.createdAt) }}</span>
@@ -218,10 +218,10 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                   </label>
                   <div class="flex items-center gap-2 text-sm text-[#0F172A] font-medium">
                     <span class="material-symbols-outlined text-[18px] text-[#006398]">apartment</span>
-                    <span>{{ ticket()!.location.building }} &bull; {{ ticket()!.location.room || 'General' }}</span>
+                    <span>{{ ticket()!.location?.building }} &bull; {{ ticket()!.location?.room || 'General' }}</span>
                   </div>
-                  @if (ticket()!.location.campusZone) {
-                    <span class="text-xs text-[#64748B] block pl-6">Zone: {{ ticket()!.location.campusZone }}</span>
+                  @if (ticket()!.location?.campusZone) {
+                    <span class="text-xs text-[#64748B] block pl-6">Zone: {{ ticket()!.location?.campusZone }}</span>
                   }
                 </div>
 
@@ -246,30 +246,30 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                   <div class="flex items-center justify-between flex-wrap gap-3 bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-lg">
                     <div class="flex items-center gap-3">
                       <div class="w-9 h-9 rounded-full bg-[#E0E7FF] text-[#1E3A8A] flex items-center justify-center font-bold text-xs">
-                        {{ ticket()!.reporter.name.charAt(0) }}
+                        {{ ticket()!.reporter?.name?.charAt(0) || '?' }}
                       </div>
                       <div>
                         <p class="text-sm font-bold text-[#0F172A]">
-                          {{ ticket()!.reporter.name }}
-                          @if (ticket()!.reporter.studentStaffId) {
-                            <span class="text-xs font-normal text-[#64748B] ml-1">(ID: #{{ ticket()!.reporter.studentStaffId }})</span>
+                          {{ ticket()!.reporter?.name }}
+                          @if (ticket()!.reporter?.studentStaffId) {
+                            <span class="text-xs font-normal text-[#64748B] ml-1">(ID: #{{ ticket()!.reporter?.studentStaffId }})</span>
                           }
                         </p>
-                        <p class="text-xs text-[#64748B]">{{ ticket()!.reporter.role }} &bull; {{ ticket()!.reporter.department || 'Campus Community' }}</p>
+                        <p class="text-xs text-[#64748B]">{{ ticket()!.reporter?.role }} &bull; {{ ticket()!.reporter?.department || 'Campus Community' }}</p>
                       </div>
                     </div>
 
                     <div class="flex items-center gap-2">
                       <a
-                        [href]="'mailto:' + ticket()!.reporter.email"
+                        [href]="'mailto:' + ticket()!.reporter?.email"
                         class="px-2.5 py-1.5 bg-white border border-[#CBD5E1] text-[#1E3A8A] hover:bg-[#EFF6FF] rounded text-xs font-semibold transition-colors flex items-center gap-1"
                       >
                         <span class="material-symbols-outlined text-[14px]">mail</span>
                         <span>Email Reporter</span>
                       </a>
-                      @if (ticket()!.reporter.phone) {
+                      @if (ticket()!.reporter?.phone) {
                         <a
-                          [href]="'tel:' + ticket()!.reporter.phone"
+                          [href]="'tel:' + ticket()!.reporter?.phone"
                           class="px-2.5 py-1.5 bg-white border border-[#CBD5E1] text-[#334155] hover:bg-slate-50 rounded text-xs font-semibold transition-colors flex items-center gap-1"
                         >
                           <span class="material-symbols-outlined text-[14px]">call</span>
@@ -286,7 +286,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                 </div>
                 <div class="space-y-1">
                   <label class="text-xs font-semibold text-[#64748B] block uppercase tracking-wider">Assigned Date</label>
-                  <p class="text-xs text-[#0F172A] font-medium">{{ formatFullDate(ticket()!.assignedAt) }}</p>
+                  <p class="text-xs text-[#0F172A] font-medium">{{ formatFullDate(ticket()!.assignedAt || '') }}</p>
                 </div>
               </div>
 
@@ -822,7 +822,9 @@ export class TicketDetailComponent implements OnInit {
     this.loading.set(true);
     this.ticketService.getTicketById(id).subscribe({
       next: (ticket) => {
-        this.manualStatusSelect = ticket.status;
+        if (ticket) {
+          this.manualStatusSelect = ticket.status;
+        }
         this.loading.set(false);
       },
       error: () => {
@@ -1025,11 +1027,13 @@ export class TicketDetailComponent implements OnInit {
         return 'Work Completed (Resolved)';
       case 'CLOSED':
         return 'Archived & Closed';
+      default:
+        return status;
     }
   }
 
   isStepComplete(step: TicketStatus, currentStatus: TicketStatus): boolean {
-    const rank: Record<TicketStatus, number> = {
+    const rank: Record<string, number> = {
       NEW: 1,
       ASSIGNED: 2,
       IN_PROGRESS: 3,

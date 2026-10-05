@@ -235,6 +235,7 @@ body {
   color: #dc2626;
   background-color: #fef2f2;
   border: 1px solid #fecaca;
+}
 /* Tabular figures for stats */
 .font-stat-numeric {
   font-feature-settings: 'tnum' on, 'cv05' on;

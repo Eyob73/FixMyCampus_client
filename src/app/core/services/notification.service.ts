@@ -1,4 +1,9 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, tap, catchError } from 'rxjs';
+import { AppNotification } from '../models/notification.model';
+import { INITIAL_NOTIFICATIONS } from './mock-data';
+import { environment } from '../../../environments/environment';
 
 export interface ToastMessage {
   id: string;
@@ -8,13 +13,26 @@ export interface ToastMessage {
   duration?: number;
 }
 
+const NOTIF_STORAGE_KEY = 'fixmycampus_notifications';
+
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class NotificationService {
+  // Toasts State
   private readonly _toasts = signal<ToastMessage[]>([]);
   readonly toasts = this._toasts.asReadonly();
 
+  // Notifications State
+  private notificationsSignal = signal<AppNotification[]>(this.loadInitial());
+  readonly notifications = this.notificationsSignal.asReadonly();
+  readonly unreadCount = computed(() =>
+    this.notificationsSignal().filter((n) => !n.read).length
+  );
+
+  constructor(private http: HttpClient) {}
+
+  // --- TOASTS LOGIC ---
   show(toast: Omit<ToastMessage, 'id'>): string {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const newToast: ToastMessage = {
@@ -56,27 +74,9 @@ export class NotificationService {
 
   clear(): void {
     this._toasts.set([]);
-import { Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap, catchError } from 'rxjs';
-import { AppNotification } from '../models/notification.model';
-import { INITIAL_NOTIFICATIONS } from './mock-data';
-import { environment } from '../../../environments/environment';
+  }
 
-const NOTIF_STORAGE_KEY = 'fixmycampus_notifications';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class NotificationService {
-  private notificationsSignal = signal<AppNotification[]>(this.loadInitial());
-  readonly notifications = this.notificationsSignal.asReadonly();
-  readonly unreadCount = computed(() =>
-    this.notificationsSignal().filter((n) => !n.read).length
-  );
-
-  constructor(private http: HttpClient) {}
-
+  // --- NOTIFICATIONS LOGIC ---
   private loadInitial(): AppNotification[] {
     try {
       const stored = localStorage.getItem(NOTIF_STORAGE_KEY);

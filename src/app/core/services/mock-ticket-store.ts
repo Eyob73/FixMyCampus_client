@@ -456,9 +456,9 @@ export class MockTicketStore {
           t.id.toLowerCase().includes(q) ||
           t.title.toLowerCase().includes(q) ||
           t.description.toLowerCase().includes(q) ||
-          t.location.building.toLowerCase().includes(q) ||
-          (t.location.room && t.location.room.toLowerCase().includes(q)) ||
-          t.reporter.name.toLowerCase().includes(q)
+          (t.location?.building?.toLowerCase().includes(q) ?? false) ||
+          (t.location?.room?.toLowerCase().includes(q) ?? false) ||
+          (t.reporter?.name?.toLowerCase().includes(q) ?? false)
       );
     }
 
@@ -479,7 +479,7 @@ export class MockTicketStore {
 
     // 5. Building filter
     if (options.building && options.building !== 'ALL') {
-      list = list.filter((t) => t.location.building.toLowerCase() === options.building?.toLowerCase());
+      list = list.filter((t) => t.location?.building?.toLowerCase() === options.building?.toLowerCase());
     }
 
     // Sort order

@@ -95,7 +95,7 @@ export class TicketDetailsComponent implements OnInit {
           if (!t) return t;
           return {
             ...t,
-            comments: [...t.comments, comment],
+            comments: [...(t.comments || []), comment],
             updatedAt: new Date().toISOString()
           };
         });

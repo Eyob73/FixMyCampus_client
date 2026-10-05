@@ -226,8 +226,8 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                     <!-- Location -->
                     <td class="py-4 px-4">
                       <div class="flex flex-col text-xs text-[#334155]">
-                        <span class="font-semibold">{{ ticket.location.building }}</span>
-                        <span class="text-[#64748B]">{{ ticket.location.room || 'General' }}</span>
+                        <span class="font-semibold">{{ ticket.location?.building || ticket.building }}</span>
+                        <span class="text-[#64748B]">{{ ticket.location?.room || ticket.room || 'General' }}</span>
                       </div>
                     </td>
 
@@ -235,11 +235,11 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                     <td class="py-4 px-4">
                       <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded-full bg-[#E0E7FF] text-[#4338CA] flex items-center justify-center text-[10px] font-bold shrink-0">
-                          {{ ticket.reporter.name.charAt(0) }}
+                          {{ ticket.reporter?.name?.charAt(0) || ticket.reporterName?.charAt(0) }}
                         </div>
                         <div class="flex flex-col min-w-0">
-                          <span class="text-xs font-medium text-[#0F172A] truncate">{{ ticket.reporter.name }}</span>
-                          <span class="text-[10px] text-[#64748B] truncate">{{ ticket.reporter.email }}</span>
+                          <span class="text-xs font-medium text-[#0F172A] truncate">{{ ticket.reporter?.name || ticket.reporterName }}</span>
+                          <span class="text-[10px] text-[#64748B] truncate">{{ ticket.reporter?.email || ticket.reporterEmail }}</span>
                         </div>
                       </div>
                     </td>
@@ -252,7 +252,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                     <!-- Dates -->
                     <td class="py-4 px-4">
                       <div class="flex flex-col text-[11px] text-[#64748B]">
-                        <span>Assigned: {{ formatDate(ticket.assignedAt) }}</span>
+                        <span>Assigned: {{ ticket.assignedAt ? formatDate(ticket.assignedAt) : 'Unassigned' }}</span>
                         <span>Updated: {{ formatTimeAgo(ticket.updatedAt) }}</span>
                       </div>
                     </td>
@@ -417,7 +417,7 @@ export class TicketListComponent implements OnInit {
       sortOrder: 'desc',
     };
 
-    this.ticketService.getMyTickets(options).subscribe({
+    this.ticketService.getTechnicianTickets(options).subscribe({
       next: (res) => {
         this.tickets.set(res.tickets);
         this.pagination.set(res);

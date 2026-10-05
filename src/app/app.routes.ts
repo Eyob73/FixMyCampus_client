@@ -1,101 +1,15 @@
 import { Routes } from '@angular/router';
 import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
+import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.component';
 import { technicianGuard } from './core/guards/technician.guard';
+import { adminGuard } from './guards/admin.guard';
+import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
-  {
-    path: 'technician',
-    component: DashboardLayout,
-    canActivate: [technicianGuard],
-import { AdminLayoutComponent } from './layout';
-import { adminGuard, roleGuard } from './guards';
-
-export const routes: Routes = [
-  {
-    path: '',
-    component: DashboardLayout,
-    children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'dashboard',
-        redirectTo: 'dashboard'
-      },
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./features/technician/dashboard/technician-dashboard.component').then(
-            (m) => m.TechnicianDashboardComponent
-          ),
-        title: 'Technician Dashboard | FixMyCampus',
-      },
-      {
-        path: 'tickets',
-        loadComponent: () =>
-          import('./features/technician/ticket-list/ticket-list.component').then(
-            (m) => m.TicketListComponent
-          ),
-        title: 'My Assigned Tickets | FixMyCampus',
-      },
-      {
-        path: 'tickets/:id',
-        loadComponent: () =>
-          import('./features/technician/ticket-detail/ticket-detail.component').then(
-            (m) => m.TicketDetailComponent
-          ),
-        title: 'Work Order Details | FixMyCampus',
-      },
-    ],
-  },
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'technician/dashboard',
-  },
-  {
-    path: '**',
-    redirectTo: 'technician/dashboard',
-  },
-          import('./pages/dashboard/dashboard.component').then((m) => m.DashboardComponent),
-        title: 'FixMyCampus - Reporter Dashboard'
-      },
-      {
-        path: 'report-issue',
-        loadComponent: () =>
-          import('./pages/report-issue/report-issue.component').then(
-            (m) => m.ReportIssueComponent
-          ),
-        title: 'FixMyCampus - Report Campus Issue'
-      },
-      {
-        path: 'my-tickets',
-        loadComponent: () =>
-          import('./pages/my-tickets/my-tickets.component').then((m) => m.MyTicketsComponent),
-        title: 'FixMyCampus - My Submitted Tickets'
-      },
-      {
-        path: 'ticket/:id',
-        loadComponent: () =>
-          import('./pages/ticket-details/ticket-details.component').then(
-            (m) => m.TicketDetailsComponent
-          ),
-        title: 'FixMyCampus - Ticket Details'
-      },
-      {
-        path: 'notifications',
-        loadComponent: () =>
-          import('./pages/notifications/notifications.component').then(
-            (m) => m.NotificationsComponent
-          ),
-        title: 'FixMyCampus - Notifications'
-      },
-      {
-        path: 'profile',
-        loadComponent: () =>
-          import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
-        title: 'FixMyCampus - Reporter Profile'
-    redirectTo: 'login',
-    pathMatch: 'full'
+    redirectTo: 'login'
   },
   {
     path: 'login',
@@ -147,6 +61,7 @@ export const routes: Routes = [
   },
   {
     path: 'reporter',
+    component: DashboardLayout,
     canActivate: [roleGuard(['REPORTER'])],
     children: [
       {
@@ -157,33 +72,85 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./features/reporters/reporter-dashboard/reporter-dashboard.component').then(
-            (m) => m.ReporterDashboardComponent
-          )
+          import('./pages/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+        title: 'FixMyCampus - Reporter Dashboard'
+      },
+      {
+        path: 'report-issue',
+        loadComponent: () =>
+          import('./pages/report-issue/report-issue.component').then(
+            (m) => m.ReportIssueComponent
+          ),
+        title: 'FixMyCampus - Report Campus Issue'
+      },
+      {
+        path: 'my-tickets',
+        loadComponent: () =>
+          import('./pages/my-tickets/my-tickets.component').then((m) => m.MyTicketsComponent),
+        title: 'FixMyCampus - My Submitted Tickets'
+      },
+      {
+        path: 'ticket/:id',
+        loadComponent: () =>
+          import('./pages/ticket-details/ticket-details.component').then(
+            (m) => m.TicketDetailsComponent
+          ),
+        title: 'FixMyCampus - Ticket Details'
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./pages/notifications/notifications.component').then(
+            (m) => m.NotificationsComponent
+          ),
+        title: 'FixMyCampus - Notifications'
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
+        title: 'FixMyCampus - Reporter Profile'
       }
     ]
   },
   {
     path: 'technician',
-    canActivate: [roleGuard(['TECHNICIAN'])],
+    component: DashboardLayout,
+    canActivate: [technicianGuard],
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
+        pathMatch: 'full',
+        redirectTo: 'dashboard'
       },
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./features/technicians/technician-dashboard/technician-dashboard.component').then(
+          import('./features/technician/dashboard/technician-dashboard.component').then(
             (m) => m.TechnicianDashboardComponent
-          )
+          ),
+        title: 'Technician Dashboard | FixMyCampus'
+      },
+      {
+        path: 'tickets',
+        loadComponent: () =>
+          import('./features/technician/ticket-list/ticket-list.component').then(
+            (m) => m.TicketListComponent
+          ),
+        title: 'My Assigned Tickets | FixMyCampus'
+      },
+      {
+        path: 'tickets/:id',
+        loadComponent: () =>
+          import('./features/technician/ticket-detail/ticket-detail.component').then(
+            (m) => m.TicketDetailComponent
+          ),
+        title: 'Work Order Details | FixMyCampus'
       }
     ]
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
     redirectTo: 'login'
   }
 ];

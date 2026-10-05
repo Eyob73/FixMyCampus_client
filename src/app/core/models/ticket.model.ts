@@ -1,6 +1,6 @@
-export type TicketStatus = 'NEW' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
+export type TicketStatus = 'NEW' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'new' | 'assigned' | 'in_progress' | 'resolved' | 'closed';
 
-export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | 'low' | 'medium' | 'high' | 'urgent';
 
 export type TicketCategory =
   | 'Electrical'
@@ -10,7 +10,14 @@ export type TicketCategory =
   | 'Structural & Doors'
   | 'Safety & Security'
   | 'Grounds & Sanitation'
-  | 'Network & IT';
+  | 'Network & IT'
+  | 'HVAC / Climate'
+  | 'Equipment'
+  | 'Furniture'
+  | 'Network & Wi-Fi'
+  | 'Cleaning & Grounds'
+  | 'Safety & Locks'
+  | 'Other';
 
 export type WorkNoteType =
   | 'DIAGNOSIS'
@@ -28,6 +35,14 @@ export interface User {
   department?: string;
   avatarUrl?: string;
   phone?: string;
+  notificationPreferences?: {
+    ticketStatusChange: boolean;
+    ticketComments: boolean;
+    systemAnnouncements: boolean;
+  };
+  departmentOrHall?: string;
+  affiliation?: string;
+  accountStatus?: string;
 }
 
 export interface ReporterInfo {
@@ -50,37 +65,18 @@ export interface LocationInfo {
 
 export interface TicketAttachment {
   id: string;
-  fileName: string;
-  fileUrl: string;
-  fileSize: string;
-  fileType: string;
+  fileName?: string;
+  name?: string;
+  fileUrl?: string;
+  url?: string;
+  fileSize?: string;
+  sizeBytes?: number;
+  fileType?: string;
+  type?: string;
   uploadedAt: string;
-  uploadedBy: string;
+  uploadedBy?: string;
   isEvidence?: boolean;
   thumbnailUrl?: string;
-export type TicketStatus = 'new' | 'assigned' | 'in_progress' | 'resolved' | 'closed';
-
-export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
-
-export type TicketCategory =
-  | 'Plumbing'
-  | 'Electrical'
-  | 'HVAC / Climate'
-  | 'Equipment'
-  | 'Furniture'
-  | 'Structural & Doors'
-  | 'Network & Wi-Fi'
-  | 'Cleaning & Grounds'
-  | 'Safety & Locks'
-  | 'Other';
-
-export interface TicketAttachment {
-  id: string;
-  name: string;
-  url: string;
-  sizeBytes: number;
-  type: string; // e.g. 'image/png', 'image/jpeg'
-  uploadedAt: string;
 }
 
 export interface TicketComment {
@@ -133,21 +129,39 @@ export interface Ticket {
   category: TicketCategory;
   priority: TicketPriority;
   status: TicketStatus;
-  location: LocationInfo;
-  reporter: ReporterInfo;
+  
+  // Admin / Tech properties
+  location?: LocationInfo;
+  reporter?: ReporterInfo;
+  assignedAt?: string;
+  dueDate?: string;
+  resolution?: TicketResolution;
+  
+  // Reporter properties
+  reporterId?: string;
+  reporterName?: string;
+  reporterEmail?: string;
+  building?: string;
+  room?: string;
+  comments?: TicketComment[];
+  additionalDetails?: string;
+  resolvedAt?: string;
+  closedAt?: string;
+  
+  // Shared properties
   assignedTechnician?: {
     id: string;
     name: string;
-    email: string;
-    department: string;
+    email?: string;
+    department?: string;
+    avatarUrl?: string;
+    specialty?: string;
+    phone?: string;
   };
   createdAt: string;
-  assignedAt: string;
   updatedAt: string;
-  dueDate?: string;
   attachments: TicketAttachment[];
   activities: TicketActivity[];
-  resolution?: TicketResolution;
 }
 
 export interface TechnicianDashboardStats {
@@ -192,41 +206,12 @@ export interface PaginatedTicketsResponse {
   page: number;
   pageSize: number;
   totalPages: number;
-  status: TicketStatus;
-  title: string;
-  description: string;
-  timestamp: string;
+  status?: TicketStatus; // made optional
+  title?: string;
+  description?: string;
+  timestamp?: string;
   actorName?: string;
   actorRole?: string;
-}
-
-export interface Ticket {
-  id: string; // e.g., 'T-1082'
-  reporterId: string;
-  reporterName: string;
-  reporterEmail?: string;
-  title: string;
-  description: string;
-  category: TicketCategory;
-  building: string;
-  room: string;
-  priority: TicketPriority;
-  status: TicketStatus;
-  assignedTechnician?: {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-    specialty?: string;
-    phone?: string;
-  };
-  attachments: TicketAttachment[];
-  comments: TicketComment[];
-  activities: TicketActivity[];
-  additionalDetails?: string;
-  createdAt: string;
-  updatedAt: string;
-  resolvedAt?: string;
-  closedAt?: string;
 }
 
 export interface CreateTicketDto {

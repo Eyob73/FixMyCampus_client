@@ -62,8 +62,8 @@ export class MyTicketsComponent implements OnInit {
           t.id.toLowerCase().includes(query) ||
           t.title.toLowerCase().includes(query) ||
           t.description.toLowerCase().includes(query) ||
-          t.building.toLowerCase().includes(query) ||
-          t.room.toLowerCase().includes(query) ||
+          (t.building || '').toLowerCase().includes(query) ||
+          (t.room || '').toLowerCase().includes(query) ||
           t.category.toLowerCase().includes(query)
       );
     }
@@ -77,7 +77,7 @@ export class MyTicketsComponent implements OnInit {
     }
 
     if (building !== 'all') {
-      list = list.filter((t) => t.building.toLowerCase() === building.toLowerCase());
+      list = list.filter((t) => (t.building || '').toLowerCase() === building.toLowerCase());
     }
 
     if (priority !== 'all') {

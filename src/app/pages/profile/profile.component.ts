@@ -56,7 +56,7 @@ export class ProfileComponent implements OnInit {
     });
 
     this.ticketService.getTicketStats().subscribe({
-      next: (s) => this.stats.set(s)
+      next: (s: TicketStats) => this.stats.set(s)
     });
   }
 

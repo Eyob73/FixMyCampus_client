@@ -139,7 +139,7 @@
                   (click)="openPreview(att)"
                   class="group relative border border-[#E2E8F0] rounded-lg overflow-hidden cursor-pointer hover:border-[#1E3A8A] transition-colors bg-[#F8FAFC]"
                 >
-                  @if (att.type.startsWith('image/')) {
+                  @if ((att.type || '').startsWith('image/')) {
                     <div class="h-32 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
                       <img
                         [src]="att.url"
@@ -181,12 +181,12 @@
                 </div>
                 <div class="flex-1 pb-4">
                   <div class="flex items-center justify-between">
-                    <p class="text-xs font-bold text-[#0F172A]">{{ act.title }}</p>
+                    <p class="text-xs font-bold text-[#0F172A]">{{ act.type }}</p>
                     <span class="text-[11px] text-[#94A3B8]">{{ act.timestamp | date:'MMM d, h:mm a' }}</span>
                   </div>
-                  <p class="text-xs text-[#444651] mt-0.5">{{ act.description }}</p>
-                  @if (act.actorName) {
-                    <span class="text-[10px] text-[#64748B] block mt-1">Logged by: {{ act.actorName }}</span>
+                  <p class="text-xs text-[#444651] mt-0.5">{{ act.content }}</p>
+                  @if (act.author?.name) {
+                    <span class="text-[10px] text-[#64748B] block mt-1">Logged by: {{ act.author.name }}</span>
                   }
                 </div>
               </div>
@@ -199,7 +199,7 @@
           <div class="border-b border-[#F1F5F9] pb-3 flex items-center justify-between">
             <h2 class="text-sm font-bold text-[#0F172A] flex items-center space-x-2">
               <span class="material-symbols-outlined text-[18px] text-[#1E3A8A]">chat</span>
-              <span>Communication & Responses ({{ t.comments.length }})</span>
+              <span>Communication & Responses ({{ t.comments?.length || 0 }})</span>
             </h2>
             <span class="text-[11px] text-[#64748B]">Visible to assigned technician & facilities</span>
           </div>

@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, of, tap, catchError, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   Ticket,
@@ -10,8 +10,18 @@ import {
   TicketStatus,
   WorkNoteType,
   TicketResolution,
+  TicketStats,
+  CreateTicketDto,
+  TicketFilter,
+  TicketComment,
+  TicketActivity,
+  TicketAttachment
 } from '../models/ticket.model';
 import { AuthService } from './auth.service';
+import { NotificationService } from './notification.service';
+import { INITIAL_TICKETS } from './mock-data';
+
+const TICKETS_STORAGE_KEY = 'fixmycampus_tickets';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +29,8 @@ import { AuthService } from './auth.service';
 export class TicketService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
+  private readonly notifService = inject(NotificationService);
+  
   private readonly baseUrl = `${environment.apiUrl}/technician`;
 
   // Reactive state signals for UI reactivity
@@ -26,6 +38,30 @@ export class TicketService {
   readonly selectedTicket = signal<Ticket | null>(null);
   readonly isLoading = signal<boolean>(false);
   readonly lastUpdated = signal<Date>(new Date());
+
+  private ticketsSignal = signal<Ticket[]>(this.loadInitial());
+  readonly tickets = this.ticketsSignal.asReadonly();
+
+  private loadInitial(): Ticket[] {
+    try {
+      const stored = localStorage.getItem(TICKETS_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn('Could not read tickets from storage', e);
+    }
+    return [...INITIAL_TICKETS];
+  }
+
+  private persist(tickets: Ticket[]): void {
+    this.ticketsSignal.set(tickets);
+    try {
+      localStorage.setItem(TICKETS_STORAGE_KEY, JSON.stringify(tickets));
+    } catch (e) {
+      console.warn('Could not save tickets to storage', e);
+    }
+  }
 
   /**
    * Fetch dashboard KPIs and workload statistics
@@ -47,7 +83,7 @@ export class TicketService {
   /**
    * Fetch tickets assigned to the technician with filtering and pagination
    */
-  getMyTickets(options: TicketFilterOptions = {}): Observable<PaginatedTicketsResponse> {
+  getTechnicianTickets(options: TicketFilterOptions = {}): Observable<PaginatedTicketsResponse> {
     this.isLoading.set(true);
     let params = new HttpParams();
 
@@ -71,9 +107,9 @@ export class TicketService {
   }
 
   /**
-   * Fetch single ticket details by ID
+   * Fetch single ticket details by ID (Technician version)
    */
-  getTicketById(id: string): Observable<Ticket> {
+  getTechnicianTicketById(id: string): Observable<Ticket> {
     this.isLoading.set(true);
     return this.http.get<Ticket>(`${this.baseUrl}/tickets/${id}`).pipe(
       tap({
@@ -178,64 +214,14 @@ export class TicketService {
         },
         error: () => this.isLoading.set(false),
       })
-import { Injectable, signal } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, tap, catchError, map } from 'rxjs';
-import {
-  Ticket,
-  TicketStats,
-  CreateTicketDto,
-  TicketFilter,
-  TicketComment,
-  TicketActivity,
-  TicketAttachment
-} from '../models/ticket.model';
-import { INITIAL_TICKETS } from './mock-data';
-import { AuthService } from './auth.service';
-import { NotificationService } from './notification.service';
-import { environment } from '../../../environments/environment';
-
-const TICKETS_STORAGE_KEY = 'fixmycampus_tickets';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class TicketService {
-  private ticketsSignal = signal<Ticket[]>(this.loadInitial());
-  readonly tickets = this.ticketsSignal.asReadonly();
-
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private notifService: NotificationService
-  ) {}
-
-  private loadInitial(): Ticket[] {
-    try {
-      const stored = localStorage.getItem(TICKETS_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (e) {
-      console.warn('Could not read tickets from storage', e);
-    }
-    return [...INITIAL_TICKETS];
-  }
-
-  private persist(tickets: Ticket[]): void {
-    this.ticketsSignal.set(tickets);
-    try {
-      localStorage.setItem(TICKETS_STORAGE_KEY, JSON.stringify(tickets));
-    } catch (e) {
-      console.warn('Could not save tickets to storage', e);
-    }
+    );
   }
 
   /**
    * Retrieves tickets submitted ONLY by the currently authenticated reporter.
    */
   getMyTickets(filter?: TicketFilter): Observable<Ticket[]> {
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = this.auth.getCurrentUser();
     let params = new HttpParams().set('reporterId', currentUser.id);
 
     if (filter) {
@@ -272,8 +258,8 @@ export class TicketService {
           t.id.toLowerCase().includes(query) ||
           t.title.toLowerCase().includes(query) ||
           t.description.toLowerCase().includes(query) ||
-          t.building.toLowerCase().includes(query) ||
-          t.room.toLowerCase().includes(query) ||
+          t.building?.toLowerCase().includes(query) ||
+          t.room?.toLowerCase().includes(query) ||
           t.category.toLowerCase().includes(query)
       );
     }
@@ -287,7 +273,7 @@ export class TicketService {
     }
 
     if (filter.building && filter.building !== 'all') {
-      list = list.filter((t) => t.building.toLowerCase() === filter.building?.toLowerCase());
+      list = list.filter((t) => t.building?.toLowerCase() === filter.building?.toLowerCase());
     }
 
     if (filter.priority && filter.priority !== 'all') {
@@ -310,7 +296,7 @@ export class TicketService {
    * Retrieves summary statistics for the reporter's own tickets.
    */
   getTicketStats(): Observable<TicketStats> {
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = this.auth.getCurrentUser();
 
     return this.http.get<TicketStats>(`${environment.apiUrl}/tickets/stats?reporterId=${currentUser.id}`).pipe(
       catchError(() => {
@@ -331,20 +317,32 @@ export class TicketService {
    * Retrieves a single ticket by ID. Enforces reporter ownership.
    */
   getTicketById(id: string): Observable<Ticket | null> {
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = this.auth.getCurrentUser();
+    this.isLoading.set(true);
 
     return this.http.get<Ticket>(`${environment.apiUrl}/tickets/${id}`).pipe(
       map((ticket) => {
-        // Enforce reporter access restriction
-        if (ticket && ticket.reporterId !== currentUser.id) {
+        // Enforce reporter access restriction or technician fallback?
+        // Wait, for ticket-details (which is shared), it might use getTicketById. 
+        // Let's just return the ticket. 
+        if (ticket && ticket.reporterId !== currentUser.id && currentUser.role === 'REPORTER') {
           return null;
         }
+        this.selectedTicket.set(ticket);
         return ticket;
+      }),
+      tap({
+        next: () => this.isLoading.set(false),
+        error: () => this.isLoading.set(false)
       }),
       catchError(() => {
         const match = this.ticketsSignal().find(
-          (t) => t.id.toLowerCase() === id.toLowerCase() && t.reporterId === currentUser.id
+          (t) => t.id.toLowerCase() === id.toLowerCase() && (t.reporterId === currentUser.id || currentUser.role !== 'REPORTER')
         );
+        if (match) {
+            this.selectedTicket.set(match);
+        }
+        this.isLoading.set(false);
         return of(match || null);
       })
     );
@@ -354,7 +352,7 @@ export class TicketService {
    * Submits a new ticket for the current reporter.
    */
   createTicket(dto: CreateTicketDto): Observable<Ticket> {
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = this.auth.getCurrentUser();
     const now = new Date().toISOString();
     
     // Generate human-friendly ID like T-1083
@@ -364,12 +362,15 @@ export class TicketService {
     const initialActivity: TicketActivity = {
       id: `act-${Date.now()}`,
       ticketId,
-      status: 'new',
-      title: 'Ticket Submitted',
-      description: `Issue submitted by ${currentUser.name} via FixMyCampus Reporter Portal.`,
+      type: 'REPORTER_UPDATE', // Replaced status
+      noteType: 'GENERAL',
+      content: `Issue submitted by ${currentUser.name} via FixMyCampus Reporter Portal.`, // Replaced description
       timestamp: now,
-      actorName: currentUser.name,
-      actorRole: 'reporter'
+      author: {
+        id: currentUser.id,
+        name: currentUser.name,
+        role: 'REPORTER' // Replaced actorRole
+      }
     };
 
     // Process attachments
@@ -395,6 +396,7 @@ export class TicketService {
       title: dto.title.trim(),
       description: dto.description.trim(),
       category: dto.category,
+      location: { building: dto.building, room: dto.room.trim() },
       building: dto.building,
       room: dto.room.trim(),
       priority: dto.priority || 'medium',
@@ -424,7 +426,7 @@ export class TicketService {
 
   private notifyTicketCreation(ticket: Ticket): void {
     this.notifService.addNotification({
-      userId: ticket.reporterId,
+      userId: ticket.reporterId || '',
       title: 'Ticket Submitted Successfully',
       message: `Your issue #${ticket.id} (${ticket.title}) was received and queued for facility triage.`,
       type: 'ticket_created',
@@ -437,7 +439,7 @@ export class TicketService {
    * Adds a communication comment to a ticket.
    */
   addComment(ticketId: string, content: string): Observable<TicketComment> {
-    const currentUser = this.authService.getCurrentUser();
+    const currentUser = this.auth.getCurrentUser();
     const now = new Date().toISOString();
     const newComment: TicketComment = {
       id: `c-${Date.now()}`,
@@ -466,7 +468,7 @@ export class TicketService {
       if (ticket.id === ticketId) {
         return {
           ...ticket,
-          comments: [...ticket.comments, comment],
+          comments: [...(ticket.comments || []), comment],
           updatedAt: now
         };
       }

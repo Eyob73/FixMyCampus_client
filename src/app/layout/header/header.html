@@ -15,8 +15,7 @@
       <form (submit)="onSearchSubmit(); $event.preventDefault()" class="relative w-full">
         <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-[#94A3B8]">search</span>
         <input
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)"
+          [(ngModel)]="searchQuery"
           name="searchQuery"
           type="text"
           placeholder="Search tickets, campus buildings, issues..."
@@ -79,7 +78,7 @@
 
             <!-- List of latest notifications -->
             <div class="max-h-80 overflow-y-auto divide-y divide-[#F1F5F9]">
-              @for (notif of notifications().slice(0, 4); track notif.id) {
+              @for (notif of notificationsList().slice(0, 4); track notif.id) {
                 <a
                   [routerLink]="notif.ticketId ? ['/ticket', notif.ticketId] : '/notifications'"
                   (click)="closeMenus()"
