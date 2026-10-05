@@ -1,0 +1,73 @@
+<div class="min-h-screen bg-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+    <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-white shadow-md mx-auto mb-4">
+      <span class="material-symbols-outlined text-3xl">domain</span>
+    </div>
+    <h2 class="text-2xl font-bold tracking-tight text-slate-900">FixMyCampus</h2>
+    <p class="mt-1 text-sm text-slate-500 font-medium">Facilities & Plant Operations Dispatch Portal</p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-6 shadow-xl rounded-2xl border border-slate-200/80 sm:px-10 space-y-6">
+      <div class="border-b border-slate-100 pb-4">
+        <h3 class="text-base font-bold text-slate-900">Administrator Sign In</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Enter institutional credentials to access dispatch telemetry</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Campus Staff Email</label>
+          <div class="relative">
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+          <div class="relative">
+            <input
+              type="password"
+              formControlName="password"
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </div>
+
+        <div class="pt-2 space-y-3">
+          <button
+            type="submit"
+            [disabled]="form.invalid || isSubmitting"
+            class="w-full py-2.5 px-4 text-sm font-semibold text-white bg-primary hover:bg-blue-900 rounded-lg shadow-sm focus:outline-hidden focus:ring-2 focus:ring-primary disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+          >
+            @if (isSubmitting) {
+              <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              Verifying...
+            } @else {
+              <span>Sign In as Admin</span>
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="quickAdminLogin()"
+            class="w-full py-2 px-3 text-xs font-semibold text-primary hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-sm">bolt</span>
+            Instant Demo Sign-in (Sarah Jenkins, Lead Admin)
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center pt-2">
+        <p class="text-[11px] text-slate-400">
+          Protected by Campus SSO & Multi-Factor Access Control
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

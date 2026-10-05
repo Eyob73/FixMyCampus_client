@@ -1,0 +1,208 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+        <span>Campus Reporters & Users</span>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+          {{ reporterService.reporters().length }} Users
+        </span>
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+        Students, faculty, and administrative staff reporting campus facilities issues.
+      </p>
+    </div>
+  </div>
+
+  <!-- Search & Role Filter Bar -->
+  <div class="bg-white border border-slate-200 rounded-lg p-3 lg:p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+    <div class="relative flex-1 min-w-[240px] max-w-md">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+      <input
+        type="text"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        placeholder="Search reporter name, email, department..."
+        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded text-sm focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
+      />
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-semibold text-slate-500">Affiliation:</label>
+      <select
+        [ngModel]="roleFilter()"
+        (ngModelChange)="roleFilter.set($event)"
+        class="border border-slate-300 rounded px-3 py-2 bg-white text-xs font-semibold text-slate-700 cursor-pointer"
+      >
+        <option value="ALL">All Roles</option>
+        <option value="STUDENT">Students</option>
+        <option value="FACULTY">Faculty</option>
+        <option value="STAFF">Staff</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Reporters Table -->
+  <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-2xs">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse min-w-[800px]">
+        <thead>
+          <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <th class="py-3 px-4">User</th>
+            <th class="py-3 px-4">Role</th>
+            <th class="py-3 px-4">Department / College</th>
+            <th class="py-3 px-4">Contact</th>
+            <th class="py-3 px-4 text-center">Submitted Tickets</th>
+            <th class="py-3 px-4 text-center">Open Tickets</th>
+            <th class="py-3 px-4">Status</th>
+            <th class="py-3 px-4 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          @for (rep of filteredReporters(); track rep.id) {
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="py-3 px-4">
+                <div class="font-bold text-slate-900">{{ rep.name }}</div>
+                <div class="text-[11px] text-slate-400">{{ rep.email }}</div>
+              </td>
+
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold"
+                  [ngClass]="{
+                    'bg-indigo-50 text-indigo-700': rep.role === 'STUDENT',
+                    'bg-blue-50 text-blue-700': rep.role === 'FACULTY',
+                    'bg-emerald-50 text-emerald-700': rep.role === 'STAFF'
+                  }"
+                >
+                  {{ rep.role }}
+                </span>
+              </td>
+
+              <td class="py-3 px-4 text-slate-700 font-medium">
+                {{ rep.department }}
+              </td>
+
+              <td class="py-3 px-4 text-slate-500">
+                {{ rep.phone }}
+              </td>
+
+              <td class="py-3 px-4 text-center font-bold text-slate-800">
+                {{ rep.submittedTicketsCount }}
+              </td>
+
+              <td class="py-3 px-4 text-center">
+                <span
+                  class="font-bold px-2 py-0.5 rounded-full text-xs"
+                  [ngClass]="rep.openTicketsCount > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-500'"
+                >
+                  {{ rep.openTicketsCount }}
+                </span>
+              </td>
+
+              <td class="py-3 px-4">
+                <app-status-badge [status]="rep.status"></app-status-badge>
+              </td>
+
+              <td class="py-3 px-4 text-right">
+                <button
+                  type="button"
+                  (click)="viewReporter(rep)"
+                  class="px-2.5 py-1 text-xs font-semibold text-primary hover:bg-blue-50 rounded transition-colors"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="py-12 text-center text-slate-400">
+                No campus users match search criteria.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Reporter Details Modal -->
+  @if (showDetailModal && selectedReporter(); as rep) {
+    <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-xl w-full p-6 space-y-5 animate-fade-in">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">{{ rep.name }}</h3>
+            <p class="text-xs text-slate-500">{{ rep.department }} ({{ rep.role }})</p>
+          </div>
+          <button (click)="showDetailModal = false" class="text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <div>
+            <span class="text-slate-400 font-bold block">Email:</span>
+            <span class="text-slate-800 font-semibold">{{ rep.email }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold block">Phone:</span>
+            <span class="text-slate-800 font-semibold">{{ rep.phone }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold block">Member Since:</span>
+            <span class="text-slate-800">{{ rep.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 font-bold block">Account Status:</span>
+            <span class="font-bold text-emerald-600">{{ rep.status }}</span>
+          </div>
+        </div>
+
+        <!-- Submission History -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            Ticket Submission History ({{ selectedReporterTickets().length }})
+          </h4>
+
+          <div class="max-h-60 overflow-y-auto space-y-2">
+            @for (ticket of selectedReporterTickets(); track ticket.id) {
+              <a
+                [routerLink]="['/admin/tickets', ticket.ticketNumber]"
+                (click)="showDetailModal = false"
+                class="p-3 rounded-lg border border-slate-200 hover:border-primary block transition-colors"
+              >
+                <div class="flex items-center justify-between text-xs mb-1">
+                  <span class="font-mono font-bold text-primary">{{ ticket.ticketNumber }}</span>
+                  <app-status-badge [status]="ticket.status"></app-status-badge>
+                </div>
+                <div class="font-bold text-slate-800 text-xs">{{ ticket.title }}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">{{ ticket.building }} • {{ ticket.createdAt | date:'shortDate' }}</div>
+              </a>
+            } @empty {
+              <p class="text-xs text-slate-400 py-4 text-center">No work orders recorded for this user.</p>
+            }
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            (click)="toggleReporterStatus(rep)"
+            class="text-xs font-semibold px-3 py-1.5 rounded transition-colors"
+            [ngClass]="rep.status === 'ACTIVE' ? 'text-amber-700 bg-amber-50 hover:bg-amber-100' : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'"
+          >
+            {{ rep.status === 'ACTIVE' ? 'Deactivate Account' : 'Reactivate Account' }}
+          </button>
+
+          <button
+            type="button"
+            (click)="showDetailModal = false"
+            class="px-4 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
