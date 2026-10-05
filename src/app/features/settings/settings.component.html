@@ -1,0 +1,92 @@
+<div class="space-y-6 max-w-4xl">
+  <div>
+    <h2 class="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">System & Operational Settings</h2>
+    <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+      Configure response SLAs, automatic dispatch triggers, and emergency notification relays.
+    </p>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-lg p-6 shadow-2xs space-y-6">
+    <!-- SLA Thresholds -->
+    <div class="space-y-4">
+      <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-base">timer</span>
+        Target Resolution Service Level Agreements (Hours)
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-rose-600 mb-1">Critical SLA (Hrs)</label>
+          <input
+            type="number"
+            [(ngModel)]="slaCritical"
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded font-bold"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-amber-600 mb-1">High SLA (Hrs)</label>
+          <input
+            type="number"
+            [(ngModel)]="slaHigh"
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded font-bold"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-blue-600 mb-1">Medium SLA (Hrs)</label>
+          <input
+            type="number"
+            [(ngModel)]="slaMedium"
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded font-bold"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Low / Routine SLA (Hrs)</label>
+          <input
+            type="number"
+            [(ngModel)]="slaLow"
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded font-bold"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toggles -->
+    <div class="space-y-4 pt-4 border-t border-slate-100">
+      <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-base">notifications_active</span>
+        Dispatch & Incident Alert Relays
+      </h3>
+
+      <div class="space-y-3">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" [(ngModel)]="emailAlerts" class="rounded text-primary focus:ring-primary/20 w-4 h-4" />
+          <div>
+            <span class="text-sm font-semibold text-slate-800">Direct Email Dispatch to On-Duty Technicians</span>
+            <p class="text-xs text-slate-500">Transmits work order PDF and equipment location coordinates upon ticket creation.</p>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" [(ngModel)]="smsAlerts" class="rounded text-primary focus:ring-primary/20 w-4 h-4" />
+          <div>
+            <span class="text-sm font-semibold text-slate-800">Critical SMS Pager Integration</span>
+            <p class="text-xs text-slate-500">Sends urgent text alert for life safety and major utility leaks.</p>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="pt-4 border-t border-slate-100 flex justify-end">
+      <button
+        type="button"
+        (click)="saveSettings()"
+        class="px-5 py-2 text-xs font-bold text-white bg-primary hover:bg-blue-900 rounded-lg shadow-sm transition-colors"
+      >
+        Save System Configuration
+      </button>
+    </div>
+  </div>
+</div>

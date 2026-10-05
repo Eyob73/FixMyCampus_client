@@ -1,0 +1,24 @@
+<div class="space-y-1">
+  @if (label()) {
+    <label
+      [attr.for]="forId()"
+      class="block text-xs font-semibold text-[#334155]"
+    >
+      {{ label() }}
+      @if (required()) {
+        <span class="text-[#DC2626] ml-0.5">*</span>
+      }
+    </label>
+  }
+
+  <ng-content></ng-content>
+
+  @if (errorMessage()) {
+    <p class="text-xs text-[#DC2626] flex items-center space-x-1 mt-1 font-medium">
+      <span class="material-symbols-outlined text-[14px]">error</span>
+      <span>{{ errorMessage() }}</span>
+    </p>
+  } @else if (hint()) {
+    <p class="text-xs text-[#64748B] mt-0.5">{{ hint() }}</p>
+  }
+</div>

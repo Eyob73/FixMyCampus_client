@@ -1,0 +1,10 @@
+<span
+  class="inline-flex items-center space-x-1.5 rounded-full border transition-colors select-none font-semibold uppercase tracking-[0.04em]"
+  [ngClass]="[
+    config().classes,
+    size() === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-0.5 text-[11px]'
+  ]"
+>
+  <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="config().dotColor"></span>
+  <span>{{ config().label }}</span>
+</span>

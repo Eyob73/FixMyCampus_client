@@ -1,0 +1,402 @@
+<app-page-container>
+  @if (loading()) {
+    <div class="p-20 text-center space-y-3">
+      <span class="w-10 h-10 border-3 border-[#1E3A8A] border-t-transparent rounded-full animate-spin inline-block"></span>
+      <p class="text-sm text-[#64748B]">Loading ticket details...</p>
+    </div>
+  } @else if (error() || !ticket()) {
+    <div class="bg-white border border-[#E2E8F0] rounded-xl p-10 text-center max-w-lg mx-auto space-y-4 shadow-sm">
+      <div class="w-14 h-14 rounded-full bg-[#FEF2F2] text-[#DC2626] flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[32px]">lock</span>
+      </div>
+      <h2 class="text-lg font-bold text-[#0F172A]">Access Restricted or Not Found</h2>
+      <p class="text-xs text-[#64748B]">
+        {{ error() || 'The requested ticket does not exist or you do not have permission to view tickets submitted by other campus accounts.' }}
+      </p>
+      <div class="pt-2">
+        <a
+          routerLink="/my-tickets"
+          class="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#1E3A8A] text-white rounded text-xs font-semibold hover:bg-[#1D4ED8]"
+        >
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Return to My Tickets</span>
+        </a>
+      </div>
+    </div>
+  } @else {
+    <!-- Main Ticket Content -->
+    @let t = ticket()!;
+
+    <!-- Breadcrumb & Back Link -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2 text-xs text-[#64748B]">
+        <a routerLink="/dashboard" class="hover:text-[#1E3A8A] flex items-center space-x-1">
+          <span class="material-symbols-outlined text-[14px]">home</span>
+          <span>Dashboard</span>
+        </a>
+        <span>/</span>
+        <a routerLink="/my-tickets" class="hover:text-[#1E3A8A]">My Tickets</a>
+        <span>/</span>
+        <span class="text-[#0F172A] font-semibold">#{{ t.id }}</span>
+      </div>
+
+      <a
+        routerLink="/my-tickets"
+        class="inline-flex items-center space-x-1 text-xs font-semibold text-[#1E3A8A] hover:underline"
+      >
+        <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+        <span>Back to Ticket List</span>
+      </a>
+    </div>
+
+    <!-- Ticket Header Hero Card -->
+    <div class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-5">
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+        <div class="space-y-2 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-bold text-[#00236F] bg-[#EFF4FF] px-2.5 py-0.5 rounded border border-[#DBEAFE]">
+              Ticket #{{ t.id }}
+            </span>
+            <app-status-badge [status]="t.status"></app-status-badge>
+            <app-status-badge [priority]="t.priority" size="sm"></app-status-badge>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]">
+              {{ t.category }}
+            </span>
+          </div>
+
+          <h1 class="text-2xl font-bold text-[#0F172A] tracking-tight">
+            {{ t.title }}
+          </h1>
+
+          <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-[#64748B]">
+            <span class="flex items-center space-x-1">
+              <span class="material-symbols-outlined text-[15px] text-[#94A3B8]">location_on</span>
+              <span>{{ t.building }} · {{ t.room }}</span>
+            </span>
+            <span class="flex items-center space-x-1">
+              <span class="material-symbols-outlined text-[15px] text-[#94A3B8]">schedule</span>
+              <span>Submitted {{ t.createdAt | date:'MMM d, y, h:mm a' }}</span>
+            </span>
+            <span class="flex items-center space-x-1">
+              <span class="material-symbols-outlined text-[15px] text-[#94A3B8]">update</span>
+              <span>Updated {{ t.updatedAt | date:'MMM d, y, h:mm a' }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Linear Status Tracker Progress Rail -->
+      <div class="border-t border-[#F1F5F9] pt-4">
+        <div class="mb-1 flex items-center justify-between">
+          <span class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+            Issue Lifecycle Progress
+          </span>
+          <span class="text-xs text-[#006398] font-semibold">
+            Status: <span class="capitalize font-bold">{{ t.status.replace('_', ' ') }}</span>
+          </span>
+        </div>
+        <app-ticket-status-tracker [currentStatus]="t.status" orientation="horizontal"></app-ticket-status-tracker>
+      </div>
+    </div>
+
+    <!-- Two Column Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left 2 Cols: Main Content & Threads -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Issue Description -->
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-3">
+          <h2 class="text-sm font-bold text-[#0F172A] flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px] text-[#1E3A8A]">notes</span>
+            <span>Issue Description</span>
+          </h2>
+          <p class="text-sm text-[#334155] leading-relaxed whitespace-pre-line">
+            {{ t.description }}
+          </p>
+
+          @if (t.additionalDetails) {
+            <div class="mt-4 pt-4 border-t border-[#F1F5F9] bg-[#F8FAFC] p-3.5 rounded-lg">
+              <p class="text-xs font-bold text-[#475569] uppercase tracking-wider mb-1">
+                Access & Special Instructions
+              </p>
+              <p class="text-xs text-[#334155]">{{ t.additionalDetails }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Attachments & Photos -->
+        @if (t.attachments && t.attachments.length > 0) {
+          <div class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-4">
+            <h2 class="text-sm font-bold text-[#0F172A] flex items-center justify-between">
+              <span class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-[18px] text-[#1E3A8A]">attach_file</span>
+                <span>Attached Files & Photos ({{ t.attachments.length }})</span>
+              </span>
+            </h2>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              @for (att of t.attachments; track att.id) {
+                <div
+                  (click)="openPreview(att)"
+                  class="group relative border border-[#E2E8F0] rounded-lg overflow-hidden cursor-pointer hover:border-[#1E3A8A] transition-colors bg-[#F8FAFC]"
+                >
+                  @if (att.type.startsWith('image/')) {
+                    <div class="h-32 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                      <img
+                        [src]="att.url"
+                        [alt]="att.name"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      />
+                    </div>
+                  } @else {
+                    <div class="h-32 w-full flex flex-col items-center justify-center text-[#1E3A8A] p-2 text-center">
+                      <span class="material-symbols-outlined text-[36px]">description</span>
+                      <span class="text-[11px] font-semibold mt-1 truncate max-w-full">{{ att.name }}</span>
+                    </div>
+                  }
+                  <div class="p-2 bg-white border-t border-[#E2E8F0]">
+                    <p class="text-xs font-semibold text-[#0F172A] truncate">{{ att.name }}</p>
+                    <span class="text-[10px] text-[#64748B]">Click to preview</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Ticket Activity / Audit Timeline -->
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-4">
+          <h2 class="text-sm font-bold text-[#0F172A] flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px] text-[#1E3A8A]">history</span>
+            <span>Activity History & Audit Log</span>
+          </h2>
+
+          <div class="space-y-4 pl-2">
+            @for (act of t.activities; track act.id; let last = $last) {
+              <div class="relative flex items-start space-x-3">
+                @if (!last) {
+                  <div class="absolute left-3.5 top-6 bottom-0 w-0.5 bg-[#E2E8F0]"></div>
+                }
+                <div class="relative z-10 w-7 h-7 rounded-full bg-[#EFF4FF] border border-[#C7D2FE] text-[#1E3A8A] flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[14px]">check</span>
+                </div>
+                <div class="flex-1 pb-4">
+                  <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold text-[#0F172A]">{{ act.title }}</p>
+                    <span class="text-[11px] text-[#94A3B8]">{{ act.timestamp | date:'MMM d, h:mm a' }}</span>
+                  </div>
+                  <p class="text-xs text-[#444651] mt-0.5">{{ act.description }}</p>
+                  @if (act.actorName) {
+                    <span class="text-[10px] text-[#64748B] block mt-1">Logged by: {{ act.actorName }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Communication & Comments Section -->
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-5">
+          <div class="border-b border-[#F1F5F9] pb-3 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-[#0F172A] flex items-center space-x-2">
+              <span class="material-symbols-outlined text-[18px] text-[#1E3A8A]">chat</span>
+              <span>Communication & Responses ({{ t.comments.length }})</span>
+            </h2>
+            <span class="text-[11px] text-[#64748B]">Visible to assigned technician & facilities</span>
+          </div>
+
+          <!-- Comment Thread List -->
+          <div class="space-y-4">
+            @for (c of t.comments; track c.id) {
+              <div
+                class="p-4 rounded-xl border transition-colors"
+                [ngClass]="c.authorRole === 'technician' ? 'bg-[#F0F9FF] border-[#BAE6FD]' : 'bg-[#F8FAFC] border-[#E2E8F0]'"
+              >
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center space-x-2">
+                    <div
+                      class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                      [ngClass]="c.authorRole === 'technician' ? 'bg-[#0284C7]' : 'bg-[#1E3A8A]'"
+                    >
+                      {{ c.authorName.charAt(0) }}
+                    </div>
+                    <span class="text-xs font-bold text-[#0F172A]">{{ c.authorName }}</span>
+                    <span
+                      class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+                      [ngClass]="c.authorRole === 'technician' ? 'bg-[#E0F2FE] text-[#0369A1]' : 'bg-[#E5EEFF] text-[#00236F]'"
+                    >
+                      {{ c.authorRole }}
+                    </span>
+                  </div>
+                  <span class="text-[10px] text-[#64748B]">
+                    {{ c.createdAt | date:'MMM d, h:mm a' }}
+                  </span>
+                </div>
+                <p class="text-xs text-[#334155] leading-relaxed pl-8">
+                  {{ c.content }}
+                </p>
+              </div>
+            } @empty {
+              <div class="p-6 text-center text-xs text-[#64748B] bg-[#F8FAFC] rounded-xl border border-dashed border-[#CBD5E1]">
+                No comments or updates yet. You can post a message below if you have additional information for the technician.
+              </div>
+            }
+          </div>
+
+          <!-- New Comment Input Box -->
+          <form (submit)="onAddComment(); $event.preventDefault()" class="space-y-3 pt-2">
+            @if (commentError()) {
+              <p class="text-xs text-[#DC2626] font-medium">{{ commentError() }}</p>
+            }
+            <div>
+              <label class="block text-xs font-semibold text-[#334155] mb-1">
+                Post a Response or Note
+              </label>
+              <textarea
+                [ngModel]="newCommentText()"
+                (ngModelChange)="newCommentText.set($event)"
+                name="newComment"
+                rows="3"
+                placeholder="Ask a question or provide schedule availability for this ticket..."
+                class="w-full p-3 bg-white border border-[#CBD5E1] rounded text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/15 resize-y"
+              ></textarea>
+            </div>
+            <div class="flex justify-end">
+              <button
+                type="submit"
+                [disabled]="submittingComment() || !newCommentText().trim()"
+                class="h-[36px] px-4 bg-[#1E3A8A] hover:bg-[#1D4ED8] disabled:opacity-50 text-white rounded text-xs font-semibold flex items-center space-x-1.5 transition-colors"
+              >
+                @if (submittingComment()) {
+                  <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span>Sending...</span>
+                } @else {
+                  <span class="material-symbols-outlined text-[16px]">send</span>
+                  <span>Send Response</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right 1 Col: Dispatcher & Location Info -->
+      <div class="space-y-6">
+        <!-- Assigned Technician Card -->
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-3">
+          <h3 class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+            Assigned Facility Staff
+          </h3>
+          @if (t.assignedTechnician) {
+            <div class="flex items-start space-x-3 pt-1">
+              <div class="w-11 h-11 rounded-full bg-[#0284C7] text-white flex items-center justify-center font-bold text-sm ring-2 ring-[#BAE6FD] shrink-0">
+                {{ t.assignedTechnician.name.charAt(0) }}{{ t.assignedTechnician.name.split(' ')[1]?.charAt(0) || '' }}
+              </div>
+              <div class="space-y-0.5">
+                <p class="text-sm font-bold text-[#0F172A]">{{ t.assignedTechnician.name }}</p>
+                <p class="text-xs text-[#0284C7] font-medium">{{ t.assignedTechnician.specialty || 'Facilities Specialist' }}</p>
+                @if (t.assignedTechnician.phone) {
+                  <p class="text-[11px] text-[#64748B] flex items-center space-x-1 pt-1">
+                    <span class="material-symbols-outlined text-[13px]">phone</span>
+                    <span>{{ t.assignedTechnician.phone }}</span>
+                  </p>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="p-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-lg text-xs text-[#B45309] space-y-1">
+              <div class="flex items-center space-x-1.5 font-bold">
+                <span class="material-symbols-outlined text-[16px]">pending</span>
+                <span>Awaiting Dispatch</span>
+              </div>
+              <p class="text-[11px]">Campus maintenance supervisors are reviewing this ticket for technician assignment.</p>
+            </div>
+          }
+        </div>
+
+        <!-- Location Information Card -->
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-3">
+          <h3 class="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+            Location Details
+          </h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1 border-b border-[#F1F5F9]">
+              <span class="text-[#64748B]">Campus Building:</span>
+              <span class="font-semibold text-[#0F172A]">{{ t.building }}</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-[#F1F5F9]">
+              <span class="text-[#64748B]">Room / Area:</span>
+              <span class="font-semibold text-[#0F172A]">{{ t.room }}</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-[#64748B]">Category:</span>
+              <span class="font-semibold text-[#1E3A8A]">{{ t.category }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submitting Account Card -->
+        <div class="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-2 text-xs">
+          <h3 class="text-[11px] font-bold text-[#64748B] uppercase tracking-wider">
+            Reported By
+          </h3>
+          <p class="font-bold text-[#0F172A]">{{ t.reporterName }}</p>
+          @if (t.reporterEmail) {
+            <p class="text-[#64748B]">{{ t.reporterEmail }}</p>
+          }
+          <p class="text-[11px] text-[#1E3A8A] pt-1">Authorized campus reporter</p>
+        </div>
+
+        <!-- Urgent Escalation Notice -->
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 space-y-2 text-xs">
+          <div class="flex items-center space-x-1.5 text-[#DC2626] font-bold">
+            <span class="material-symbols-outlined text-[16px]">support_agent</span>
+            <span>Need Emergency Help?</span>
+          </div>
+          <p class="text-[#64748B] text-[11px] leading-relaxed">
+            If the situation escalates into a life safety emergency or active flood, contact Facilities Emergency Dispatch:
+          </p>
+          <p class="text-xs font-bold text-[#0F172A] bg-[#FEF2F2] p-2 rounded border border-[#FECACA] text-center">
+            (555) 019-9000 (24/7)
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Preview Lightbox Modal -->
+    @if (previewAttachment()) {
+      <div
+        class="fixed inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in"
+        (click)="closePreview()"
+      >
+        <div
+          class="relative max-w-4xl max-h-[90vh] bg-white rounded-xl overflow-hidden shadow-2xl"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="p-3 bg-white border-b border-[#E2E8F0] flex items-center justify-between">
+            <span class="text-xs font-bold text-[#0F172A] truncate">{{ previewAttachment()?.name }}</span>
+            <button
+              type="button"
+              (click)="closePreview()"
+              class="p-1 rounded text-[#64748B] hover:text-[#0F172A]"
+            >
+              <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+          <div class="p-2 bg-black flex items-center justify-center max-h-[75vh] overflow-auto">
+            <img [src]="previewAttachment()?.url" [alt]="previewAttachment()?.name" class="max-w-full max-h-[70vh] object-contain" />
+          </div>
+          <div class="p-3 bg-[#F8FAFC] flex justify-end">
+            <a
+              [href]="previewAttachment()?.url"
+              target="_blank"
+              class="text-xs font-semibold text-[#1E3A8A] hover:underline flex items-center space-x-1"
+            >
+              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+              <span>Open Full Resolution</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</app-page-container>
