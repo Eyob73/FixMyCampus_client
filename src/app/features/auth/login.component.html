@@ -1,183 +1,152 @@
-<div class="min-h-screen bg-background text-on-surface antialiased flex flex-col justify-between selection:bg-surface-container-high selection:text-primary">
-  <!-- Top Subtle Utility Bar (Institution Status) -->
-  <header class="w-full border-b border-outline-variant bg-surface-container-lowest px-4 sm:px-6 py-2.5 flex items-center justify-between text-xs text-on-surface-variant">
-    <div class="flex items-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>
-      <span class="font-medium text-on-surface-variant">Campus Operations System: Normal Status</span>
-    </div>
-    <div class="hidden sm:flex items-center gap-4 text-xs">
-      <a class="hover:text-primary transition-colors duration-150 flex items-center gap-1 text-on-surface-variant" href="#" (click)="$event.preventDefault()">
-        <span class="material-symbols-outlined text-[16px] text-outline">domain</span>
-        <span>University Physical Plant</span>
-      </a>
-      <span class="text-outline-variant">|</span>
-      <a class="hover:text-primary transition-colors duration-150 flex items-center gap-1 text-on-surface-variant" href="#" (click)="$event.preventDefault()">
-        <span class="material-symbols-outlined text-[16px] text-outline">help_outline</span>
-        <span>Support Desk</span>
-      </a>
-    </div>
-  </header>
+<div class="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden bg-slate-50 antialiased selection:bg-blue-100 selection:text-primary">
+  <!-- Subtle Ambient Glow Accents (Borderless Modern Backdrop) -->
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-200/35 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-200/25 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] bg-gradient-to-tr from-blue-100/25 via-indigo-50/20 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
-  <!-- Centered Login Canvas -->
-  <main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
-    <div class="w-full max-w-[440px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xs p-6 sm:p-8 space-y-6 animate-fade-in">
-      <!-- Institutional Brand Identity Header -->
-      <div class="flex flex-col items-center text-center">
-        <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary mb-3.5 border border-outline-variant shadow-xs">
-          <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">handyman</span>
+  <!-- Attractive Floating Login Card (No Harsh Box Border, No Outer Clutter) -->
+  <main class="w-full max-w-[440px] bg-white rounded-2xl shadow-xl shadow-slate-900/6 p-6 sm:p-9 relative z-10 space-y-6">
+    <!-- Brand Identity Header -->
+    <div class="flex flex-col items-center text-center">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#00236f] to-[#1e3a8a] flex items-center justify-center text-white mb-4 shadow-lg shadow-blue-950/20 transform hover:scale-105 transition-transform duration-200">
+        <span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">handyman</span>
+      </div>
+      <h1 class="text-2xl sm:text-[26px] font-bold text-slate-900 tracking-tight">FixMyCampus</h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1">Campus Issue Reporting &amp; Maintenance</p>
+    </div>
+
+    <!-- Error Alert Notice -->
+    @if (errorMessage()) {
+      <div class="p-3.5 bg-rose-50/90 border border-rose-200/80 rounded-xl flex items-start gap-2.5 text-xs text-rose-900 animate-fade-in" role="alert">
+        <span class="material-symbols-outlined text-base text-rose-600 shrink-0 mt-0.5">error</span>
+        <div class="flex-1 leading-relaxed">
+          <span class="font-semibold block text-rose-950">Authentication Notice</span>
+          {{ errorMessage() }}
         </div>
-        <h1 class="text-2xl font-bold text-primary tracking-tight">FixMyCampus</h1>
-        <p class="text-xs text-on-surface-variant mt-1">Campus Issue Reporting &amp; Maintenance</p>
+      </div>
+    }
+
+    <!-- Authentication Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
+      <!-- University Email Input Field -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-700 tracking-wide" for="universityEmail">
+          University Email
+        </label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[19px]">school</span>
+          </div>
+          <input
+            id="universityEmail"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="name@university.edu"
+            class="w-full h-[42px] pl-10 pr-3.5 bg-slate-50/70 hover:bg-slate-50 focus:bg-white border rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-150"
+            [ngClass]="{
+              'border-rose-300 bg-rose-50/30 focus:border-rose-500 focus:ring-rose-500/10':
+                loginForm.get('email')?.touched && loginForm.get('email')?.invalid,
+              'border-slate-200': !(loginForm.get('email')?.touched && loginForm.get('email')?.invalid)
+            }"
+          />
+        </div>
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')) {
+          <p class="text-[11px] text-rose-600 pl-1 font-medium">University email address is required.</p>
+        } @else if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')) {
+          <p class="text-[11px] text-rose-600 pl-1 font-medium">Please enter a valid university email address.</p>
+        }
       </div>
 
-      <!-- Error Alert Notice -->
-      @if (errorMessage()) {
-        <div class="p-3 bg-error-container border border-error/20 rounded-lg flex items-start gap-2.5 text-xs text-on-error-container animate-fade-in" role="alert">
-          <span class="material-symbols-outlined text-base text-error shrink-0 mt-0.5">error</span>
-          <div class="flex-1 leading-relaxed">
-            <span class="font-bold block">Authentication Notice</span>
-            {{ errorMessage() }}
-          </div>
-        </div>
-      }
-
-      <!-- Authentication Form -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
-        <!-- University Email Input Field -->
-        <div>
-          <label class="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1" for="universityEmail">
-            University Email
+      <!-- Password Input Field -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-slate-700 tracking-wide" for="passwordField">
+            Password
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-              <span class="material-symbols-outlined text-[18px]">school</span>
-            </div>
-            <input
-              id="universityEmail"
-              type="email"
-              formControlName="email"
-              autocomplete="email"
-              placeholder="name@university.edu"
-              class="w-full h-[38px] pl-9 pr-3 py-2 bg-surface-container-lowest border rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors"
-              [ngClass]="{
-                'border-error bg-error-container/20 focus:border-error focus:ring-error':
-                  loginForm.get('email')?.touched && loginForm.get('email')?.invalid,
-                'border-outline-variant': !(loginForm.get('email')?.touched && loginForm.get('email')?.invalid)
-              }"
-            />
-          </div>
-          @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')) {
-            <p class="text-[11px] text-error mt-1">University email address is required.</p>
-          } @else if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')) {
-            <p class="text-[11px] text-error mt-1">Please enter a valid university email address.</p>
-          }
-        </div>
-
-        <!-- Password Input Field -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="text-xs font-semibold text-on-surface uppercase tracking-wider" for="passwordField">
-              Password
-            </label>
-            <a
-              routerLink="/login"
-              (click)="$event.preventDefault()"
-              class="text-xs text-secondary hover:text-primary hover:underline transition-colors"
-              title="Contact facilities department for password recovery"
-            >
-              Forgot password?
-            </a>
-          </div>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-              <span class="material-symbols-outlined text-[18px]">lock</span>
-            </div>
-            <input
-              id="passwordField"
-              [type]="showPassword() ? 'text' : 'password'"
-              formControlName="password"
-              autocomplete="current-password"
-              placeholder="••••••••••••"
-              class="w-full h-[38px] pl-9 pr-10 py-2 bg-surface-container-lowest border rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors"
-              [ngClass]="{
-                'border-error bg-error-container/20 focus:border-error focus:ring-error':
-                  loginForm.get('password')?.touched && loginForm.get('password')?.invalid,
-                'border-outline-variant': !(loginForm.get('password')?.touched && loginForm.get('password')?.invalid)
-              }"
-            />
-            <button
-              type="button"
-              (click)="togglePasswordVisibility()"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface transition-colors"
-              aria-label="Toggle password visibility"
-            >
-              <span class="material-symbols-outlined text-[18px]">
-                {{ showPassword() ? 'visibility_off' : 'visibility' }}
-              </span>
-            </button>
-          </div>
-          @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
-            <p class="text-[11px] text-error mt-1">Password is required.</p>
-          } @else if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')) {
-            <p class="text-[11px] text-error mt-1">Password must be at least 6 characters.</p>
-          }
-        </div>
-
-        <!-- Remember Me Checkbox -->
-        <div class="flex items-center pt-0.5">
-          <input
-            id="rememberMe"
-            type="checkbox"
-            formControlName="rememberMe"
-            class="h-4 w-4 rounded border-outline-variant text-primary-container focus:ring-primary-container focus:ring-offset-0 cursor-pointer"
-          />
-          <label for="rememberMe" class="ml-2 block text-xs text-on-surface-variant cursor-pointer select-none">
-            Keep me signed in on this workstation
-          </label>
-        </div>
-
-        <!-- Primary Action Button -->
-        <div class="pt-1.5">
-          <button
-            type="submit"
-            [disabled]="isSubmitting() || loginForm.invalid"
-            class="w-full h-[38px] px-4 bg-primary-container hover:bg-primary text-on-primary rounded-lg text-sm font-semibold flex items-center justify-center gap-2 shadow-xs transition-all duration-150 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+          <a
+            routerLink="/login"
+            (click)="$event.preventDefault()"
+            class="text-xs text-primary hover:text-blue-800 font-medium transition-colors"
+            title="Contact facilities department for password recovery"
           >
-            @if (isSubmitting()) {
-              <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              <span>Authenticating...</span>
-            } @else {
-              <span>Sign In</span>
-            }
+            Forgot password?
+          </a>
+        </div>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[19px]">lock</span>
+          </div>
+          <input
+            id="passwordField"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="••••••••••••"
+            class="w-full h-[42px] pl-10 pr-11 bg-slate-50/70 hover:bg-slate-50 focus:bg-white border rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-150"
+            [ngClass]="{
+              'border-rose-300 bg-rose-50/30 focus:border-rose-500 focus:ring-rose-500/10':
+                loginForm.get('password')?.touched && loginForm.get('password')?.invalid,
+              'border-slate-200': !(loginForm.get('password')?.touched && loginForm.get('password')?.invalid)
+            }"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors"
+            aria-label="Toggle password visibility"
+          >
+            <span class="material-symbols-outlined text-[19px]">
+              {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
           </button>
         </div>
-      </form>
-
-      <!-- Registration Redirect Link -->
-      <div class="text-center pt-2 border-t border-outline-variant/30">
-        <p class="text-xs text-on-surface-variant">
-          Don't have an account?
-          <a class="font-semibold text-secondary hover:text-primary underline underline-offset-2 ml-1 transition-colors duration-150" href="#" (click)="$event.preventDefault()">
-            Register here
-          </a>
-        </p>
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
+          <p class="text-[11px] text-rose-600 pl-1 font-medium">Password is required.</p>
+        } @else if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')) {
+          <p class="text-[11px] text-rose-600 pl-1 font-medium">Password must be at least 6 characters.</p>
+        }
       </div>
+
+      <!-- Keep Me Signed In Checkbox -->
+      <div class="flex items-center pt-0.5">
+        <input
+          id="rememberMe"
+          type="checkbox"
+          formControlName="rememberMe"
+          class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer transition-colors"
+        />
+        <label for="rememberMe" class="ml-2 block text-xs text-slate-600 cursor-pointer select-none">
+          Keep me signed in on this workstation
+        </label>
+      </div>
+
+      <!-- Primary Action Submit Button -->
+      <div class="pt-2">
+        <button
+          type="submit"
+          [disabled]="isSubmitting() || loginForm.invalid"
+          class="w-full h-[42px] px-5 bg-gradient-to-r from-[#00236f] via-[#1e3a8a] to-[#00236f] hover:from-[#001c59] hover:via-[#162e6e] hover:to-[#001c59] text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-950/20 hover:shadow-lg hover:shadow-blue-950/30 transition-all duration-150 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-primary/20"
+        >
+          @if (isSubmitting()) {
+            <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <span>Authenticating...</span>
+          } @else {
+            <span>Sign In</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          }
+        </button>
+      </div>
+    </form>
+
+    <!-- Registration Redirect Link -->
+    <div class="text-center pt-4 border-t border-slate-100">
+      <p class="text-xs text-slate-500">
+        Don't have an account?
+        <a class="font-semibold text-primary hover:text-blue-800 hover:underline underline-offset-2 ml-1 transition-colors" href="#" (click)="$event.preventDefault()">
+          Register here
+        </a>
+      </p>
     </div>
   </main>
-
-  <!-- Institutional Operations Footer -->
-  <footer class="w-full border-t border-outline-variant bg-surface-container-lowest py-3.5 px-4 sm:px-6">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-on-surface-variant">
-      <div>
-        <span>© 2025 University Physical Plant &amp; Campus Services. All rights reserved.</span>
-      </div>
-      <div class="flex items-center gap-4">
-        <a class="hover:text-primary transition-colors" href="#" (click)="$event.preventDefault()">Privacy Notice</a>
-        <span>•</span>
-        <a class="hover:text-primary transition-colors" href="#" (click)="$event.preventDefault()">Terms of Operations</a>
-        <span>•</span>
-        <a class="hover:text-primary transition-colors" href="#" (click)="$event.preventDefault()">Emergency Protocol</a>
-      </div>
-    </div>
-  </footer>
 </div>
