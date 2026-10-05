@@ -1,1 +1,13 @@
-<p>dashboard-layout works!</p>
+<div class="min-h-screen bg-[#F8FAFC] flex flex-col antialiased">
+  <!-- Side Navigation Bar -->
+  <app-sidebar [isOpen]="sidebarOpen()" (closeSidebar)="closeSidebar()"></app-sidebar>
+
+  <!-- Main Content Wrapper (Shifted 256px on lg screens) -->
+  <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+    <!-- Top Nav Header -->
+    <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+
+    <!-- Routed Page Content -->
+    <router-outlet></router-outlet>
+  </div>
+</div>

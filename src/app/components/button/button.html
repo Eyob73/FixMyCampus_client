@@ -1,1 +1,29 @@
-<p>button works!</p>
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  (click)="onClick($event)"
+  class="inline-flex items-center justify-center font-medium rounded transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed select-none"
+  [ngClass]="{
+    'w-full': fullWidth(),
+    'h-[32px] px-3 text-xs gap-1.5': size() === 'sm',
+    'h-[38px] px-4 text-sm gap-2': size() === 'md',
+    'h-[44px] px-5 text-base gap-2.5': size() === 'lg',
+
+    'bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white shadow-sm': variant() === 'primary',
+    'bg-white text-[#334155] border border-[#CBD5E1] hover:bg-[#F8FAFC] hover:border-[#94A3B8] shadow-xs': variant() === 'secondary' || variant() === 'outline',
+    'bg-white text-[#DC2626] border border-[#FCA5A5] hover:bg-[#FEF2F2] hover:border-[#F87171]': variant() === 'destructive',
+    'bg-transparent text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]': variant() === 'ghost'
+  }"
+>
+  @if (loading()) {
+    <span class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0"></span>
+  } @else if (icon()) {
+    <span class="material-symbols-outlined text-[18px] shrink-0">{{ icon() }}</span>
+  }
+
+  <ng-content></ng-content>
+
+  @if (!loading() && trailingIcon()) {
+    <span class="material-symbols-outlined text-[18px] shrink-0">{{ trailingIcon() }}</span>
+  }
+</button>
