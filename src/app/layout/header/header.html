@@ -1,1 +1,106 @@
-<p>header works!</p>
+<header class="h-16 bg-white border-b border-slate-200 sticky top-0 z-20 px-4 lg:px-8 flex items-center justify-between shadow-2xs">
+  <!-- Left Side: Toggle & Breadcrumb -->
+  <div class="flex items-center gap-3">
+    <!-- Hamburger for mobile -->
+    <button
+      type="button"
+      (click)="toggleSidebar.emit()"
+      class="lg:hidden p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+      aria-label="Toggle navigation"
+    >
+      <span class="material-symbols-outlined text-2xl">menu</span>
+    </button>
+
+    <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+      <span class="material-symbols-outlined text-base text-slate-400">tune</span>
+      <span class="text-slate-900 font-semibold text-sm">Campus Facility Operations</span>
+      <span class="hidden sm:inline text-slate-300">/</span>
+      <span class="hidden sm:inline text-slate-500">Dispatch Portal</span>
+    </div>
+  </div>
+
+  <!-- Right Side Actions -->
+  <div class="flex items-center gap-2 sm:gap-3">
+    <!-- Quick Create Ticket Button -->
+    <button
+      type="button"
+      (click)="openNewTicket.emit()"
+      class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary hover:bg-blue-900 text-white text-xs font-semibold rounded shadow-xs focus:outline-hidden focus:ring-2 focus:ring-primary/40 transition-colors"
+    >
+      <span class="material-symbols-outlined text-base">add</span>
+      <span class="hidden sm:inline">New Ticket</span>
+    </button>
+
+    <!-- Notifications Bell Dropdown -->
+    <div class="relative">
+      <button
+        type="button"
+        (click)="toggleNotifs()"
+        class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+        title="Notifications"
+      >
+        <span class="material-symbols-outlined text-xl">notifications</span>
+        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+      </button>
+
+      <!-- Notifications Panel -->
+      @if (showNotifications) {
+        <div
+          class="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-4 space-y-3 animate-fade-in"
+        >
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-primary">notifications</span>
+              Notifications
+            </h4>
+            <span class="text-[11px] font-semibold text-primary cursor-pointer hover:underline">Mark all read</span>
+          </div>
+
+          <div class="space-y-2 max-h-72 overflow-y-auto">
+            @for (n of notifications; track n.id) {
+              <div class="p-2.5 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors flex items-start gap-3">
+                <span
+                  class="material-symbols-outlined text-base shrink-0 mt-0.5"
+                  [ngClass]="{
+                    'text-rose-600': n.type === 'danger',
+                    'text-emerald-600': n.type === 'success',
+                    'text-blue-600': n.type === 'info'
+                  }"
+                >
+                  {{ n.icon }}
+                </span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-slate-800 leading-snug">{{ n.title }}</p>
+                  <span class="text-[10px] text-slate-400 mt-1 block">{{ n.time }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <button
+            type="button"
+            (click)="goToTickets()"
+            class="w-full py-1.5 text-center text-xs font-semibold text-primary hover:bg-blue-50 rounded transition-colors"
+          >
+            View Ticket Feed
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- User Avatar & Role Badge -->
+    @if (authService.currentUser(); as user) {
+      <div class="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
+        <img
+          [src]="user.avatarUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80'"
+          [alt]="user.name"
+          class="w-8 h-8 rounded-full object-cover border border-slate-300"
+        />
+        <div class="hidden md:block text-left">
+          <p class="text-xs font-bold text-slate-900 leading-none truncate max-w-[120px]">{{ user.name }}</p>
+          <span class="text-[10px] font-medium text-slate-500">Administrator</span>
+        </div>
+      </div>
+    }
+  </div>
+</header>
