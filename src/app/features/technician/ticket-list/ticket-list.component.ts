@@ -2,15 +2,15 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TicketService } from '../../../core/services/ticket.service';
-import { NotificationService } from '../../../core/services/notification.service';
+import { TicketService } from '../../../services/ticket.service';
+import { NotificationService } from '../../../services/notification.service';
 import {
   Ticket,
   TicketFilterOptions,
   TicketStatus,
   TicketPriority,
   PaginatedTicketsResponse,
-} from '../../../core/models/ticket.model';
+} from '../../../models/ticket.model';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
 import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm-modal.component';
@@ -226,8 +226,8 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                     <!-- Location -->
                     <td class="py-4 px-4">
                       <div class="flex flex-col text-xs text-[#334155]">
-                        <span class="font-semibold">{{ ticket.location?.building || ticket.building }}</span>
-                        <span class="text-[#64748B]">{{ ticket.location?.room || ticket.room || 'General' }}</span>
+                        <span class="font-semibold">{{ ticket.building }}</span>
+                        <span class="text-[#64748B]">{{ ticket.room || 'General' }}</span>
                       </div>
                     </td>
 
@@ -235,11 +235,11 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                     <td class="py-4 px-4">
                       <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded-full bg-[#E0E7FF] text-[#4338CA] flex items-center justify-center text-[10px] font-bold shrink-0">
-                          {{ ticket.reporter?.name?.charAt(0) || ticket.reporterName?.charAt(0) }}
+                          {{ ticket.reporterName?.charAt(0) || 'U' }}
                         </div>
                         <div class="flex flex-col min-w-0">
-                          <span class="text-xs font-medium text-[#0F172A] truncate">{{ ticket.reporter?.name || ticket.reporterName }}</span>
-                          <span class="text-[10px] text-[#64748B] truncate">{{ ticket.reporter?.email || ticket.reporterEmail }}</span>
+                          <span class="text-xs font-medium text-[#0F172A] truncate">{{ ticket.reporterName || 'Unknown' }}</span>
+                          <span class="text-[10px] text-[#64748B] truncate">{{ ticket.reporterEmail || 'N/A' }}</span>
                         </div>
                       </div>
                     </td>
@@ -252,7 +252,6 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                     <!-- Dates -->
                     <td class="py-4 px-4">
                       <div class="flex flex-col text-[11px] text-[#64748B]">
-                        <span>Assigned: {{ ticket.assignedAt ? formatDate(ticket.assignedAt) : 'Unassigned' }}</span>
                         <span>Updated: {{ formatTimeAgo(ticket.updatedAt) }}</span>
                       </div>
                     </td>
@@ -414,7 +413,7 @@ export class TicketListComponent implements OnInit {
       page: this.currentPage,
       pageSize: this.pageSize,
       sortBy: 'updatedAt',
-      sortOrder: 'desc',
+      sortDirection: 'desc',
     };
 
     this.ticketService.getTechnicianTickets(options).subscribe({
@@ -488,7 +487,7 @@ export class TicketListComponent implements OnInit {
     this.confirmLoading = true;
 
     this.ticketService
-      .updateTicketStatus(ticketId, 'IN_PROGRESS', 'Technician arrived on site and initiated diagnostic repair.')
+      .updateStatus(ticketId, 'IN_PROGRESS', 'Technician arrived on site and initiated diagnostic repair.')
       .subscribe({
         next: () => {
           this.notification.success(`Ticket #${ticketId} is now marked IN PROGRESS.`);

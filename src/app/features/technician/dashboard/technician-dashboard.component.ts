@@ -1,14 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { TicketService } from '../../../core/services/ticket.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { NotificationService } from '../../../core/services/notification.service';
+import { TicketService } from '../../../services/ticket.service';
+import { AuthService } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
 import {
   TechnicianDashboardStats,
   Ticket,
   TicketStatus,
-} from '../../../core/models/ticket.model';
+} from '../../../models/ticket.model';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
 
@@ -25,7 +25,7 @@ import { PriorityBadge } from '../../../components/priority-badge/priority-badge
         <div class="space-y-1">
           <div class="flex items-center space-x-2.5">
             <h1 class="text-2xl font-bold text-[#0F172A] tracking-tight">
-              Welcome back, {{ authService.currentUser().name.split(' ')[0] }}
+              Welcome back, {{ authService.currentUser()?.name.split(' ')[0] }}
             </h1>
             <span
               class="bg-[#EFF6FF] text-[#1E3A8A] text-xs font-semibold px-2.5 py-0.5 rounded-full border border-[#DBEAFE]"
@@ -412,8 +412,8 @@ import { PriorityBadge } from '../../../components/priority-badge/priority-badge
                     <!-- Location -->
                     <td class="py-3 px-4">
                       <div class="flex flex-col text-xs text-[#334155]">
-                        <span class="font-medium">{{ ticket.location?.building || ticket.building }}</span>
-                        <span class="text-[#64748B]">{{ ticket.location?.room || ticket.room || 'General Area' }}</span>
+                        <span class="font-medium">{{ ticket.building }}</span>
+                        <span class="text-[#64748B]">{{ ticket.room || 'General Area' }}</span>
                       </div>
                     </td>
 
@@ -421,9 +421,9 @@ import { PriorityBadge } from '../../../components/priority-badge/priority-badge
                     <td class="py-3 px-4">
                       <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded-full bg-[#E0E7FF] text-[#4338CA] flex items-center justify-center text-[10px] font-bold">
-                          {{ ticket.reporter?.name?.charAt(0) || ticket.reporterName?.charAt(0) }}
+                          {{ ticket.reporterName?.charAt(0) || 'U' }}
                         </div>
-                        <span class="text-xs text-[#334155] font-medium">{{ ticket.reporter?.name || ticket.reporterName }}</span>
+                        <span class="text-xs text-[#334155] font-medium">{{ ticket.reporterName || 'Unknown' }}</span>
                       </div>
                     </td>
 
@@ -498,7 +498,7 @@ export class TechnicianDashboardComponent implements OnInit {
       },
     });
 
-    this.ticketService.getTechnicianTickets({ pageSize: 6, sortBy: 'updatedAt', sortOrder: 'desc' }).subscribe({
+    this.ticketService.getTechnicianTickets({ pageSize: 6, sortBy: 'updatedAt', sortDirection: 'desc' }).subscribe({
       next: (res) => {
         this.recentTickets.set(res.tickets);
         this.loading.set(false);
@@ -510,7 +510,7 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   quickStartWork(ticket: Ticket): void {
-    this.ticketService.updateTicketStatus(ticket.id, 'IN_PROGRESS', 'Technician started work via quick action.').subscribe({
+    this.ticketService.updateStatus(ticket.id, 'IN_PROGRESS', 'Technician started work via quick action.').subscribe({
       next: () => {
         this.notification.success(`Ticket #${ticket.id} status updated to IN PROGRESS.`);
         this.refreshData();

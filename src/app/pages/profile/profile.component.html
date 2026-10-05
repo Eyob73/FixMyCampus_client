@@ -37,7 +37,7 @@
         <!-- Avatar -->
         <div class="relative inline-block">
           <div class="w-20 h-20 rounded-full bg-[#1E3A8A] text-white flex items-center justify-center text-2xl font-bold mx-auto ring-4 ring-[#EFF4FF]">
-            {{ currentUser().name.charAt(0) }}{{ currentUser().name.split(' ')[1]?.charAt(0) || '' }}
+            {{ currentUser()?.name.charAt(0) }}{{ currentUser()?.name.split(' ')[1]?.charAt(0) || '' }}
           </div>
           <span class="absolute bottom-0 right-1 w-5 h-5 bg-[#10B981] border-2 border-white rounded-full flex items-center justify-center text-white" title="Active Account">
             <span class="material-symbols-outlined text-[12px]">check</span>
@@ -45,8 +45,8 @@
         </div>
 
         <div>
-          <h2 class="text-lg font-bold text-[#0F172A]">{{ currentUser().name }}</h2>
-          <p class="text-xs text-[#64748B]">{{ currentUser().email }}</p>
+          <h2 class="text-lg font-bold text-[#0F172A]">{{ currentUser()?.name }}</h2>
+          <p class="text-xs text-[#64748B]">{{ currentUser()?.email }}</p>
           <div class="mt-2 flex items-center justify-center space-x-1.5">
             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#EFF4FF] text-[#1E3A8A] border border-[#DBEAFE]">
               Reporter
@@ -60,15 +60,15 @@
         <div class="border-t border-[#F1F5F9] pt-4 text-xs text-left space-y-2 text-[#444651]">
           <div class="flex justify-between py-1 border-b border-[#F8FAFC]">
             <span class="text-[#64748B]">Affiliation:</span>
-            <span class="font-semibold text-[#0F172A]">{{ currentUser().affiliation }}</span>
+            <span class="font-semibold text-[#0F172A]">{{ currentUser()?.affiliation }}</span>
           </div>
           <div class="flex justify-between py-1 border-b border-[#F8FAFC]">
             <span class="text-[#64748B]">Default Location:</span>
-            <span class="font-semibold text-[#0F172A] truncate max-w-[160px]">{{ currentUser().departmentOrHall }}</span>
+            <span class="font-semibold text-[#0F172A] truncate max-w-[160px]">{{ currentUser()?.departmentOrHall }}</span>
           </div>
           <div class="flex justify-between py-1">
             <span class="text-[#64748B]">Account Status:</span>
-            <span class="font-semibold text-[#10B981] capitalize">{{ currentUser().accountStatus }}</span>
+            <span class="font-semibold text-[#10B981] capitalize">{{ currentUser()?.accountStatus }}</span>
           </div>
         </div>
       </div>
@@ -138,7 +138,7 @@
             <div class="relative">
               <input
                 type="email"
-                [value]="currentUser().email"
+                [value]="currentUser()?.email"
                 disabled
                 class="w-full h-[40px] pl-3.5 pr-9 bg-[#F1F5F9] border border-[#CBD5E1] rounded text-sm text-[#64748B] cursor-not-allowed select-none"
               />

@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TicketService } from './ticket.service';
 import { AuthService } from './auth.service';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 describe('TicketService', () => {
   let service: TicketService;
@@ -124,7 +124,7 @@ describe('TicketService', () => {
     expect(newTicket.id).toBeDefined();
     expect(newTicket.title).toBe('Broken Radiator Valve');
     expect(newTicket.status).toBe('new');
-    expect(newTicket.reporterId).toBe(authService.getCurrentUser().id);
+    expect(newTicket.reporterId).toBe(authService.getcurrentUser()?.id);
     expect(newTicket.activities.length).toBe(1);
   });
 
@@ -137,7 +137,7 @@ describe('TicketService', () => {
       service.addComment(ticket.id, 'Here is additional information.')
     );
     expect(comment.content).toBe('Here is additional information.');
-    expect(comment.authorId).toBe(authService.getCurrentUser().id);
+    expect(comment.authorId).toBe(authService.getcurrentUser()?.id);
 
     const updated = await firstValueFrom(service.getTicketById(ticket.id));
     expect(updated?.comments.length).toBe(initialCommentCount + 1);

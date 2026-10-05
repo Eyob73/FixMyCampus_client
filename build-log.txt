@@ -1,0 +1,1199 @@
+
+> fix-my-campus-client@0.0.0 build
+> ng build
+
+> Building...
+√ Building...
+Application bundle generation failed. [9.625 seconds] - 2026-10-05T14:11:46.765Z
+
+X [ERROR] Could not resolve "../services/auth.service"
+
+    src/app/core/guards/technician.guard.ts:3:28:
+      3 │ import { AuthService } from '../services/auth.service';
+        ╵                             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "../services/notification.service"
+
+    src/app/core/guards/technician.guard.ts:4:36:
+      4 │ ...rt { NotificationService } from '../services/notification.service';
+        ╵                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] Could not resolve "../../../environments/environment"
+
+    src/app/services/ticket.service.ts:4:28:
+      4 │ import { environment } from '../../../environments/environment';
+        ╵                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '../models/notification.model' or its corresponding type declarations. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/notification.service.ts:4:32:
+      4 │ import { AppNotification } from '../models/notification.model';
+        ╵                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '../../../environments/environment' or its corresponding type declarations. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:4:28:
+      4 │ import { environment } from '../../../environments/environment';
+        ╵                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'TechnicianDashboardStats'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:7:2:
+      7 │   TechnicianDashboardStats,
+        ╵   ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'TicketFilterOptions'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:8:2:
+      8 │   TicketFilterOptions,
+        ╵   ~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'PaginatedTicketsResponse'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:9:2:
+      9 │   PaginatedTicketsResponse,
+        ╵   ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'WorkNoteType'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:11:2:
+      11 │   WorkNoteType,
+         ╵   ~~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'TicketResolution'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:12:2:
+      12 │   TicketResolution,
+         ╵   ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2724: '"../models/ticket.model"' has no exported member named 'TicketStats'. Did you mean 'TicketStatus'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:13:2:
+      13 │   TicketStats,
+         ╵   ~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'TicketFilter'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:15:2:
+      15 │   TicketFilter,
+         ╵   ~~~~~~~~~~~~
+
+
+X [ERROR] TS2305: Module '"../models/ticket.model"' has no exported member 'TicketComment'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:16:2:
+      16 │   TicketComment,
+         ╵   ~~~~~~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"new"' is not assignable to type 'TicketStatus'. Did you mean '"NEW"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:45:21:
+      45 │     if (s === 'new') return 'new';
+         ╵                      ~~~~~~
+
+
+X [ERROR] TS2820: Type '"in_progress"' is not assignable to type 'TicketStatus'. Did you mean '"IN_PROGRESS"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:46:51:
+      46 │ ... (s === 'inprogress' || s === 'in progress') return 'in_progress';
+         ╵                                                 ~~~~~~
+
+
+X [ERROR] TS2820: Type '"resolved"' is not assignable to type 'TicketStatus'. Did you mean '"RESOLVED"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:47:26:
+      47 │     if (s === 'resolved') return 'resolved';
+         ╵                           ~~~~~~
+
+
+X [ERROR] TS2820: Type '"closed"' is not assignable to type 'TicketStatus'. Did you mean '"CLOSED"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:48:24:
+      48 │     if (s === 'closed') return 'closed';
+         ╵                         ~~~~~~
+
+
+X [ERROR] TS2820: Type '"new"' is not assignable to type 'TicketStatus'. Did you mean '"NEW"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:49:4:
+      49 │     return 'new'; // default
+         ╵     ~~~~~~
+
+
+X [ERROR] TS2820: Type '"medium"' is not assignable to type 'TicketPriority'. Did you mean '"MEDIUM"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:64:6:
+      64 │       priority: 'medium', // Fallback as .NET doesn't seem to have...
+         ╵       ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"resolved"' have no overlap. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:142:8:
+      142 │     if (newStatus === 'resolved') endpoint = 'resolve';
+          ╵         ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type '"resolved"' is not assignable to parameter of type 'TicketStatus'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:161:39:
+      161 │ ...is.updateTicketStatus(id, 'resolved', resolution.resolutionDes...
+          ╵                              ~~~~~~~~~~
+
+
+X [ERROR] TS4111: Property 'resolutionDescription' comes from an index signature, so it must be accessed with ['resolutionDescription']. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:161:62:
+      161 │ ...teTicketStatus(id, 'resolved', resolution.resolutionDescription);
+          ╵                                              ~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"new"' have no overlap. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:185:39:
+      185 │         openCount: tickets.filter(t => t.status === 'new').length,
+          ╵                                        ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"in_progress"' have no overlap. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:186:45:
+      186 │ ...essCount: tickets.filter(t => t.status === 'in_progress').length,
+          ╵                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"resolved"' have no overlap. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:187:43:
+      187 │ ...solvedCount: tickets.filter(t => t.status === 'resolved').length,
+          ╵                                     ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"closed"' have no overlap. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:188:41:
+      188 │ ...   closedCount: tickets.filter(t => t.status === 'closed').length
+          ╵                                        ~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:36:17:
+      36 │     const name = this.currentUser().name || 'Tech';
+         ╵                  ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'assignedTechnician' does not exist on type 'Ticket'. Did you mean 'assignedTechnicianId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:61:74:
+      61 │ ...ets().filter((t) => !t.assignedTechnician && t.status !== 'clos...
+         ╵                           ~~~~~~~~~~~~~~~~~~
+
+  'assignedTechnicianId' is declared here.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:40:2:
+      40 │   assignedTechnicianId?: string;
+         ╵   ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"closed"' have no overlap. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:61:96:
+      61 │ ...ssignedTechnician && t.status !== 'closed' && t.status !== 'CLO...
+         ╵                         ~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.html:84:27:
+      84 │           {{ currentUser().name.charAt(0) }}{{ currentUser().name....
+         ╵                            ~~~~
+
+  Error occurs in the template of component SidebarComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:20:15:
+      20 │   templateUrl: './sidebar.html',
+         ╵                ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.html:84:61:
+      84 │ ....charAt(0) }}{{ currentUser().name.split(' ')[1]?.charAt(0) || ...
+         ╵                                  ~~~~
+
+  Error occurs in the template of component SidebarComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:20:15:
+      20 │   templateUrl: './sidebar.html',
+         ╵                ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.html:87:87:
+      87 │ ...-semibold text-[#0F172A] truncate">{{ currentUser().name }}</span>
+         ╵                                                        ~~~~
+
+  Error occurs in the template of component SidebarComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:20:15:
+      20 │   templateUrl: './sidebar.html',
+         ╵                ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.html:88:77:
+      88 │ ...t-[10px] text-[#64748B] truncate">{{ currentUser().email }}</span>
+         ╵                                                       ~~~~~
+
+  Error occurs in the template of component SidebarComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/sidebar/sidebar.ts:20:15:
+      20 │   templateUrl: './sidebar.html',
+         ╵                ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:36:17:
+      36 │     const name = this.currentUser().name || 'Tech';
+         ╵                  ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.html:134:29:
+      134 │             {{ currentUser().name.charAt(0) }}{{ currentUser().na...
+          ╵                              ~~~~
+
+  Error occurs in the template of component HeaderComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:13:15:
+      13 │   templateUrl: './header.html',
+         ╵                ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.html:134:63:
+      134 │ ...charAt(0) }}{{ currentUser().name.split(' ')[1]?.charAt(0) || ...
+          ╵                                 ~~~~
+
+  Error occurs in the template of component HeaderComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:13:15:
+      13 │   templateUrl: './header.html',
+         ╵                ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.html:137:94:
+      137 │ ...old text-[#0F172A] leading-tight">{{ currentUser().name }}</span>
+          ╵                                                       ~~~~
+
+  Error occurs in the template of component HeaderComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:13:15:
+      13 │   templateUrl: './header.html',
+         ╵                ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.html:151:75:
+      151 │ ...s="text-xs font-bold text-[#0F172A]">{{ currentUser().name }}</p>
+          ╵                                                          ~~~~
+
+  Error occurs in the template of component HeaderComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:13:15:
+      13 │   templateUrl: './header.html',
+         ╵                ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.html:152:78:
+      152 │ ...ext-[11px] text-[#64748B] truncate">{{ currentUser().email }}</p>
+          ╵                                                         ~~~~~
+
+  Error occurs in the template of component HeaderComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:13:15:
+      13 │   templateUrl: './header.html',
+         ╵                ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.html:154:33:
+      154 │                 {{ currentUser().affiliation }}
+          ╵                                  ~~~~~~~~~~~
+
+  Error occurs in the template of component HeaderComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/layout/header/header.ts:13:15:
+      13 │   templateUrl: './header.html',
+         ╵                ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '../services/auth.service' or its corresponding type declarations. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/guards/technician.guard.ts:3:28:
+      3 │ import { AuthService } from '../services/auth.service';
+        ╵                             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '../services/notification.service' or its corresponding type declarations. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/guards/technician.guard.ts:4:36:
+      4 │ ...rt { NotificationService } from '../services/notification.service';
+        ╵                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS18046: 'authService' is of type 'unknown'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/guards/technician.guard.ts:11:6:
+      11 │   if (authService.isTechnician()) {
+         ╵       ~~~~~~~~~~~
+
+
+X [ERROR] TS18046: 'notificationService' is of type 'unknown'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/guards/technician.guard.ts:15:2:
+      15 │   notificationService.error('Access restricted to authenticated ma...
+         ╵   ~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'deleteTicket' does not exist on type 'TicketService'. Did you mean 'selectedTicket'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-list/ticket-list.component.ts:161:25:
+      161 │       this.ticketService.deleteTicket(this.ticketToDelete).subscr...
+          ╵                          ~~~~~~~~~~~~
+
+  'selectedTicket' is declared here.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:36:11:
+      36 │   readonly selectedTicket = signal<Ticket | null>(null);
+         ╵            ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'updateStatus' does not exist on type 'TicketService'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-list/ticket-list.component.ts:181:25:
+      181 │       this.ticketService.updateStatus(id, this.bulkStatusTarget)....
+          ╵                          ~~~~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'Ticket | null' is not assignable to parameter of type 'Ticket | undefined'.
+  Type 'null' is not assignable to type 'Ticket | undefined'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:64:24:
+      64 │         this.ticket.set(t);
+         ╵                         ^
+
+
+X [ERROR] TS2339: Property 'assignTechnician' does not exist on type 'TicketService'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:108:7:
+      108 │       .assignTechnician(t.id, tech.id, tech.name, tech.specialty)
+          ╵        ~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'updated' implicitly has an 'any' type. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:110:15:
+      110 │         next: (updated) => {
+          ╵                ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'updateStatus' does not exist on type 'TicketService'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:133:7:
+      133 │       .updateStatus(t.id, this.targetStatus, this.statusComment)
+          ╵        ~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'updated' implicitly has an 'any' type. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:135:15:
+      135 │         next: (updated) => {
+          ╵                ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'updatePriority' does not exist on type 'TicketService'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:150:23:
+      150 │     this.ticketService.updatePriority(t.id, newPriority).subscribe({
+          ╵                        ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'updated' implicitly has an 'any' type. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:151:13:
+      151 │       next: (updated) => {
+          ╵              ~~~~~~~
+
+
+X [ERROR] TS2339: Property 'addInternalNote' does not exist on type 'TicketService'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:163:23:
+      163 │     this.ticketService.addInternalNote(t.id, text).subscribe({
+          ╵                        ~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS7006: Parameter 'updated' implicitly has an 'any' type. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:164:13:
+      164 │       next: (updated) => {
+          ╵              ~~~~~~~
+
+
+X [ERROR] TS2551: Property 'deleteTicket' does not exist on type 'TicketService'. Did you mean 'selectedTicket'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/tickets/ticket-detail/ticket-detail.component.ts:176:23:
+      176 │     this.ticketService.deleteTicket(t.id).subscribe({
+          ╵                        ~~~~~~~~~~~~
+
+  'selectedTicket' is declared here.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/services/ticket.service.ts:36:11:
+      36 │   readonly selectedTicket = signal<Ticket | null>(null);
+         ╵            ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2307: Cannot find module '../models/notification.model' or its corresponding type declarations. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:3:32:
+      3 │ import { AppNotification } from '../models/notification.model';
+        ╵                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"reporter"' is not assignable to type 'UserRole'. Did you mean '"REPORTER"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:10:2:
+      10 │   role: 'reporter',
+         ╵   ~~~~
+
+  The expected type comes from property 'role' which is declared here on type 'User'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/user.model.ts:7:2:
+      7 │   role: UserRole;
+        ╵   ~~~~
+
+
+X [ERROR] TS2322: Type '"Equipment"' is not assignable to type 'TicketCategory'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:31:4:
+      31 │     category: 'Equipment',
+         ╵     ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:31:2:
+      31 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"high"' is not assignable to type 'TicketPriority'. Did you mean '"HIGH"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:34:4:
+      34 │     priority: 'high',
+         ╵     ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"in_progress"' is not assignable to type 'TicketStatus'. Did you mean '"IN_PROGRESS"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:35:4:
+      35 │     status: 'in_progress',
+         ╵     ~~~~~~
+
+  The expected type comes from property 'status' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:45:2:
+      45 │   status: TicketStatus;
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2353: Object literal may only specify known properties, and 'name' does not exist in type 'TicketAttachment'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:45:8:
+      45 │         name: 'projector_error_light.jpg',
+         ╵         ~~~~
+
+
+X [ERROR] TS2820: Type '"Plumbing"' is not assignable to type 'TicketCategory'. Did you mean '"PLUMBING"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:121:4:
+      121 │     category: 'Plumbing',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:31:2:
+      31 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"high"' is not assignable to type 'TicketPriority'. Did you mean '"HIGH"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:124:4:
+      124 │     priority: 'high',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"assigned"' is not assignable to type 'TicketStatus'. Did you mean '"ASSIGNED"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:125:4:
+      125 │     status: 'assigned',
+          ╵     ~~~~~~
+
+  The expected type comes from property 'status' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:45:2:
+      45 │   status: TicketStatus;
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2820: Type '"Electrical"' is not assignable to type 'TicketCategory'. Did you mean '"ELECTRICAL"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:181:4:
+      181 │     category: 'Electrical',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:31:2:
+      31 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"medium"' is not assignable to type 'TicketPriority'. Did you mean '"MEDIUM"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:184:4:
+      184 │     priority: 'medium',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"new"' is not assignable to type 'TicketStatus'. Did you mean '"NEW"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:185:4:
+      185 │     status: 'new',
+          ╵     ~~~~~~
+
+  The expected type comes from property 'status' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:45:2:
+      45 │   status: TicketStatus;
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2322: Type '"Network & Wi-Fi"' is not assignable to type 'TicketCategory'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:213:4:
+      213 │     category: 'Network & Wi-Fi',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:31:2:
+      31 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"medium"' is not assignable to type 'TicketPriority'. Did you mean '"MEDIUM"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:216:4:
+      216 │     priority: 'medium',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"resolved"' is not assignable to type 'TicketStatus'. Did you mean '"RESOLVED"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:217:4:
+      217 │     status: 'resolved',
+          ╵     ~~~~~~
+
+  The expected type comes from property 'status' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:45:2:
+      45 │   status: TicketStatus;
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2322: Type '"Furniture"' is not assignable to type 'TicketCategory'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:296:4:
+      296 │     category: 'Furniture',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:31:2:
+      31 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"low"' is not assignable to type 'TicketPriority'. Did you mean '"LOW"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:299:4:
+      299 │     priority: 'low',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"resolved"' is not assignable to type 'TicketStatus'. Did you mean '"RESOLVED"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:300:4:
+      300 │     status: 'resolved',
+          ╵     ~~~~~~
+
+  The expected type comes from property 'status' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:45:2:
+      45 │   status: TicketStatus;
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2322: Type '"HVAC / Climate"' is not assignable to type 'TicketCategory'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:355:4:
+      355 │     category: 'HVAC / Climate',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:31:2:
+      31 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"medium"' is not assignable to type 'TicketPriority'. Did you mean '"MEDIUM"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:358:4:
+      358 │     priority: 'medium',
+          ╵     ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:44:2:
+      44 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2820: Type '"closed"' is not assignable to type 'TicketStatus'. Did you mean '"CLOSED"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/mock-data.ts:359:4:
+      359 │     status: 'closed',
+          ╵     ~~~~~~
+
+  The expected type comes from property 'status' which is declared here on type 'Ticket'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:45:2:
+      45 │   status: TicketStatus;
+         ╵   ~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").Ticket[]' is not assignable to parameter of type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").Ticket[]'.
+  Property 'activities' is missing in type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").Ticket' but required in type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/dashboard/dashboard.component.ts:66:34:
+      66 │         this.allRecentTickets.set(tickets);
+         ╵                                   ~~~~~~~
+
+  'activities' is declared here.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model.ts:164:2:
+      164 │   activities: TicketActivity[];
+          ╵   ~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/dashboard/dashboard.component.html:6:100:
+      6 │ ...0F172A] tracking-tight">Welcome back, {{ currentUser().name }}</h1>
+        ╵                                                           ~~~~
+
+  Error occurs in the template of component DashboardComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/dashboard/dashboard.component.ts:22:15:
+      22 │   templateUrl: './dashboard.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2322: Type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").TicketCategory' is not assignable to type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").TicketCategory'.
+  Type '"Electrical"' is not assignable to type 'TicketCategory'. Did you mean '"ELECTRICAL"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/report-issue/report-issue.component.ts:164:8:
+      164 │         category: formValue.category as TicketCategory,
+          ╵         ~~~~~~~~
+
+  The expected type comes from property 'category' which is declared here on type 'CreateTicketDto'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:58:2:
+      58 │   category: TicketCategory;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2322: Type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").TicketPriority' is not assignable to type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").TicketPriority'.
+  Type '"medium"' is not assignable to type 'TicketPriority'. Did you mean '"MEDIUM"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/report-issue/report-issue.component.ts:167:8:
+      167 │         priority: formValue.priority as TicketPriority,
+          ╵         ~~~~~~~~
+
+  The expected type comes from property 'priority' which is declared here on type 'CreateTicketDto'
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model.ts:62:2:
+      62 │   priority: TicketPriority;
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").Ticket[]' is not assignable to parameter of type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").Ticket[]'.
+  Property 'activities' is missing in type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").Ticket' but required in type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/my-tickets/my-tickets.component.ts:137:25:
+      137 │         this.tickets.set(data);
+          ╵                          ~~~~
+
+  'activities' is declared here.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model.ts:164:2:
+      164 │   activities: TicketActivity[];
+          ╵   ~~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").Ticket' is not assignable to parameter of type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").Ticket'.
+  Property 'activities' is missing in type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").Ticket' but required in type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/ticket-details/ticket-details.component.ts:69:26:
+      69 │           this.ticket.set(data);
+         ╵                           ~~~~
+
+  'activities' is declared here.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model.ts:164:2:
+      164 │   activities: TicketActivity[];
+          ╵   ~~~~~~~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:49:12:
+      49 │       name: user.name,
+         ╵             ~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:50:13:
+      50 │       phone: user.phone || '',
+         ╵              ~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:51:24:
+      51 │       departmentOrHall: user.departmentOrHall || '',
+         ╵                         ~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:52:19:
+      52 │       affiliation: user.affiliation || '',
+         ╵                    ~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:53:26:
+      53 │       emailNotifications: user.notificationPreferences?.email ?? t...
+         ╵                           ~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:54:27:
+      54 │       statusNotifications: user.notificationPreferences?.ticketSta...
+         ╵                            ~~~~
+
+
+X [ERROR] TS18047: 'user' is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:55:28:
+      55 │       commentNotifications: user.notificationPreferences?.ticketCo...
+         ╵                             ~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:40:29:
+      40 │             {{ currentUser().name.charAt(0) }}{{ currentUser().nam...
+         ╵                              ~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:40:63:
+      40 │ ....charAt(0) }}{{ currentUser().name.split(' ')[1]?.charAt(0) || ...
+         ╵                                  ~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:48:72:
+      48 │ ...s="text-lg font-bold text-[#0F172A]">{{ currentUser().name }}</h2>
+         ╵                                                          ~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:49:61:
+      49 │ ...   <p class="text-xs text-[#64748B]">{{ currentUser().email }}</p>
+         ╵                                                          ~~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:63:72:
+      63 │ ...nt-semibold text-[#0F172A]">{{ currentUser().affiliation }}</span>
+         ╵                                                 ~~~~~~~~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:67:95:
+      67 │ ...runcate max-w-[160px]">{{ currentUser().departmentOrHall }}</span>
+         ╵                                            ~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:71:83:
+      71 │ ...ext-[#10B981] capitalize">{{ currentUser().accountStatus }}</span>
+         ╵                                               ~~~~~~~~~~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.html:141:39:
+      141 │                 [value]="currentUser().email"
+          ╵                                        ~~~~~
+
+  Error occurs in the template of component ProfileComponent.
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/pages/profile/profile.component.ts:21:15:
+      21 │   templateUrl: './profile.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/dashboard/technician-dashboard.component.ts:28:57:
+      28 │ ...  Welcome back, {{ authService.currentUser().name.split(' ')[0] }}
+         ╵                                                 ~~~~
+
+
+X [ERROR] TS2322: Type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").TicketAttachment[]' is not assignable to type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").TicketAttachment[]'.
+  Type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").TicketAttachment' is not assignable to type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").TicketAttachment'.
+    Types of property 'fileSize' are incompatible.
+      Type 'number' is not assignable to type 'string'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:838:4:
+      838 │     return (this.ticket()?.attachments || []).filter((a) => !a.is...
+          ╵     ~~~~~~
+
+
+X [ERROR] TS2339: Property 'isEvidence' does not exist on type 'TicketAttachment'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:838:63:
+      838 │ ... (this.ticket()?.attachments || []).filter((a) => !a.isEvidence);
+          ╵                                                         ~~~~~~~~~~
+
+
+X [ERROR] TS2322: Type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").TicketAttachment[]' is not assignable to type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").TicketAttachment[]'.
+  Type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/models/ticket.model").TicketAttachment' is not assignable to type 'import("C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/core/models/ticket.model").TicketAttachment'.
+    Types of property 'fileSize' are incompatible.
+      Type 'number' is not assignable to type 'string'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:842:4:
+      842 │     return (this.ticket()?.attachments || []).filter((a) => a.isE...
+          ╵     ~~~~~~
+
+
+X [ERROR] TS2339: Property 'isEvidence' does not exist on type 'TicketAttachment'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:842:62:
+      842 │ ...n (this.ticket()?.attachments || []).filter((a) => a.isEvidence);
+          ╵                                                         ~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'activities' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:846:37:
+      846 │     const list = [...(this.ticket()?.activities || [])];
+          ╵                                      ~~~~~~~~~~
+
+
+X [ERROR] TS2345: Argument of type '"NEW" | "ASSIGNED" | "IN_PROGRESS" | "CLOSED" | "new" | "in_progress" | "resolved" | "closed" | "assigned"' is not assignable to parameter of type 'TicketStatus'.
+  Type '"new"' is not assignable to type 'TicketStatus'. Did you mean '"NEW"'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:886:38:
+      886 │ ...tStatus(current.id, this.manualStatusSelect, `Technician updat...
+          ╵                        ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'location' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:92:29:
+      92 │                 {{ ticket()!.location?.building }} &bull; {{ ticke...
+         ╵                              ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'location' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:92:71:
+      92 │ ...uilding }} &bull; {{ ticket()!.location?.room || 'General Area' }}
+         ╵                                   ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'location' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:221:39:
+      221 │ ...        <span>{{ ticket()!.location?.building }} &bull; {{ tic...
+          ╵                               ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'location' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:221:81:
+      221 │ ...ding }} &bull; {{ ticket()!.location?.room || 'General' }}</span>
+          ╵                                ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'location' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:223:33:
+      223 │                   @if (ticket()!.location?.campusZone) {
+          ╵                                  ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'location' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:224:87:
+      224 │ ...8B] block pl-6">Zone: {{ ticket()!.location?.campusZone }}</span>
+          ╵                                       ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'assignedTechnician' does not exist on type 'Ticket'. Did you mean 'assignedTechnicianId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:234:39:
+      234 │ ...   <span>{{ ticket()!.assignedTechnician?.name || authService....
+          ╵                          ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:234:93:
+      234 │ ...ignedTechnician?.name || authService.currentUser().name }}</span>
+          ╵                                                       ~~~~
+
+
+X [ERROR] TS2551: Property 'assignedTechnician' does not exist on type 'Ticket'. Did you mean 'assignedTechnicianId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:237:33:
+      237 │ ...         {{ ticket()!.assignedTechnician?.department || authSe...
+          ╵                          ~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2531: Object is possibly 'null'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:237:93:
+      237 │ ...Technician?.department || authService.currentUser().department }}
+          ╵                                                        ~~~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:249:37:
+      249 │ ...                 {{ ticket()!.reporter?.name?.charAt(0) || '?' }}
+          ╵                                  ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:253:39:
+      253 │                           {{ ticket()!.reporter?.name }}
+          ╵                                        ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:254:41:
+      254 │                           @if (ticket()!.reporter?.studentStaffId) {
+          ╵                                          ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:255:101:
+      255 │ ...48B] ml-1">(ID: #{{ ticket()!.reporter?.studentStaffId }})</span>
+          ╵                                  ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:258:71:
+      258 │ ...xt-[#64748B]">{{ ticket()!.reporter?.role }} &bull; {{ ticket(...
+          ╵                               ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:258:109:
+      258 │ ...ole }} &bull; {{ ticket()!.reporter?.department || 'Campus Com...
+          ╵                               ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:264:54:
+      264 │ ...                   [href]="'mailto:' + ticket()!.reporter?.email"
+          ╵                                                     ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:270:37:
+      270 │                       @if (ticket()!.reporter?.phone) {
+          ╵                                      ~~~~~~~~
+
+
+X [ERROR] TS2551: Property 'reporter' does not exist on type 'Ticket'. Did you mean 'reporterId'? [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:272:53:
+      272 │ ...                      [href]="'tel:' + ticket()!.reporter?.phone"
+          ╵                                                     ~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'assignedAt' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:289:92:
+      289 │ ...font-medium">{{ formatFullDate(ticket()!.assignedAt || '') }}</p>
+          ╵                                             ~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'resolution' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:332:27:
+      332 │             @if (ticket()!.resolution; as res) {
+          ╵                            ~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'resolution' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:332:27:
+      332 │             @if (ticket()!.resolution; as res) {
+          ╵                            ~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'activities' does not exist on type 'Ticket'. [plugin angular-compiler]
+
+    C:/Users/sata/Desktop/project/FixMyCampus/FixMyCampus_client/src/app/features/technician/ticket-detail/ticket-detail.component.ts:612:76:
+      612 │ ...o text-[#64748B]">{{ ticket()!.activities.length }} events</span>
+          ╵                                   ~~~~~~~~~~
+
+

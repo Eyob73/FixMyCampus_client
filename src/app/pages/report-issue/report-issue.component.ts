@@ -2,9 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TicketService } from '../../core/services/ticket.service';
-import { TicketCategory, TicketPriority } from '../../core/models/ticket.model';
-import { CAMPUS_BUILDINGS, TICKET_CATEGORIES } from '../../core/services/mock-data';
+import { TicketService } from '../../services/ticket.service';
+import { TicketCategory, TicketPriority } from '../../models/ticket.model';
+import { CAMPUS_BUILDINGS, TICKET_CATEGORIES } from '../../core/mock-data';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 import { FormFieldComponent } from '../../components/form-field/form-field';
 
@@ -199,7 +199,7 @@ export class ReportIssueComponent {
       category: '',
       building: '',
       room: '',
-      priority: 'medium',
+      priority: 'MEDIUM',
       description: '',
       additionalDetails: ''
     });

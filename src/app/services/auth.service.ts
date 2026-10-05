@@ -1,9 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, catchError, map, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, tap, throwError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthResponse, LoginRequest, User, UserRole } from '../models';
+import { AuthResponse, LoginRequest, User, UserRole, UpdateProfileDto } from '../models';
 
 export const SUPPORTED_ROLES: readonly UserRole[] = ['ADMIN', 'TECHNICIAN', 'REPORTER'] as const;
 
@@ -56,6 +56,10 @@ export class AuthService {
     return this.currentUserSignal()?.role === 'REPORTER';
   }
 
+  public getCurrentUser(): User | null {
+    return this.currentUserSignal();
+  }
+
   /**
    * Determine redirect route based on verified role
    */
@@ -104,6 +108,33 @@ export class AuthService {
         return throwError(() => new Error(errorMessage));
       })
     );
+  }
+
+  /**
+   * Update User Profile (Mock implementation for now since .NET API doesn't have the endpoint yet)
+   */
+  public updateProfile(dto: UpdateProfileDto): Observable<User> {
+    const currentUser = this.currentUserSignal();
+    if (!currentUser) {
+      return throwError(() => new Error('No user is currently logged in.'));
+    }
+
+    const updatedUser: User = {
+      ...currentUser,
+      name: dto.name,
+      phone: dto.phone ?? currentUser.phone,
+      departmentOrHall: dto.departmentOrHall ?? currentUser.departmentOrHall,
+      affiliation: dto.affiliation ?? currentUser.affiliation,
+      notificationPreferences: dto.notificationPreferences ?? currentUser.notificationPreferences
+    };
+
+    this.currentUserSignal.set(updatedUser);
+    
+    // Update the stored user
+    const storage = localStorage.getItem(this.USER_KEY) ? localStorage : sessionStorage;
+    storage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+
+    return of(updatedUser);
   }
 
   /**

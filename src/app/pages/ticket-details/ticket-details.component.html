@@ -139,22 +139,22 @@
                   (click)="openPreview(att)"
                   class="group relative border border-[#E2E8F0] rounded-lg overflow-hidden cursor-pointer hover:border-[#1E3A8A] transition-colors bg-[#F8FAFC]"
                 >
-                  @if ((att.type || '').startsWith('image/')) {
+                  @if ((att.fileType || '').startsWith('image/')) {
                     <div class="h-32 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
                       <img
-                        [src]="att.url"
-                        [alt]="att.name"
+                        [src]="att.fileUrl"
+                        [alt]="att.fileName"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       />
                     </div>
                   } @else {
                     <div class="h-32 w-full flex flex-col items-center justify-center text-[#1E3A8A] p-2 text-center">
                       <span class="material-symbols-outlined text-[36px]">description</span>
-                      <span class="text-[11px] font-semibold mt-1 truncate max-w-full">{{ att.name }}</span>
+                      <span class="text-[11px] font-semibold mt-1 truncate max-w-full">{{ att.fileName }}</span>
                     </div>
                   }
                   <div class="p-2 bg-white border-t border-[#E2E8F0]">
-                    <p class="text-xs font-semibold text-[#0F172A] truncate">{{ att.name }}</p>
+                    <p class="text-xs font-semibold text-[#0F172A] truncate">{{ att.fileName }}</p>
                     <span class="text-[10px] text-[#64748B]">Click to preview</span>
                   </div>
                 </div>
@@ -171,7 +171,7 @@
           </h2>
 
           <div class="space-y-4 pl-2">
-            @for (act of t.activities; track act.id; let last = $last) {
+            @for (act of t.activityLog; track act.id; let last = $last) {
               <div class="relative flex items-start space-x-3">
                 @if (!last) {
                   <div class="absolute left-3.5 top-6 bottom-0 w-0.5 bg-[#E2E8F0]"></div>
@@ -181,12 +181,12 @@
                 </div>
                 <div class="flex-1 pb-4">
                   <div class="flex items-center justify-between">
-                    <p class="text-xs font-bold text-[#0F172A]">{{ act.type }}</p>
+                    <p class="text-xs font-bold text-[#0F172A]">{{ act.action }}</p>
                     <span class="text-[11px] text-[#94A3B8]">{{ act.timestamp | date:'MMM d, h:mm a' }}</span>
                   </div>
-                  <p class="text-xs text-[#444651] mt-0.5">{{ act.content }}</p>
-                  @if (act.author?.name) {
-                    <span class="text-[10px] text-[#64748B] block mt-1">Logged by: {{ act.author.name }}</span>
+                  <p class="text-xs text-[#444651] mt-0.5">{{ act.comment }}</p>
+                  @if (act.actorName) {
+                    <span class="text-[10px] text-[#64748B] block mt-1">Logged by: {{ act.actorName }}</span>
                   }
                 </div>
               </div>
@@ -373,7 +373,7 @@
           (click)="$event.stopPropagation()"
         >
           <div class="p-3 bg-white border-b border-[#E2E8F0] flex items-center justify-between">
-            <span class="text-xs font-bold text-[#0F172A] truncate">{{ previewAttachment()?.name }}</span>
+            <span class="text-xs font-bold text-[#0F172A] truncate">{{ previewAttachment()?.fileName }}</span>
             <button
               type="button"
               (click)="closePreview()"
@@ -383,11 +383,11 @@
             </button>
           </div>
           <div class="p-2 bg-black flex items-center justify-center max-h-[75vh] overflow-auto">
-            <img [src]="previewAttachment()?.url" [alt]="previewAttachment()?.name" class="max-w-full max-h-[70vh] object-contain" />
+            <img [src]="previewAttachment()?.fileUrl" [alt]="previewAttachment()?.fileName" class="max-w-full max-h-[70vh] object-contain" />
           </div>
           <div class="p-3 bg-[#F8FAFC] flex justify-end">
             <a
-              [href]="previewAttachment()?.url"
+              [href]="previewAttachment()?.fileUrl"
               target="_blank"
               class="text-xs font-semibold text-[#1E3A8A] hover:underline flex items-center space-x-1"
             >

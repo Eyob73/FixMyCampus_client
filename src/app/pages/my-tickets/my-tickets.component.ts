@@ -2,9 +2,9 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TicketService } from '../../core/services/ticket.service';
-import { Ticket, TicketStatus, TicketPriority } from '../../core/models/ticket.model';
-import { CAMPUS_BUILDINGS, TICKET_CATEGORIES } from '../../core/services/mock-data';
+import { TicketService } from '../../services/ticket.service';
+import { Ticket, TicketStatus, TicketPriority } from '../../models/ticket.model';
+import { CAMPUS_BUILDINGS, TICKET_CATEGORIES } from '../../core/mock-data';
 import { StatusBadge } from '../../components/status-badge/status-badge';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TicketPriority } from '../../core/models/ticket.model';
+import { TicketPriority } from '../../models/ticket.model';
 
 @Component({
   selector: 'app-priority-badge',

@@ -1,6 +1,6 @@
 import { Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TicketStatus, TicketPriority } from '../../core/models/ticket.model';
+import { TicketStatus, TicketPriority } from '../../models/ticket.model';
 
 @Component({
   selector: 'app-status-badge',

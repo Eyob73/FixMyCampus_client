@@ -2,12 +2,12 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TicketService } from '../../core/services/ticket.service';
-import { AuthService } from '../../core/services/auth.service';
-import { Ticket, TicketStats } from '../../core/models/ticket.model';
+import { TicketService } from '../../services/ticket.service';
+import { AuthService } from '../../services/auth.service';
+import { Ticket, TicketStats } from '../../models/ticket.model';
 import { StatusBadge } from '../../components/status-badge/status-badge';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
-import { CAMPUS_BUILDINGS } from '../../core/services/mock-data';
+import { CAMPUS_BUILDINGS } from '../../core/mock-data';
 
 @Component({
   selector: 'app-dashboard',

@@ -1,9 +1,9 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { TicketService } from '../../core/services/ticket.service';
-import { NotificationService } from '../../core/services/notification.service';
+import { AuthService } from '../../services/auth.service';
+import { TicketService } from '../../services/ticket.service';
+import { NotificationService } from '../../services/notification.service';
 
 interface NavItem {
   label: string;
@@ -33,7 +33,7 @@ export class SidebarComponent {
   currentUser = this.authService.currentUser;
 
   get userInitials(): string {
-    const name = this.currentUser().name || 'Tech';
+    const name = this.currentUser()?.name || 'Tech';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
@@ -58,7 +58,7 @@ export class SidebarComponent {
     }
 
     // Admin nav items
-    const unassignedCount = this.ticketService.tickets().filter((t) => !t.assignedTechnician && t.status !== 'closed' && t.status !== 'CLOSED').length;
+    const unassignedCount = this.ticketService.tickets().filter((t) => !t.assignedTechnician && t.status !== 'CLOSED').length;
     return [
       { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard' },
       { label: 'Tickets', route: '/admin/tickets', icon: 'confirmation_number', badge: unassignedCount > 0 ? unassignedCount : undefined },

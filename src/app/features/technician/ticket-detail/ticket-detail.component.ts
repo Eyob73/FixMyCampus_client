@@ -2,15 +2,16 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TicketService } from '../../../core/services/ticket.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { NotificationService } from '../../../core/services/notification.service';
+import { TicketService } from '../../../services/ticket.service';
+import { AuthService } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
 import {
   Ticket,
   TicketStatus,
-  WorkNoteType,
   TicketAttachment,
-} from '../../../core/models/ticket.model';
+} from '../../../models/ticket.model';
+
+type WorkNoteType = 'DIAGNOSIS' | 'WORK_PERFORMED' | 'MATERIALS_REQUIRED' | 'DELAY_REASON' | 'GENERAL';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
 import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm-modal.component';
@@ -89,7 +90,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
             <p class="text-xs text-[#64748B] flex flex-wrap items-center gap-x-2 gap-y-1">
               <span class="flex items-center gap-1 text-[#334155] font-medium">
                 <span class="material-symbols-outlined text-[15px] text-[#006398]">apartment</span>
-                {{ ticket()!.location?.building }} &bull; {{ ticket()!.location?.room || 'General Area' }}
+                {{ ticket()!.building }} &bull; {{ ticket()!.room || 'General Area' }}
               </span>
               <span>&bull;</span>
               <span>Reported on {{ formatFullDate(ticket()!.createdAt) }}</span>
@@ -218,11 +219,8 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                   </label>
                   <div class="flex items-center gap-2 text-sm text-[#0F172A] font-medium">
                     <span class="material-symbols-outlined text-[18px] text-[#006398]">apartment</span>
-                    <span>{{ ticket()!.location?.building }} &bull; {{ ticket()!.location?.room || 'General' }}</span>
+                    <span>{{ ticket()!.building }} &bull; {{ ticket()!.room || 'General' }}</span>
                   </div>
-                  @if (ticket()!.location?.campusZone) {
-                    <span class="text-xs text-[#64748B] block pl-6">Zone: {{ ticket()!.location?.campusZone }}</span>
-                  }
                 </div>
 
                 <div class="space-y-1">
@@ -231,10 +229,10 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                   </label>
                   <div class="flex items-center gap-2 text-sm text-[#0F172A] font-medium">
                     <span class="material-symbols-outlined text-[18px] text-[#1E3A8A]">engineering</span>
-                    <span>{{ ticket()!.assignedTechnician?.name || authService.currentUser().name }}</span>
+                    <span>{{ ticket()!.assignedTechnicianName || authService.currentUser()?.name }}</span>
                   </div>
                   <span class="text-xs text-[#64748B] block pl-6">
-                    {{ ticket()!.assignedTechnician?.department || authService.currentUser().department }}
+                    {{ ticket()!.assignedTechnicianSpecialty || authService.currentUser()?.department }}
                   </span>
                 </div>
 
@@ -246,30 +244,27 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                   <div class="flex items-center justify-between flex-wrap gap-3 bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-lg">
                     <div class="flex items-center gap-3">
                       <div class="w-9 h-9 rounded-full bg-[#E0E7FF] text-[#1E3A8A] flex items-center justify-center font-bold text-xs">
-                        {{ ticket()!.reporter?.name?.charAt(0) || '?' }}
+                        {{ ticket()!.reporterName?.charAt(0) || '?' }}
                       </div>
                       <div>
                         <p class="text-sm font-bold text-[#0F172A]">
-                          {{ ticket()!.reporter?.name }}
-                          @if (ticket()!.reporter?.studentStaffId) {
-                            <span class="text-xs font-normal text-[#64748B] ml-1">(ID: #{{ ticket()!.reporter?.studentStaffId }})</span>
-                          }
+                          {{ ticket()!.reporterName }}
                         </p>
-                        <p class="text-xs text-[#64748B]">{{ ticket()!.reporter?.role }} &bull; {{ ticket()!.reporter?.department || 'Campus Community' }}</p>
+                        <p class="text-xs text-[#64748B]">{{ ticket()!.reporterRole || 'Reporter' }}</p>
                       </div>
                     </div>
 
                     <div class="flex items-center gap-2">
                       <a
-                        [href]="'mailto:' + ticket()!.reporter?.email"
+                        [href]="'mailto:' + ticket()!.reporterEmail"
                         class="px-2.5 py-1.5 bg-white border border-[#CBD5E1] text-[#1E3A8A] hover:bg-[#EFF6FF] rounded text-xs font-semibold transition-colors flex items-center gap-1"
                       >
                         <span class="material-symbols-outlined text-[14px]">mail</span>
                         <span>Email Reporter</span>
                       </a>
-                      @if (ticket()!.reporter?.phone) {
+                      @if (ticket()!.reporterPhone) {
                         <a
-                          [href]="'tel:' + ticket()!.reporter?.phone"
+                          [href]="'tel:' + ticket()!.reporterPhone"
                           class="px-2.5 py-1.5 bg-white border border-[#CBD5E1] text-[#334155] hover:bg-slate-50 rounded text-xs font-semibold transition-colors flex items-center gap-1"
                         >
                           <span class="material-symbols-outlined text-[14px]">call</span>
@@ -286,7 +281,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                 </div>
                 <div class="space-y-1">
                   <label class="text-xs font-semibold text-[#64748B] block uppercase tracking-wider">Assigned Date</label>
-                  <p class="text-xs text-[#0F172A] font-medium">{{ formatFullDate(ticket()!.assignedAt || '') }}</p>
+                  <p class="text-xs text-[#0F172A] font-medium">{{ formatFullDate(ticket()!.updatedAt || '') }}</p>
                 </div>
               </div>
 
@@ -450,7 +445,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                           <span class="material-symbols-outlined text-xl text-[#10B981]">image</span>
                           <div class="truncate">
                             <p class="text-xs font-semibold text-[#0F172A] truncate">{{ att.fileName }}</p>
-                            <p class="text-[10px] text-[#64748B]">{{ att.fileSize }} &bull; By {{ att.uploadedBy }}</p>
+                            <p class="text-[10px] text-[#64748B]">{{ att.fileSize }} bytes &bull; On {{ att.uploadedAt | date:'short' }}</p>
                           </div>
                         </div>
                         <a
@@ -609,7 +604,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                   <span class="material-symbols-outlined text-[#1E3A8A]">timeline</span>
                   <h3 class="text-base font-bold text-[#0F172A]">Activity Timeline</h3>
                 </div>
-                <span class="text-xs font-mono text-[#64748B]">{{ ticket()!.activities.length }} events</span>
+                <span class="text-xs font-mono text-[#64748B]">{{ ticket()!.activityLog?.length || 0 }} events</span>
               </div>
 
               <!-- Vertical Timeline Component (Matching Stitch Admin Details) -->
@@ -630,11 +625,11 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
                         <span class="font-bold text-[#0F172A]">{{ getActivityTitle(activity) }}</span>
                         <span class="text-[10px] text-[#64748B] font-mono">{{ formatTimeAgo(activity.timestamp) }}</span>
                       </div>
-                      <p class="text-[#334155] leading-relaxed">{{ activity.content }}</p>
+                      <p class="text-[#334155] leading-relaxed">{{ activity.comment || activity.action }}</p>
                       <div class="pt-1 text-[10px] text-[#64748B] flex items-center gap-1 border-t border-slate-100 mt-1">
                         <span class="material-symbols-outlined text-[12px]">person</span>
                         <span>
-                          <strong>{{ activity.author.name }}</strong> ({{ activity.author.role }})
+                          <strong>{{ activity.actorName }}</strong> ({{ activity.actorRole }})
                         </span>
                       </div>
                     </div>
@@ -835,15 +830,15 @@ export class TicketDetailComponent implements OnInit {
   }
 
   get reporterAttachments(): TicketAttachment[] {
-    return (this.ticket()?.attachments || []).filter((a) => !a.isEvidence);
+    return (this.ticket()?.attachments || []);
   }
 
   get evidenceAttachments(): TicketAttachment[] {
-    return (this.ticket()?.attachments || []).filter((a) => a.isEvidence);
+    return [];
   }
 
   get sortedActivities() {
-    const list = [...(this.ticket()?.activities || [])];
+    const list = [...(this.ticket()?.activityLog || [])];
     return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
@@ -857,7 +852,7 @@ export class TicketDetailComponent implements OnInit {
 
     this.actionLoading.set(true);
     this.ticketService
-      .updateTicketStatus(current.id, 'IN_PROGRESS', 'Technician arrived on site and began diagnostic/repair procedures.')
+      .updateStatus(current.id, 'IN_PROGRESS', 'Technician arrived on site and began diagnostic/repair procedures.')
       .subscribe({
         next: () => {
           this.notification.success(`Ticket #${current.id} transitioned to IN PROGRESS.`);
@@ -883,7 +878,7 @@ export class TicketDetailComponent implements OnInit {
 
     this.actionLoading.set(true);
     this.ticketService
-      .updateTicketStatus(current.id, this.manualStatusSelect, `Technician updated status to ${this.manualStatusSelect}.`)
+      .updateStatus(current.id, this.manualStatusSelect, `Technician updated status to ${this.manualStatusSelect}.`)
       .subscribe({
         next: () => {
           this.notification.success(`Ticket #${current.id} status updated to ${this.manualStatusSelect}.`);

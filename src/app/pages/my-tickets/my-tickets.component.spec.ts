@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { MyTicketsComponent } from './my-tickets.component';
-import { TicketService } from '../../core/services/ticket.service';
+import { TicketService } from '../../services/ticket.service';
 
 describe('MyTicketsComponent', () => {
   let fixture: ComponentFixture<MyTicketsComponent>;

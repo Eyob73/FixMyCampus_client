@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
-import { TicketService } from '../../core/services/ticket.service';
+import { TicketService } from '../../services/ticket.service';
 
 describe('DashboardComponent', () => {
   let fixture: ComponentFixture<DashboardComponent>;

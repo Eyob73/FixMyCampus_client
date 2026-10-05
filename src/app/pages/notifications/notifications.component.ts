@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NotificationService } from '../../core/services/notification.service';
-import { AppNotification } from '../../core/models/notification.model';
+import { NotificationService } from '../../services/notification.service';
+import { AppNotification } from '../../models/notification.model';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 
 @Component({

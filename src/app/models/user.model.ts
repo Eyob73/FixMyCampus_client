@@ -7,7 +7,20 @@ export interface User {
   role: UserRole;
   avatarUrl?: string;
   department?: string;
+  departmentOrHall?: string;
+  phone?: string;
+  affiliation?: string;
+  accountStatus?: string;
+  notificationPreferences?: any;
   isActive?: boolean;
+}
+
+export interface UpdateProfileDto {
+  name: string;
+  phone?: string;
+  departmentOrHall?: string;
+  affiliation?: string;
+  notificationPreferences?: any;
 }
 
 export interface LoginRequest {

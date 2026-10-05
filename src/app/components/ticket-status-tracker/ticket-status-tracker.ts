@@ -1,6 +1,6 @@
 import { Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TicketStatus } from '../../core/models/ticket.model';
+import { TicketStatus } from '../../models/ticket.model';
 
 export interface TimelineStep {
   key: TicketStatus;
@@ -21,11 +21,11 @@ export class TicketStatusTracker {
   orientation = input<'horizontal' | 'vertical'>('horizontal');
 
   readonly steps: TimelineStep[] = [
-    { key: 'new', label: 'Submitted', sublabel: 'Issue registered', icon: 'send' },
-    { key: 'assigned', label: 'Assigned', sublabel: 'Technician dispatched', icon: 'person_pin' },
-    { key: 'in_progress', label: 'In Progress', sublabel: 'Active repair underway', icon: 'engineering' },
-    { key: 'resolved', label: 'Resolved', sublabel: 'Work finished', icon: 'task_alt' },
-    { key: 'closed', label: 'Closed', sublabel: 'Inspection completed', icon: 'verified' }
+    { key: 'NEW', label: 'Submitted', sublabel: 'Issue registered', icon: 'send' },
+    { key: 'ASSIGNED', label: 'Assigned', sublabel: 'Technician dispatched', icon: 'person_pin' },
+    { key: 'IN_PROGRESS', label: 'In Progress', sublabel: 'Active repair underway', icon: 'engineering' },
+    { key: 'RESOLVED', label: 'Resolved', sublabel: 'Work finished', icon: 'task_alt' },
+    { key: 'CLOSED', label: 'Closed', sublabel: 'Inspection completed', icon: 'verified' }
   ];
 
   readonly currentStepIndex = computed(() => {

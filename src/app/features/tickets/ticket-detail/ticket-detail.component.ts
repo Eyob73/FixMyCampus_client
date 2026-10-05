@@ -59,8 +59,8 @@ export class TicketDetailComponent implements OnInit {
 
   loadTicket(id: string): void {
     this.isLoading.set(true);
-    this.ticketService.getTicketById(id).subscribe({
-      next: (t) => {
+    this.ticketService.getTechnicianTicketById(id).subscribe({
+      next: (t: Ticket) => {
         this.ticket.set(t);
         this.isLoading.set(false);
       },
@@ -107,7 +107,7 @@ export class TicketDetailComponent implements OnInit {
     this.ticketService
       .assignTechnician(t.id, tech.id, tech.name, tech.specialty)
       .subscribe({
-        next: (updated) => {
+        next: (updated: Ticket) => {
           this.ticket.set(updated);
           this.showAssignModal = false;
           this.notificationService.success(
@@ -132,7 +132,7 @@ export class TicketDetailComponent implements OnInit {
     this.ticketService
       .updateStatus(t.id, this.targetStatus, this.statusComment)
       .subscribe({
-        next: (updated) => {
+        next: (updated: Ticket) => {
           this.ticket.set(updated);
           this.showStatusModal = false;
           this.notificationService.success(

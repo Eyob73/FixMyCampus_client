@@ -2,9 +2,9 @@ import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NotificationService } from '../../core/services/notification.service';
-import { AuthService } from '../../core/services/auth.service';
-import { TicketService } from '../../core/services/ticket.service';
+import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
+import { TicketService } from '../../services/ticket.service';
 
 @Component({
   selector: 'app-header',
@@ -33,7 +33,7 @@ export class HeaderComponent {
   currentUser = this.authService.currentUser;
 
   get userInitials(): string {
-    const name = this.currentUser().name || 'Tech';
+    const name = this.currentUser()?.name || 'Tech';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 

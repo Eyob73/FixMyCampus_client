@@ -2,9 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { TicketService } from '../../core/services/ticket.service';
-import { TicketStats } from '../../core/models/ticket.model';
+import { AuthService } from '../../services/auth.service';
+import { TicketService } from '../../services/ticket.service';
+import { TicketStats } from '../../models/ticket.model';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 import { FormFieldComponent } from '../../components/form-field/form-field';
 
@@ -45,15 +45,17 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.currentUser();
-    this.profileForm.patchValue({
-      name: user.name,
-      phone: user.phone || '',
-      departmentOrHall: user.departmentOrHall || '',
-      affiliation: user.affiliation || '',
-      emailNotifications: user.notificationPreferences?.email ?? true,
-      statusNotifications: user.notificationPreferences?.ticketStatusChanges ?? true,
-      commentNotifications: user.notificationPreferences?.ticketComments ?? true
-    });
+    if (user) {
+      this.profileForm.patchValue({
+        name: user.name,
+        phone: user.phone || '',
+        departmentOrHall: user.departmentOrHall || '',
+        affiliation: user.affiliation || '',
+        emailNotifications: user.notificationPreferences?.email ?? true,
+        statusNotifications: user.notificationPreferences?.ticketStatusChanges ?? true,
+        commentNotifications: user.notificationPreferences?.ticketComments ?? true
+      });
+    }
 
     this.ticketService.getTicketStats().subscribe({
       next: (s: TicketStats) => this.stats.set(s)
