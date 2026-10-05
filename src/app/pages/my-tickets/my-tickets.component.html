@@ -1,0 +1,312 @@
+<app-page-container>
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="space-y-1">
+      <div class="flex items-center space-x-2 text-xs text-[#64748B]">
+        <a routerLink="/dashboard" class="hover:text-[#1E3A8A] flex items-center space-x-1">
+          <span class="material-symbols-outlined text-[14px]">home</span>
+          <span>Dashboard</span>
+        </a>
+        <span>/</span>
+        <span class="text-[#0F172A] font-semibold">My Tickets</span>
+      </div>
+      <h1 class="text-2xl font-bold text-[#0F172A] tracking-tight">My Submitted Tickets</h1>
+      <p class="text-sm text-[#444651]">
+        All maintenance and physical plant issues submitted by your account.
+      </p>
+    </div>
+
+    <div>
+      <a
+        routerLink="/report-issue"
+        class="inline-flex items-center space-x-2 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white h-[38px] px-4 rounded text-sm font-semibold shadow-sm transition-colors"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        <span>Report New Issue</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Bar Card matching Stitch Design -->
+  <section class="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-3">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <!-- Search Input -->
+      <div class="relative flex-1 max-w-md">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-[#94A3B8]">search</span>
+        <input
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event); onFilterChange()"
+          type="text"
+          placeholder="Filter by ticket ID, title, room, keywords..."
+          class="w-full pl-9 pr-4 py-1.5 h-[38px] bg-white border border-[#CBD5E1] rounded text-xs text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/15 transition-colors"
+        />
+      </div>
+
+      <!-- Quick Filter Dropdowns Grid -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Status Filter -->
+        <select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event); onFilterChange()"
+          class="h-[36px] bg-white border border-[#CBD5E1] text-[#334155] rounded text-xs px-3 focus:outline-none focus:border-[#1E3A8A]"
+        >
+          <option value="all">All Statuses</option>
+          <option value="new">New / Submitted</option>
+          <option value="assigned">Assigned</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
+
+        <!-- Category Filter -->
+        <select
+          [ngModel]="categoryFilter()"
+          (ngModelChange)="categoryFilter.set($event); onFilterChange()"
+          class="h-[36px] bg-white border border-[#CBD5E1] text-[#334155] rounded text-xs px-3 focus:outline-none focus:border-[#1E3A8A]"
+        >
+          <option value="all">All Categories</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+
+        <!-- Building Filter -->
+        <select
+          [ngModel]="buildingFilter()"
+          (ngModelChange)="buildingFilter.set($event); onFilterChange()"
+          class="h-[36px] bg-white border border-[#CBD5E1] text-[#334155] rounded text-xs px-3 focus:outline-none focus:border-[#1E3A8A]"
+        >
+          <option value="all">All Buildings</option>
+          @for (b of buildings; track b) {
+            <option [value]="b">{{ b }}</option>
+          }
+        </select>
+
+        <!-- Priority Filter -->
+        <select
+          [ngModel]="priorityFilter()"
+          (ngModelChange)="priorityFilter.set($event); onFilterChange()"
+          class="h-[36px] bg-white border border-[#CBD5E1] text-[#334155] rounded text-xs px-3 focus:outline-none focus:border-[#1E3A8A]"
+        >
+          <option value="all">All Priorities</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+
+        <!-- Sort By -->
+        <select
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event)"
+          class="h-[36px] bg-white border border-[#CBD5E1] text-[#334155] rounded text-xs px-3 focus:outline-none focus:border-[#1E3A8A]"
+        >
+          <option value="created_desc">Newest First</option>
+          <option value="created_asc">Oldest First</option>
+          <option value="updated_desc">Recently Updated</option>
+        </select>
+
+        <!-- Clear Filters Button -->
+        @if (isFilterActive()) {
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="h-[36px] px-3 inline-flex items-center space-x-1 text-xs text-[#DC2626] hover:bg-[#FEF2F2] rounded border border-[#FECACA] font-medium transition-colors"
+          >
+            <span class="material-symbols-outlined text-[16px]">filter_alt_off</span>
+            <span>Reset</span>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Tickets Table Card -->
+  <section class="bg-white border border-[#E2E8F0] rounded-xl shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] overflow-hidden">
+    @if (loading()) {
+      <div class="p-16 text-center space-y-3">
+        <span class="w-8 h-8 border-3 border-[#1E3A8A] border-t-transparent rounded-full animate-spin inline-block"></span>
+        <p class="text-xs text-[#64748B]">Loading your tickets...</p>
+      </div>
+    } @else if (error()) {
+      <div class="p-8 text-center text-xs text-[#DC2626] bg-[#FEF2F2]">
+        {{ error() }}
+        <button (click)="loadTickets()" class="underline ml-2 font-semibold">Try Again</button>
+      </div>
+    } @else {
+      <!-- Responsive Data Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider w-24">Ticket #</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Issue Title & Location</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Category</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Priority</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Status</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Submitted</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Last Updated</th>
+              <th class="py-3 px-5 text-[11px] font-bold text-[#64748B] uppercase tracking-wider text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#F1F5F9]">
+            @for (ticket of paginatedTickets(); track ticket.id) {
+              <tr class="hover:bg-[#F8FAFC] transition-colors group">
+                <!-- Ticket ID -->
+                <td class="py-3.5 px-5 text-xs font-bold text-[#00236F]">
+                  <a [routerLink]="['/ticket', ticket.id]" class="hover:underline">
+                    #{{ ticket.id }}
+                  </a>
+                </td>
+
+                <!-- Issue Title + Location -->
+                <td class="py-3.5 px-5">
+                  <div class="flex flex-col">
+                    <a
+                      [routerLink]="['/ticket', ticket.id]"
+                      class="text-xs font-semibold text-[#0F172A] group-hover:text-[#1E3A8A] transition-colors line-clamp-1"
+                    >
+                      {{ ticket.title }}
+                    </a>
+                    <span class="text-[11px] text-[#64748B] flex items-center space-x-1 mt-0.5">
+                      <span class="material-symbols-outlined text-[13px] text-[#94A3B8]">location_on</span>
+                      <span>{{ ticket.building }} · {{ ticket.room }}</span>
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Category -->
+                <td class="py-3.5 px-5">
+                  <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#EFF4FF] text-[#1E3A8A] border border-[#DBEAFE]">
+                    {{ ticket.category }}
+                  </span>
+                </td>
+
+                <!-- Priority -->
+                <td class="py-3.5 px-5">
+                  <app-status-badge [priority]="ticket.priority" size="sm"></app-status-badge>
+                </td>
+
+                <!-- Status -->
+                <td class="py-3.5 px-5">
+                  <app-status-badge [status]="ticket.status"></app-status-badge>
+                </td>
+
+                <!-- Submitted Date -->
+                <td class="py-3.5 px-5 text-xs text-[#64748B]">
+                  {{ ticket.createdAt | date:'MMM d, y' }}
+                </td>
+
+                <!-- Last Updated Date -->
+                <td class="py-3.5 px-5 text-xs text-[#64748B]">
+                  {{ ticket.updatedAt | date:'MMM d, y' }}
+                </td>
+
+                <!-- Action Button -->
+                <td class="py-3.5 px-5 text-right">
+                  <a
+                    [routerLink]="['/ticket', ticket.id]"
+                    class="inline-flex items-center h-8 px-3 rounded border border-[#CBD5E1] bg-white text-[#334155] hover:bg-[#F8FAFC] hover:border-[#94A3B8] text-xs font-semibold transition-colors"
+                  >
+                    View
+                  </a>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="py-16 text-center">
+                  <div class="max-w-sm mx-auto space-y-3">
+                    <div class="w-12 h-12 rounded-full bg-[#EFF4FF] text-[#1E3A8A] flex items-center justify-center mx-auto">
+                      <span class="material-symbols-outlined text-[28px]">search_off</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#0F172A]">No tickets found</h3>
+                    <p class="text-xs text-[#64748B]">
+                      @if (isFilterActive()) {
+                        No submitted tickets match your active filter criteria.
+                      } @else {
+                        You haven't submitted any maintenance requests yet.
+                      }
+                    </p>
+                    <div class="pt-2">
+                      @if (isFilterActive()) {
+                        <button
+                          type="button"
+                          (click)="clearFilters()"
+                          class="px-3.5 py-1.5 rounded text-xs font-semibold text-[#1E3A8A] border border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                        >
+                          Clear Filters
+                        </button>
+                      } @else {
+                        <a
+                          routerLink="/report-issue"
+                          class="inline-flex items-center space-x-1.5 px-4 py-2 rounded text-xs font-semibold bg-[#1E3A8A] text-white hover:bg-[#1D4ED8]"
+                        >
+                          <span class="material-symbols-outlined text-[16px]">add</span>
+                          <span>Submit your first issue</span>
+                        </a>
+                      }
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Toolbar -->
+      @if (filteredTickets().length > 0) {
+        <div class="py-3.5 px-5 bg-[#F8FAFC] border-t border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#64748B]">
+          <div>
+            Showing
+            <span class="font-semibold text-[#0F172A]">
+              {{ (currentPage() - 1) * pageSize() + 1 }}
+            </span>
+            to
+            <span class="font-semibold text-[#0F172A]">
+              {{ Math.min(currentPage() * pageSize(), filteredTickets().length) }}
+            </span>
+            of
+            <span class="font-semibold text-[#0F172A]">{{ filteredTickets().length }}</span>
+            tickets
+          </div>
+
+          <!-- Page Navigation -->
+          <div class="flex items-center space-x-1.5">
+            <button
+              type="button"
+              (click)="goToPage(currentPage() - 1)"
+              [disabled]="currentPage() === 1"
+              class="h-8 px-2.5 border border-[#CBD5E1] rounded bg-white hover:bg-[#F8FAFC] disabled:opacity-40 disabled:cursor-not-allowed text-[#334155] font-medium flex items-center space-x-1"
+            >
+              <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+              <span class="hidden sm:inline">Prev</span>
+            </button>
+
+            <!-- Page Buttons -->
+            @for (p of [].constructor(totalPages()); track $index; let idx = $index) {
+              <button
+                type="button"
+                (click)="goToPage(idx + 1)"
+                class="w-8 h-8 rounded text-xs font-semibold transition-colors"
+                [ngClass]="currentPage() === idx + 1 ? 'bg-[#1E3A8A] text-white' : 'bg-white border border-[#CBD5E1] text-[#334155] hover:bg-[#F8FAFC]'"
+              >
+                {{ idx + 1 }}
+              </button>
+            }
+
+            <button
+              type="button"
+              (click)="goToPage(currentPage() + 1)"
+              [disabled]="currentPage() === totalPages()"
+              class="h-8 px-2.5 border border-[#CBD5E1] rounded bg-white hover:bg-[#F8FAFC] disabled:opacity-40 disabled:cursor-not-allowed text-[#334155] font-medium flex items-center space-x-1"
+            >
+              <span class="hidden sm:inline">Next</span>
+              <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </section>
+</app-page-container>

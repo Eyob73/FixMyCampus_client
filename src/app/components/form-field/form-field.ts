@@ -1,9 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [],
   selector: 'app-form-field',
-  styleUrl: './form-field.css',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './form-field.html',
+  styleUrl: './form-field.css'
 })
-export class FormField {}
+export class FormFieldComponent {
+  label = input<string | undefined>(undefined);
+  forId = input<string | undefined>(undefined);
+  required = input<boolean>(false);
+  errorMessage = input<string | undefined>(undefined);
+  hint = input<string | undefined>(undefined);
+}

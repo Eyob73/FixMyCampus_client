@@ -4,6 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TicketService } from '../../core/services/ticket.service';
+import { Component, output, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../core/services/notification.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { TicketService } from '../../services/ticket.service';
 
 @Component({
   selector: 'app-header',
@@ -154,5 +165,105 @@ export class Header {
 
   toggleHelpModal(): void {
     this.showHelpModal.update((v) => !v);
+  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule],
+  templateUrl: './header.html',
+  styleUrl: './header.css'
+})
+export class HeaderComponent {
+  private router = inject(Router);
+  private notifService = inject(NotificationService);
+  private authService = inject(AuthService);
+
+  toggleSidebar = output<void>();
+
+  searchQuery = signal<string>('');
+  showNotifMenu = signal<boolean>(false);
+  showUserMenu = signal<boolean>(false);
+
+  unreadCount = this.notifService.unreadCount;
+  notifications = this.notifService.notifications;
+  currentUser = this.authService.currentUser;
+
+  onSearchSubmit(): void {
+    const q = this.searchQuery().trim();
+    if (q) {
+      this.router.navigate(['/my-tickets'], { queryParams: { search: q } });
+    }
+  }
+
+  toggleNotifs(): void {
+    this.showNotifMenu.update(v => !v);
+    this.showUserMenu.set(false);
+  }
+
+  toggleUser(): void {
+    this.showUserMenu.update(v => !v);
+    this.showNotifMenu.set(false);
+  }
+
+  closeMenus(): void {
+    this.showNotifMenu.set(false);
+    this.showUserMenu.set(false);
+  }
+
+  markAllAsRead(): void {
+    this.notifService.markAllAsRead().subscribe();
+  }
+
+  onLogout(): void {
+    this.closeMenus();
+    if (confirm('Are you sure you want to sign out?')) {
+      this.authService.logout();
+      this.router.navigate(['/dashboard']);
+    }
+  @Output() toggleSidebar = new EventEmitter<void>();
+  @Output() openNewTicket = new EventEmitter<void>();
+
+  showNotifications = false;
+
+  constructor(
+    public authService: AuthService,
+    public ticketService: TicketService,
+    private router: Router
+  ) {}
+
+  get notifications(): Array<{ id: string; title: string; time: string; icon: string; type: string }> {
+    return [
+      {
+        id: '1',
+        title: 'Emergency: Lab 304 temp spike above 78°F',
+        time: '12m ago',
+        icon: 'error',
+        type: 'danger'
+      },
+      {
+        id: '2',
+        title: 'Ticket #T-1078 was marked Resolved by James Reynolds',
+        time: '45m ago',
+        icon: 'check_circle',
+        type: 'success'
+      },
+      {
+        id: '3',
+        title: 'Hydraulic maintenance scheduled for Founders Tower',
+        time: '2h ago',
+        icon: 'schedule',
+        type: 'info'
+      }
+    ];
+  }
+
+  toggleNotifs(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  closeNotifs(): void {
+    this.showNotifications = false;
+  }
+
+  goToTickets(): void {
+    this.closeNotifs();
+    this.router.navigate(['/admin/tickets']);
   }
 }

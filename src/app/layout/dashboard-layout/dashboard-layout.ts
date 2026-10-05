@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';
 import { Header } from '../header/header';
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar';
+import { HeaderComponent } from '../header/header';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -24,5 +28,18 @@ import { Header } from '../header/header';
       </div>
     </div>
   `,
+  imports: [RouterOutlet, SidebarComponent, HeaderComponent],
+  templateUrl: './dashboard-layout.html',
+  styleUrl: './dashboard-layout.css'
 })
-export class DashboardLayout {}
+export class DashboardLayout {
+  sidebarOpen = signal<boolean>(false);
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
+}

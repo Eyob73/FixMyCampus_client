@@ -1,0 +1,105 @@
+<!-- Horizontal Step Tracker -->
+@if (orientation() === 'horizontal') {
+  <div class="w-full py-4 px-2">
+    <div class="relative flex items-center justify-between">
+      <!-- Background Connecting Line -->
+      <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-0.5 bg-[#E2E8F0] z-0"></div>
+      
+      <!-- Progress Bar Overlay -->
+      <div
+        class="absolute left-6 top-1/2 -translate-y-1/2 h-0.5 bg-[#1E3A8A] transition-all duration-300 z-0"
+        [style.width.%]="(currentStepIndex() / (steps.length - 1)) * 100"
+      ></div>
+
+      <!-- Step Nodes -->
+      @for (step of steps; track step.key; let idx = $index) {
+        <div class="relative z-10 flex flex-col items-center group">
+          <!-- Node Circle -->
+          <div
+            class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 text-xs font-semibold"
+            [ngClass]="{
+              'bg-[#1E3A8A] text-white shadow-sm ring-4 ring-white': isStepCompleted(idx),
+              'bg-white text-[#0284C7] ring-4 ring-[#0284C7] border-2 border-white shadow-sm': isStepActive(idx),
+              'bg-[#F1F5F9] text-[#94A3B8] border border-[#CBD5E1] ring-4 ring-white': !isStepCompleted(idx) && !isStepActive(idx)
+            }"
+          >
+            @if (isStepCompleted(idx)) {
+              <span class="material-symbols-outlined text-[16px]">check</span>
+            } @else if (isStepActive(idx)) {
+              <span class="w-2.5 h-2.5 rounded-full bg-[#0284C7] animate-pulse"></span>
+            } @else {
+              <span class="text-[11px]">{{ idx + 1 }}</span>
+            }
+          </div>
+
+          <!-- Label -->
+          <div class="mt-2 text-center">
+            <p
+              class="text-xs font-semibold transition-colors leading-tight"
+              [ngClass]="{
+                'text-[#0F172A]': isStepCompleted(idx),
+                'text-[#1E3A8A] font-bold': isStepActive(idx),
+                'text-[#94A3B8]': !isStepCompleted(idx) && !isStepActive(idx)
+              }"
+            >
+              {{ step.label }}
+            </p>
+            <p class="text-[10px] text-[#64748B] hidden sm:block leading-tight mt-0.5">
+              {{ step.sublabel }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- Vertical Step Tracker -->
+  <div class="space-y-4 py-2">
+    @for (step of steps; track step.key; let idx = $index; let last = $last) {
+      <div class="relative flex items-start space-x-3 group">
+        <!-- Connecting Line for vertical -->
+        @if (!last) {
+          <div
+            class="absolute left-3.5 top-7 bottom-0 w-0.5 -ml-px transition-colors"
+            [ngClass]="idx < currentStepIndex() ? 'bg-[#1E3A8A]' : 'bg-[#E2E8F0]'"
+          ></div>
+        }
+
+        <!-- Node -->
+        <div
+          class="relative z-10 w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all text-xs"
+          [ngClass]="{
+            'bg-[#1E3A8A] text-white shadow-sm ring-2 ring-white': isStepCompleted(idx),
+            'bg-white text-[#0284C7] ring-2 ring-[#0284C7] border border-white': isStepActive(idx),
+            'bg-[#F1F5F9] text-[#94A3B8] border border-[#CBD5E1]': !isStepCompleted(idx) && !isStepActive(idx)
+          }"
+        >
+          @if (isStepCompleted(idx)) {
+            <span class="material-symbols-outlined text-[15px]">check</span>
+          } @else if (isStepActive(idx)) {
+            <span class="w-2 h-2 rounded-full bg-[#0284C7] animate-pulse"></span>
+          } @else {
+            <span class="text-[11px]">{{ idx + 1 }}</span>
+          }
+        </div>
+
+        <!-- Text details -->
+        <div class="flex-1 pb-4">
+          <p
+            class="text-xs font-semibold leading-tight"
+            [ngClass]="{
+              'text-[#0F172A]': isStepCompleted(idx),
+              'text-[#1E3A8A] font-bold': isStepActive(idx),
+              'text-[#94A3B8]': !isStepCompleted(idx) && !isStepActive(idx)
+            }"
+          >
+            {{ step.label }}
+          </p>
+          <p class="text-[11px] text-[#64748B] mt-0.5">
+            {{ step.sublabel }}
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+}
