@@ -1,9 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar';
+import { HeaderComponent } from '../header/header';
 
 @Component({
-  imports: [],
   selector: 'app-dashboard-layout',
-  styleUrl: './dashboard-layout.css',
+  standalone: true,
+  imports: [RouterOutlet, SidebarComponent, HeaderComponent],
   templateUrl: './dashboard-layout.html',
+  styleUrl: './dashboard-layout.css'
 })
-export class DashboardLayout {}
+export class DashboardLayout {
+  sidebarOpen = signal<boolean>(false);
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
+}

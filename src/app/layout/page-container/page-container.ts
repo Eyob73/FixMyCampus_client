@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  imports: [],
   selector: 'app-page-container',
-  styleUrl: './page-container.css',
+  standalone: true,
   templateUrl: './page-container.html',
+  styleUrl: './page-container.css'
 })
-export class PageContainer {}
+export class PageContainerComponent {}
