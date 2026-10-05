@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from './layout';
-import { adminGuard } from './guards';
+import { adminGuard, roleGuard } from './guards';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'admin/dashboard',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
@@ -57,7 +57,43 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'reporter',
+    canActivate: [roleGuard(['REPORTER'])],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/reporters/reporter-dashboard/reporter-dashboard.component').then(
+            (m) => m.ReporterDashboardComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'technician',
+    canActivate: [roleGuard(['TECHNICIAN'])],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/technicians/technician-dashboard/technician-dashboard.component').then(
+            (m) => m.TechnicianDashboardComponent
+          )
+      }
+    ]
+  },
+  {
     path: '**',
-    redirectTo: 'admin/dashboard'
+    redirectTo: 'login'
   }
 ];

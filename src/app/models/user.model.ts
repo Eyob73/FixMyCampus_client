@@ -7,7 +7,13 @@ export interface User {
   role: UserRole;
   avatarUrl?: string;
   department?: string;
-  token?: string;
+  isActive?: boolean;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
 }
 
 export interface AuthResponse {
