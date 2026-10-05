@@ -1,5 +1,6 @@
 export const environment = {
 <<<<<<< HEAD
+<<<<<<< HEAD
   production: false,
   apiUrl: 'http://localhost:3000/api',
   appName: 'FixMyCampus',
@@ -10,4 +11,8 @@ export const environment = {
   appName: 'FixMyCampus - Facilities & Plant Operations',
   useMockFallback: true,
 >>>>>>> technician
+=======
+  production: true,
+  apiUrl: 'http://localhost:5040/api'
+>>>>>>> admin
 };

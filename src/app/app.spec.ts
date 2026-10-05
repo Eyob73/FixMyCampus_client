@@ -17,6 +17,7 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
   it('should have the correct title', () => {
@@ -25,4 +26,6 @@ describe('App', () => {
     expect(app.title).toBe('FixMyCampus_client');
   });
 >>>>>>> technician
+=======
+>>>>>>> admin
 });

@@ -10,6 +10,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'destructive' 
   templateUrl: './button.html',
   styleUrl: './button.css'
 })
+<<<<<<< HEAD
 export class ButtonComponent {
   variant = input<ButtonVariant>('primary');
   size = input<'sm' | 'md' | 'lg'>('md');
@@ -28,3 +29,6 @@ export class ButtonComponent {
     }
   }
 }
+=======
+export class Button { }
+>>>>>>> admin
