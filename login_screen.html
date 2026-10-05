@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>FixMyCampus - Sign In</title>
+<!-- Material Symbols Outlined font -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN with forms plugin -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container": "#e5eeff",
+            "secondary-fixed-dim": "#93ccff",
+            "on-primary-fixed-variant": "#264191",
+            "on-surface-variant": "#444651",
+            "surface-variant": "#d3e4fe",
+            "inverse-surface": "#213145",
+            "on-background": "#0b1c30",
+            "tertiary-fixed": "#6ffbbe",
+            "on-primary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "surface-container-high": "#dce9ff",
+            "primary-fixed": "#dce1ff",
+            "on-tertiary-container": "#27c38a",
+            "surface-dim": "#cbdbf5",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed-variant": "#004b73",
+            "primary-fixed-dim": "#b6c4ff",
+            "secondary": "#006398",
+            "primary-container": "#1e3a8a",
+            "on-surface": "#0b1c30",
+            "inverse-primary": "#b6c4ff",
+            "on-primary-container": "#90a8ff",
+            "tertiary-container": "#004a31",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#cce5ff",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#757682",
+            "on-secondary-container": "#00476e",
+            "on-tertiary-fixed": "#002113",
+            "secondary-container": "#5bb8fe",
+            "surface-container-highest": "#d3e4fe",
+            "error": "#ba1a1a",
+            "surface-tint": "#4059aa",
+            "on-tertiary-fixed-variant": "#005236",
+            "surface-container-low": "#eff4ff",
+            "surface": "#f8f9ff",
+            "outline-variant": "#c5c5d3",
+            "surface-bright": "#f8f9ff",
+            "on-primary-fixed": "#00164e",
+            "tertiary": "#00311f",
+            "tertiary-fixed-dim": "#4edea3",
+            "on-secondary-fixed": "#001d31",
+            "on-tertiary": "#ffffff",
+            "inverse-on-surface": "#eaf1ff",
+            "background": "#f8f9ff",
+            "primary": "#00236f"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin-desktop": "2rem",
+            "space-md": "0.75rem",
+            "space-2xl": "2rem",
+            "space-2xs": "0.25rem",
+            "space-xl": "1.5rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-lg": "1rem",
+            "space-xs": "0.375rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "body-md": ["Inter"],
+            "display-lg": ["Inter"],
+            "headline-sm": ["Inter"],
+            "title-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-lg": ["Inter"],
+            "stat-numeric": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-sm": ["Inter"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "title-md": ["15px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "500" }],
+            "stat-numeric": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-container-high selection:text-primary">
+<!-- Top Subtle Utility Bar (Institution Status) -->
+<header class="w-full border-b border-outline-variant bg-surface-container-lowest px-6 py-2.5 flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>
+<span class="text-label-sm font-label-sm text-on-surface-variant font-medium">Campus Operations System: Normal Status</span>
+</div>
+<div class="flex items-center gap-4 text-label-sm font-label-sm">
+<a class="hover:text-primary transition-colors duration-150 flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="">University Physical Plant</span>
+</a>
+<span class="text-outline-variant">|</span>
+<a class="hover:text-primary transition-colors duration-150 flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">help_outline</span>
+<span class="">Support Desk</span>
+</a>
+</div>
+</header>
+<!-- Centered Login Canvas -->
+<main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
+<div class="w-full max-w-[440px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 sm:p-8">
+<!-- Institutional Brand Identity Header -->
+<div class="flex flex-col items-center text-center mb-7">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary mb-3.5 border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: &quot;FILL&quot; 1;">handyman</span>
+</div>
+<h1 class="text-headline-lg font-headline-lg text-primary tracking-tight font-bold">FixMyCampus</h1>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Campus Issue Reporting &amp; Maintenance</p>
+
+</div>
+<!-- Authentication Form -->
+<form class="space-y-4" id="loginForm" onsubmit="event.preventDefault(); handleFormSubmit();">
+<!-- University Email Input Field -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="universityEmail">
+            University Email
+          </label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[18px]">school</span>
+</div>
+<input class="w-full h-[38px] pl-9 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors" id="universityEmail" name="email" placeholder="name@university.edu" required="" type="email" value="student@univ.edu">
+</div>
+</div>
+<!-- Password Input Field -->
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="text-label-md font-label-md text-on-surface" for="passwordField">
+              Password
+            </label>
+<a class="text-label-sm font-label-sm text-secondary hover:text-primary transition-colors duration-150" href="#">
+              Forgot password?
+            </a>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+</div>
+<input class="w-full h-[38px] pl-9 pr-10 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors" id="passwordField" name="password" placeholder="••••••••••••" required="" type="password" value="campusPass2025!">
+<button aria-label="Toggle password visibility" class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface transition-colors" id="togglePasswordBtn" type="button">
+<span class="material-symbols-outlined text-[18px]" id="passwordToggleIcon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me Checkbox -->
+<div class="flex items-center pt-0.5">
+<input checked="" class="h-4 w-4 rounded border-outline-variant text-primary-container focus:ring-primary-container focus:ring-offset-0 transition" id="rememberMe" name="remember" type="checkbox">
+<label class="ml-2 block text-body-sm font-body-sm text-on-surface-variant cursor-pointer select-none" for="rememberMe">
+            Keep me signed in on this workstation
+          </label>
+</div>
+<!-- Primary Action Button -->
+<div class="pt-1.5">
+<button class="w-full h-[38px] px-4 bg-primary-container hover:bg-primary text-on-primary rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm transition-all duration-150 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2" id="submitBtn" type="submit">
+<span class="">Sign In</span>
+
+</button>
+</div>
+</form>
+<!-- Quick Role-Switch Test Credentials Helper (Hackathon MVP Demo) -->
+
+<!-- Registration Redirect Link -->
+<div class="mt-6 text-center">
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+          Don't have an account? 
+          <a class="font-semibold text-secondary hover:text-primary transition-colors duration-150 underline underline-offset-2" href="#">
+            Register here
+          </a>
+</p>
+</div>
+<!-- Feedback Toast / Notice (Dynamically toggled) -->
+<div class="mt-4 p-2.5 bg-surface-container rounded-lg border border-outline-variant text-label-md font-label-md text-primary flex items-center gap-2 hidden" id="statusToast">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span id="toastMessage" class="">Applied Reporter (Student) test credentials</span>
+</div>
+</div>
+</main>
+<!-- Institutional Operations Footer -->
+<footer class="w-full border-t border-outline-variant bg-surface-container-lowest py-3.5 px-6">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<div>
+<span class="">© 2025 University Physical Plant &amp; Campus Services. All rights reserved.</span>
+</div>
+<div class="flex items-center gap-4">
+<a class="hover:text-primary transition-colors" href="#">Privacy Notice</a>
+<span class="">•</span>
+<a class="hover:text-primary transition-colors" href="#">Terms of Operations</a>
+<span class="">•</span>
+<a class="hover:text-primary transition-colors" href="#">Emergency Protocol</a>
+</div>
+</div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+    // Password visibility toggle
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const passwordField = document.getElementById('passwordField');
+    const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = passwordField.getAttribute('type') === 'password';
+      passwordField.setAttribute('type', isPassword ? 'text' : 'password');
+      passwordToggleIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+    });
+
+    // Preset credential helper
+    function setCredentials(email, password, roleName) {
+      document.getElementById('universityEmail').value = email;
+      document.getElementById('passwordField').value = password;
+      
+      const toast = document.getElementById('statusToast');
+      const toastMsg = document.getElementById('toastMessage');
+      
+      toastMsg.textContent = `Applied ${roleName} test credentials`;
+      toast.classList.remove('hidden');
+      
+      // Animate focus to the primary button
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.classList.add('ring-2', 'ring-secondary');
+      setTimeout(() => {
+        submitBtn.classList.remove('ring-2', 'ring-secondary');
+      }, 600);
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Form submission mock handler
+    function handleFormSubmit() {
+      const submitBtn = document.getElementById('submitBtn');
+      const originalHTML = submitBtn.innerHTML;
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+        <span>Authenticating...</span>
+      `;
+      
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <span class="material-symbols-outlined text-[18px]">check</span>
+          <span>Access Granted</span>
+        `;
+        
+        const toast = document.getElementById('statusToast');
+        const toastMsg = document.getElementById('toastMessage');
+        toastMsg.textContent = 'Redirecting to FixMyCampus Dashboard...';
+        toast.classList.remove('hidden');
+        
+        setTimeout(() => {
+          submitBtn.innerHTML = originalHTML;
+        }, 2000);
+      }, 900);
+    }
+  </script>
+
+
+</body></html>
