@@ -2,9 +2,9 @@ import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationStore } from '../../store/notification.store';
 import { AuthService } from '../../services/auth.service';
-import { TicketService } from '../../services/ticket.service';
+import { TicketStore } from '../../store/ticket.store';
 
 @Component({
   selector: 'app-header',
@@ -18,9 +18,9 @@ export class HeaderComponent {
   @Output() openNewTicket = new EventEmitter<void>();
 
   router = inject(Router);
-  notifService = inject(NotificationService);
+  notificationStore = inject(NotificationStore);
   authService = inject(AuthService);
-  ticketService = inject(TicketService);
+  ticketStore = inject(TicketStore);
 
   searchQuery = '';
   showNotifMenu = signal<boolean>(false);
@@ -28,8 +28,8 @@ export class HeaderComponent {
   showHelpModal = signal<boolean>(false);
   showNotifications = false;
 
-  unreadCount = this.notifService.unreadCount;
-  notificationsList = this.notifService.notifications;
+  unreadCount = this.notificationStore.unreadCount;
+  notificationsList = this.notificationStore.notifications;
   currentUser = this.authService.currentUser;
 
   get userInitials(): string {
@@ -86,7 +86,7 @@ export class HeaderComponent {
   }
 
   markAllAsRead(): void {
-    this.notifService.markAllAsRead().subscribe();
+    this.notificationStore.markAllAsRead();
   }
 
   goToTickets(): void {

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService, ToastMessage } from '../../services/notification.service';
+import { ToastMessage } from '../../services/notification.service';
+import { NotificationStore } from '../../store/notification.store';
 
 @Component({
   selector: 'app-toast',
@@ -8,7 +9,7 @@ import { NotificationService, ToastMessage } from '../../services/notification.s
   imports: [CommonModule],
   template: `
     <div class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none px-4">
-      @for (toast of notificationService.toasts(); track toast.id) {
+      @for (toast of notificationStore.toasts(); track toast.id) {
         <div
           class="pointer-events-auto flex items-start gap-3 p-4 rounded-lg shadow-lg border transition-all duration-300 animate-slide-up"
           [ngClass]="getToastClasses(toast)"
@@ -24,7 +25,7 @@ import { NotificationService, ToastMessage } from '../../services/notification.s
           </div>
           <button
             type="button"
-            (click)="notificationService.dismiss(toast.id)"
+            (click)="notificationStore.dismissToast(toast.id)"
             class="text-slate-400 hover:text-slate-600 transition-colors p-1 -mr-1 -mt-1 rounded"
           >
             <span class="material-symbols-outlined text-base">close</span>
@@ -50,7 +51,8 @@ import { NotificationService, ToastMessage } from '../../services/notification.s
   `]
 })
 export class ToastComponent {
-  constructor(public notificationService: NotificationService) {}
+  public notificationStore = inject(NotificationStore);
+  constructor() {}
 
   getToastClasses(toast: ToastMessage): string {
     switch (toast.type) {

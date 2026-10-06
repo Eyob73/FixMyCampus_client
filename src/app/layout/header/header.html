@@ -289,11 +289,9 @@
     <!-- User Avatar & Role Badge -->
     @if (authService.currentUser(); as user) {
       <div class="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
-        <img
-          [src]="user.avatarUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80'"
-          [alt]="user.name"
-          class="w-8 h-8 rounded-full object-cover border border-slate-300"
-        />
+        <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-slate-500 text-sm">person</span>
+        </div>
         <div class="hidden md:block text-left">
           <p class="text-xs font-bold text-slate-900 leading-none truncate max-w-[120px]">{{ user.name }}</p>
           <span class="text-[10px] font-medium text-slate-500">Administrator</span>

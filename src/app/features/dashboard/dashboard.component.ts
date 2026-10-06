@@ -1,11 +1,12 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { StatCardComponent } from '../../components/stat-card/stat-card.component';
 import { StatusBadgeComponent } from '../../ui/badge/status-badge.component';
 import { DashboardService } from '../../services/dashboard.service';
-import { TicketService } from '../../services/ticket.service';
-import { NotificationService } from '../../services/notification.service';
+import { DashboardStore } from '../../store/dashboard.store';
+import { TicketStore } from '../../store/ticket.store';
+import { NotificationStore } from '../../store/notification.store';
 import { Ticket } from '../../models';
 
 @Component({
@@ -15,12 +16,17 @@ import { Ticket } from '../../models';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   selectedStatusFilter = signal<string>('ALL');
+
+  public dashboardStore = inject(DashboardStore);
+  public ticketStore = inject(TicketStore);
+  private notificationStore = inject(NotificationStore);
+  private router = inject(Router);
 
   // Filtered recent tickets based on clicked card or filter
   filteredRecentTickets = computed<Ticket[]>(() => {
-    const tickets = this.ticketService.tickets();
+    const tickets = this.ticketStore.tickets();
     const filter = this.selectedStatusFilter();
 
     if (filter === 'UNASSIGNED') {
@@ -41,12 +47,12 @@ export class DashboardComponent {
     return tickets.slice(0, 6);
   });
 
-  constructor(
-    public dashboardService: DashboardService,
-    public ticketService: TicketService,
-    private notificationService: NotificationService,
-    private router: Router
-  ) {}
+  constructor() {}
+
+  ngOnInit(): void {
+    this.ticketStore.loadTickets();
+    this.dashboardStore.loadAdminStats();
+  }
 
   filterBy(status: string): void {
     if (this.selectedStatusFilter() === status) {
@@ -65,16 +71,16 @@ export class DashboardComponent {
   }
 
   exportReport(): void {
-    this.notificationService.success(
-      'Operational Log Exported',
-      'CSV report generated for 8 active facilities and 15 work orders.'
-    );
+    this.notificationStore.showToast({
+      type: 'success',
+      message: 'CSV report generated for 8 active facilities and 15 work orders.'
+    });
   }
 
   broadcastAlert(): void {
-    this.notificationService.info(
-      'Campus Dispatch Notice',
-      'Chilled water pipeline maintenance scheduled for Science Quad between 18:00 - 22:00.'
-    );
+    this.notificationStore.showToast({
+      type: 'info',
+      message: 'Chilled water pipeline maintenance scheduled for Science Quad between 18:00 - 22:00.'
+    });
   }
 }

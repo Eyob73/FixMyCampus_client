@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TicketService } from '../../../services/ticket.service';
-import { NotificationService } from '../../../services/notification.service';
+import { NotificationStore } from '../../../store/notification.store';
 import {
   Ticket,
   TicketFilterOptions,
@@ -361,7 +361,7 @@ import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm
 })
 export class TicketListComponent implements OnInit {
   private readonly ticketService = inject(TicketService);
-  private readonly notification = inject(NotificationService);
+  private readonly notificationStore = inject(NotificationStore);
   private readonly route = inject(ActivatedRoute);
 
   tickets = signal<Ticket[]>([]);
@@ -423,7 +423,7 @@ export class TicketListComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.notification.error('Failed to load tickets from backend API.');
+        this.notificationStore.showToast({ type: 'error', message: 'Failed to load tickets from backend API.' });
         this.loading.set(false);
       },
     });
@@ -490,14 +490,14 @@ export class TicketListComponent implements OnInit {
       .updateStatus(ticketId, 'IN_PROGRESS', 'Technician arrived on site and initiated diagnostic repair.')
       .subscribe({
         next: () => {
-          this.notification.success(`Ticket #${ticketId} is now marked IN PROGRESS.`);
+          this.notificationStore.showToast({ type: 'success', message: `Ticket #${ticketId} is now marked IN PROGRESS.` });
           this.confirmLoading = false;
           this.confirmModalOpen = false;
           this.pendingTicketToStart = null;
           this.loadTickets();
         },
         error: () => {
-          this.notification.error(`Failed to update status for Ticket #${ticketId}.`);
+          this.notificationStore.showToast({ type: 'error', message: `Failed to update status for Ticket #${ticketId}.` });
           this.confirmLoading = false;
         },
       });

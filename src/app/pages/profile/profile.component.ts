@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { TicketService } from '../../services/ticket.service';
+import { TicketStore } from '../../store/ticket.store';
 import { TicketStats } from '../../models/ticket.model';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 import { FormFieldComponent } from '../../components/form-field/form-field';
@@ -24,7 +24,7 @@ import { FormFieldComponent } from '../../components/form-field/form-field';
 export class ProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private ticketService = inject(TicketService);
+  private ticketStore = inject(TicketStore);
 
   currentUser = this.authService.currentUser;
   stats = signal<TicketStats | null>(null);
@@ -57,9 +57,15 @@ export class ProfileComponent implements OnInit {
       });
     }
 
-    this.ticketService.getTicketStats().subscribe({
-      next: (s: TicketStats) => this.stats.set(s)
-    });
+    const tickets = this.ticketStore.tickets();
+    const st = {
+      totalSubmitted: tickets.length,
+      openCount: tickets.filter(t => t.status === 'NEW').length,
+      inProgressCount: tickets.filter(t => t.status === 'IN_PROGRESS').length,
+      resolvedCount: tickets.filter(t => t.status === 'RESOLVED').length,
+      closedCount: tickets.filter(t => t.status === 'CLOSED').length
+    };
+    this.stats.set(st);
   }
 
   onSubmit(): void {

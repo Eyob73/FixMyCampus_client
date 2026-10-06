@@ -1,11 +1,11 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { StatusBadgeComponent } from '../../../ui/badge/status-badge.component';
-import { NotificationService } from '../../../services/notification.service';
-import { ReporterService } from '../../../services/reporter.service';
-import { TicketService } from '../../../services/ticket.service';
+import { NotificationStore } from '../../../store/notification.store';
+import { ReporterStore } from '../../../store/reporter.store';
+import { TicketStore } from '../../../store/ticket.store';
 import { Reporter, ReporterRole, ReporterStatus, Ticket } from '../../../models';
 
 @Component({
@@ -15,7 +15,15 @@ import { Reporter, ReporterRole, ReporterStatus, Ticket } from '../../../models'
   templateUrl: './reporter-list.component.html',
   styleUrl: './reporter-list.component.css'
 })
-export class ReporterListComponent {
+export class ReporterListComponent implements OnInit {
+  private notificationStore = inject(NotificationStore);
+  public reporterStore = inject(ReporterStore);
+  public ticketStore = inject(TicketStore);
+
+  ngOnInit() {
+    this.reporterStore.loadReporters();
+  }
+
   searchQuery = signal<string>('');
   roleFilter = signal<ReporterRole | 'ALL'>('ALL');
 
@@ -23,7 +31,7 @@ export class ReporterListComponent {
   showDetailModal = false;
 
   filteredReporters = computed<Reporter[]>(() => {
-    let list = this.reporterService.reporters();
+    let list = this.reporterStore.reporters();
     const query = this.searchQuery().toLowerCase().trim();
     const role = this.roleFilter();
 
@@ -47,14 +55,8 @@ export class ReporterListComponent {
   selectedReporterTickets = computed<Ticket[]>(() => {
     const rep = this.selectedReporter();
     if (!rep) return [];
-    return this.ticketService.tickets().filter((t) => t.reporterId === rep.id || t.reporterEmail === rep.email);
+    return this.ticketStore.tickets().filter((t) => t.reporterId === rep.id || t.reporterEmail === rep.email);
   });
-
-  constructor(
-    public reporterService: ReporterService,
-    public ticketService: TicketService,
-    private notificationService: NotificationService
-  ) {}
 
   viewReporter(rep: Reporter): void {
     this.selectedReporter.set(rep);
@@ -63,14 +65,11 @@ export class ReporterListComponent {
 
   toggleReporterStatus(rep: Reporter): void {
     const nextStatus: ReporterStatus = rep.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    this.reporterService.toggleStatus(rep.id, nextStatus).subscribe({
-      next: (updated) => {
-        this.selectedReporter.set(updated);
-        this.notificationService.success(
-          'Account Updated',
-          `${rep.name} status set to ${nextStatus}.`
-        );
-      }
+    this.reporterStore.toggleReporterStatus({ id: rep.id, newStatus: nextStatus });
+    this.selectedReporter.update((r) => r ? { ...r, status: nextStatus } : null);
+    this.notificationStore.showToast({
+      type: 'success',
+      message: `${rep.name} status set to ${nextStatus}.`
     });
   }
 }

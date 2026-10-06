@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationStore } from '../../store/notification.store';
 import { AppNotification } from '../../models/notification.model';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 
@@ -13,17 +13,17 @@ import { PageContainerComponent } from '../../layout/page-container/page-contain
   styleUrl: './notifications.component.css'
 })
 export class NotificationsComponent implements OnInit {
-  private notifService = inject(NotificationService);
+  private notificationStore = inject(NotificationStore);
 
-  notifications = this.notifService.notifications;
-  unreadCount = this.notifService.unreadCount;
+  notifications = this.notificationStore.notifications;
+  unreadCount = this.notificationStore.unreadCount;
 
   filterTab = signal<'all' | 'unread'>('all');
   loading = signal<boolean>(false);
 
   filteredList = computed(() => {
     if (this.filterTab() === 'unread') {
-      return this.notifications().filter((n) => !n.read);
+      return this.notifications().filter((n: AppNotification) => !n.read);
     }
     return this.notifications();
   });
@@ -33,22 +33,18 @@ export class NotificationsComponent implements OnInit {
   }
 
   refresh(): void {
-    this.loading.set(true);
-    this.notifService.getNotifications().subscribe({
-      next: () => this.loading.set(false),
-      error: () => this.loading.set(false)
-    });
+    this.notificationStore.loadNotifications();
   }
 
   markAsRead(item: AppNotification, event: Event): void {
     event.stopPropagation();
     if (!item.read) {
-      this.notifService.markAsRead(item.id).subscribe();
+      this.notificationStore.markAsRead(item.id);
     }
   }
 
   markAllAsRead(): void {
-    this.notifService.markAllAsRead().subscribe();
+    this.notificationStore.markAllAsRead();
   }
 
   getIcon(type: string): string {

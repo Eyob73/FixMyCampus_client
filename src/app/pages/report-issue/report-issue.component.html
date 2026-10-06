@@ -95,7 +95,7 @@
                 [ngClass]="isFieldInvalid('category') ? 'border-[#DC2626]' : 'border-[#CBD5E1] focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/15'"
               >
                 <option value="" disabled selected>Select category...</option>
-                @for (cat of categories; track cat) {
+                @for (cat of categories(); track cat) {
                   <option [value]="cat">{{ cat }}</option>
                 }
               </select>
@@ -147,7 +147,7 @@
                 [ngClass]="isFieldInvalid('building') ? 'border-[#DC2626]' : 'border-[#CBD5E1] focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/15'"
               >
                 <option value="" disabled selected>Select campus building...</option>
-                @for (b of buildings; track b) {
+                @for (b of buildings(); track b) {
                   <option [value]="b">{{ b }}</option>
                 }
               </select>

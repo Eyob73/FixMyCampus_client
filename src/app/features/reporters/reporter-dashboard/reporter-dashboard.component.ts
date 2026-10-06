@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-
+import { DashboardStore } from '../../../store/dashboard.store';
 @Component({
   selector: 'app-reporter-dashboard',
   standalone: true,
@@ -56,21 +56,36 @@ import { AuthService } from '../../../services/auth.service';
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
-              <span class="material-symbols-outlined text-2xl text-primary mb-2">add_task</span>
-              <h3 class="text-sm font-semibold text-on-surface">Submit New Request</h3>
-              <p class="text-xs text-on-surface-variant mt-1">Report electrical, plumbing, HVAC, or structural campus issues.</p>
-            </div>
-            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
-              <span class="material-symbols-outlined text-2xl text-secondary mb-2">pending_actions</span>
-              <h3 class="text-sm font-semibold text-on-surface">Active Reports</h3>
-              <p class="text-xs text-on-surface-variant mt-1">Track progress on issues submitted by your department.</p>
-            </div>
-            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
-              <span class="material-symbols-outlined text-2xl text-tertiary-container mb-2">verified</span>
-              <h3 class="text-sm font-semibold text-on-surface">Resolved Tickets</h3>
-              <p class="text-xs text-on-surface-variant mt-1">Review inspection sign-offs and completed maintenance work orders.</p>
-            </div>
+            <a routerLink="/reporter/tickets/new" class="block p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary transition-colors cursor-pointer group">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="material-symbols-outlined text-2xl text-primary mb-2 group-hover:scale-110 transition-transform">add_task</span>
+                  <h3 class="text-sm font-semibold text-on-surface">Submit New Request</h3>
+                  <p class="text-xs text-on-surface-variant mt-1">Report electrical, plumbing, HVAC, or structural campus issues.</p>
+                </div>
+                <span class="text-3xl font-bold text-primary">{{ dashboardStore.reporterStats()?.totalTickets ?? 0 }}</span>
+              </div>
+            </a>
+            <a routerLink="/reporter/tickets" [queryParams]="{ status: 'OPEN' }" class="block p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:border-secondary transition-colors cursor-pointer group">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="material-symbols-outlined text-2xl text-secondary mb-2 group-hover:scale-110 transition-transform">pending_actions</span>
+                  <h3 class="text-sm font-semibold text-on-surface">Active Reports</h3>
+                  <p class="text-xs text-on-surface-variant mt-1">Track progress on issues submitted by your department.</p>
+                </div>
+                <span class="text-3xl font-bold text-secondary">{{ (dashboardStore.reporterStats()?.newTickets ?? 0) + (dashboardStore.reporterStats()?.assignedTickets ?? 0) + (dashboardStore.reporterStats()?.inProgressTickets ?? 0) }}</span>
+              </div>
+            </a>
+            <a routerLink="/reporter/tickets" [queryParams]="{ status: 'RESOLVED' }" class="block p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:border-tertiary-container transition-colors cursor-pointer group">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="material-symbols-outlined text-2xl text-tertiary-container mb-2 group-hover:scale-110 transition-transform">verified</span>
+                  <h3 class="text-sm font-semibold text-on-surface">Resolved Tickets</h3>
+                  <p class="text-xs text-on-surface-variant mt-1">Review inspection sign-offs and completed maintenance work orders.</p>
+                </div>
+                <span class="text-3xl font-bold text-tertiary-container">{{ dashboardStore.reporterStats()?.resolvedTickets ?? 0 }}</span>
+              </div>
+            </a>
           </div>
         </div>
       </main>
@@ -82,6 +97,14 @@ import { AuthService } from '../../../services/auth.service';
     </div>
   `
 })
-export class ReporterDashboardComponent {
-  constructor(public authService: AuthService) {}
+export class ReporterDashboardComponent implements OnInit {
+  readonly dashboardStore = inject(DashboardStore);
+
+  constructor(
+    public authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.dashboardStore.loadReporterStats();
+  }
 }

@@ -4,7 +4,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TicketService } from '../../services/ticket.service';
 import { Ticket, TicketStatus, TicketPriority } from '../../models/ticket.model';
-import { CAMPUS_BUILDINGS, TICKET_CATEGORIES } from '../../core/mock-data';
+import { MetadataService } from '../../services/metadata.service';
 import { StatusBadge } from '../../components/status-badge/status-badge';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 
@@ -43,8 +43,10 @@ export class MyTicketsComponent implements OnInit {
   currentPage = signal<number>(1);
   pageSize = signal<number>(6);
 
-  buildings = CAMPUS_BUILDINGS;
-  categories = TICKET_CATEGORIES;
+  private metadataService = inject(MetadataService);
+
+  buildings = this.metadataService.buildings;
+  categories = this.metadataService.categories;
 
   // Filtered list
   filteredTickets = computed(() => {

@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
-import { TechnicianService } from '../../services/technician.service';
-import { TicketService } from '../../services/ticket.service';
-import { NotificationService } from '../../services/notification.service';
+import { TechnicianStore } from '../../store/technician.store';
+import { TicketStore } from '../../store/ticket.store';
+import { NotificationStore } from '../../store/notification.store';
 
 @Component({
   selector: 'app-reports',
@@ -13,17 +13,18 @@ import { NotificationService } from '../../services/notification.service';
   styleUrl: './reports.component.css'
 })
 export class ReportsComponent {
+  public technicianStore = inject(TechnicianStore);
+  public ticketStore = inject(TicketStore);
+  private notificationStore = inject(NotificationStore);
+
   constructor(
-    public dashboardService: DashboardService,
-    public technicianService: TechnicianService,
-    public ticketService: TicketService,
-    private notificationService: NotificationService
+    public dashboardService: DashboardService
   ) {}
 
   exportAudit(): void {
-    this.notificationService.success(
-      'Audit Package Generated',
-      'Download initiated for complete facilities operational logs (Q3/Q4).'
-    );
+    this.notificationStore.showToast({
+      type: 'success',
+      message: 'Download initiated for complete facilities operational logs (Q3/Q4).'
+    });
   }
 }

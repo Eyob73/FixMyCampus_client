@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TicketService } from '../../../services/ticket.service';
+import { TicketStore } from '../../../store/ticket.store';
 import { AuthService } from '../../../services/auth.service';
-import { NotificationService } from '../../../services/notification.service';
+import { NotificationStore } from '../../../store/notification.store';
 import {
   Ticket,
   TicketStatus,
@@ -770,10 +771,11 @@ export class TicketDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly ticketService = inject(TicketService);
+  readonly ticketStore = inject(TicketStore);
   readonly authService = inject(AuthService);
-  private readonly notification = inject(NotificationService);
+  private readonly notificationStore = inject(NotificationStore);
 
-  readonly ticket = this.ticketService.selectedTicket;
+  readonly ticket = this.ticketStore.selectedTicket;
   readonly loading = signal<boolean>(false);
   readonly actionLoading = signal<boolean>(false);
   readonly submittingNote = signal<boolean>(false);
@@ -820,10 +822,12 @@ export class TicketDetailComponent implements OnInit {
         if (ticket) {
           this.manualStatusSelect = ticket.status;
         }
+        // Actually, we can use ticketStore for fetching:
+        this.ticketStore.loadTicketById(id);
         this.loading.set(false);
       },
       error: () => {
-        this.notification.error(`Failed to load Ticket #${id}.`);
+        this.notificationStore.showToast({ type: 'error', message: `Failed to load Ticket #${id}.` });
         this.loading.set(false);
       },
     });
@@ -855,13 +859,14 @@ export class TicketDetailComponent implements OnInit {
       .updateStatus(current.id, 'IN_PROGRESS', 'Technician arrived on site and began diagnostic/repair procedures.')
       .subscribe({
         next: () => {
-          this.notification.success(`Ticket #${current.id} transitioned to IN PROGRESS.`);
+          this.notificationStore.showToast({ type: 'success', message: `Ticket #${current.id} transitioned to IN PROGRESS.` });
+          this.ticketStore.loadTicketById(current.id);
           this.actionLoading.set(false);
           this.confirmStartModalOpen = false;
           this.manualStatusSelect = 'IN_PROGRESS';
         },
         error: () => {
-          this.notification.error(`Failed to update ticket status.`);
+          this.notificationStore.showToast({ type: 'error', message: `Failed to update ticket status.` });
           this.actionLoading.set(false);
         },
       });
@@ -881,11 +886,12 @@ export class TicketDetailComponent implements OnInit {
       .updateStatus(current.id, this.manualStatusSelect, `Technician updated status to ${this.manualStatusSelect}.`)
       .subscribe({
         next: () => {
-          this.notification.success(`Ticket #${current.id} status updated to ${this.manualStatusSelect}.`);
+          this.notificationStore.showToast({ type: 'success', message: `Ticket #${current.id} status updated to ${this.manualStatusSelect}.` });
+          this.ticketStore.loadTicketById(current.id);
           this.actionLoading.set(false);
         },
         error: () => {
-          this.notification.error(`Failed to update ticket status.`);
+          this.notificationStore.showToast({ type: 'error', message: `Failed to update ticket status.` });
           this.actionLoading.set(false);
         },
       });
@@ -898,12 +904,13 @@ export class TicketDetailComponent implements OnInit {
     this.submittingNote.set(true);
     this.ticketService.addWorkNote(current.id, this.newNoteContent.trim(), this.newNoteType).subscribe({
       next: () => {
-        this.notification.success('Work note logged successfully.');
+        this.notificationStore.showToast({ type: 'success', message: 'Work note logged successfully.' });
+        this.ticketStore.loadTicketById(current.id);
         this.newNoteContent = '';
         this.submittingNote.set(false);
       },
       error: () => {
-        this.notification.error('Failed to log work note.');
+        this.notificationStore.showToast({ type: 'error', message: 'Failed to log work note.' });
         this.submittingNote.set(false);
       },
     });
@@ -944,13 +951,14 @@ export class TicketDetailComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.notification.success(`Ticket #${current.id} has been resolved!`);
+          this.notificationStore.showToast({ type: 'success', message: `Ticket #${current.id} has been resolved!` });
+          this.ticketStore.loadTicketById(current.id);
           this.submittingResolution.set(false);
           this.showResolutionModal = false;
           this.manualStatusSelect = 'RESOLVED';
         },
         error: () => {
-          this.notification.error('Failed to resolve ticket. Please try again.');
+          this.notificationStore.showToast({ type: 'error', message: 'Failed to resolve ticket. Please try again.' });
           this.submittingResolution.set(false);
         },
       });
@@ -988,13 +996,14 @@ export class TicketDetailComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.notification.success(`Evidence file "${this.stagedFile?.name}" uploaded.`);
+          this.notificationStore.showToast({ type: 'success', message: `Evidence file "${this.stagedFile?.name}" uploaded.` });
+          this.ticketStore.loadTicketById(current.id);
           this.stagedFile = null;
           this.stagedFileSize = '';
           this.uploadingEvidence.set(false);
         },
         error: () => {
-          this.notification.error('Failed to upload evidence file.');
+          this.notificationStore.showToast({ type: 'error', message: 'Failed to upload evidence file.' });
           this.uploadingEvidence.set(false);
         },
       });
@@ -1006,7 +1015,7 @@ export class TicketDetailComponent implements OnInit {
 
   copyTicketLink(): void {
     navigator.clipboard?.writeText(window.location.href);
-    this.notification.info('Ticket link copied to clipboard.');
+    this.notificationStore.showToast({ type: 'info', message: 'Ticket link copied to clipboard.' });
   }
 
   // Step helper methods

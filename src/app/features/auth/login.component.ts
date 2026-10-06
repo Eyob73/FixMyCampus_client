@@ -1,9 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationStore } from '../../store/notification.store';
 import { LoginRequest, UserRole } from '../../models';
 
 @Component({
@@ -20,10 +20,11 @@ export class LoginComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   returnUrl: string | null = null;
 
+  private readonly notificationStore = inject(NotificationStore);
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private notificationService: NotificationService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -71,17 +72,20 @@ export class LoginComponent implements OnInit {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         this.isSubmitting.set(false);
-        this.notificationService.success(
-          'Authentication Successful',
-          `Welcome back, ${response.user.name}.`
-        );
+        this.notificationStore.showToast({
+          type: 'success',
+          message: `Welcome back, ${response.user.name}.`
+        });
         this.redirectUser(response.user.role);
       },
       error: (err: Error) => {
         this.isSubmitting.set(false);
         const message = err.message || 'Authentication failed. Please verify your credentials.';
         this.errorMessage.set(message);
-        this.notificationService.error('Sign In Failed', message);
+        this.notificationStore.showToast({
+          type: 'error',
+          message
+        });
       }
     });
   }

@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BuildingService } from '../../services/building.service';
-import { NotificationService } from '../../services/notification.service';
-import { TechnicianService } from '../../services/technician.service';
+import { BuildingStore } from '../../store/building.store';
+import { NotificationStore } from '../../store/notification.store';
+import { TechnicianStore } from '../../store/technician.store';
 import { TicketService } from '../../services/ticket.service';
+import { TicketStore } from '../../store/ticket.store';
 import { CreateTicketDto, TicketCategory, TicketPriority } from '../../models';
 
 @Component({
@@ -98,7 +99,7 @@ import { CreateTicketDto, TicketCategory, TicketPriority } from '../../models';
                   formControlName="building"
                   class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
                 >
-                  @for (b of buildingService.buildings(); track b.id) {
+                  @for (b of buildingStore.buildings(); track b.id) {
                     <option [value]="b.name">{{ b.name }}</option>
                   }
                 </select>
@@ -135,7 +136,7 @@ import { CreateTicketDto, TicketCategory, TicketPriority } from '../../models';
                 class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
               >
                 <option value="">-- Unassigned (Send to Queue) --</option>
-                @for (tech of technicianService.technicians(); track tech.id) {
+                @for (tech of technicianStore.technicians(); track tech.id) {
                   <option [value]="tech.id">
                     {{ tech.name }} ({{ tech.specialty }}) - {{ tech.status }}
                   </option>
@@ -189,12 +190,14 @@ export class TicketCreateModalComponent implements OnInit {
   form!: FormGroup;
   isSubmitting = false;
 
+  readonly buildingStore = inject(BuildingStore);
+  readonly technicianStore = inject(TechnicianStore);
+  private readonly ticketStore = inject(TicketStore);
+  private readonly notificationStore = inject(NotificationStore);
+
   constructor(
     private fb: FormBuilder,
-    public buildingService: BuildingService,
-    public technicianService: TechnicianService,
-    private ticketService: TicketService,
-    private notificationService: NotificationService
+    private ticketService: TicketService
   ) {}
 
   ngOnInit(): void {
@@ -202,7 +205,7 @@ export class TicketCreateModalComponent implements OnInit {
   }
 
   private initForm(): void {
-    const defaultBuilding = this.buildingService.buildings()[0]?.name || 'Physical Sciences Hall & Labs';
+    const defaultBuilding = this.buildingStore.buildings()[0]?.name || 'Physical Sciences Hall & Labs';
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
@@ -241,15 +244,19 @@ export class TicketCreateModalComponent implements OnInit {
     this.ticketService.createTicket(dto).subscribe({
       next: (ticket) => {
         this.isSubmitting = false;
-        this.notificationService.success(
-          'Ticket Created Successfully',
-          `Work order #${ticket.ticketNumber} has been dispatched.`
-        );
+        this.notificationStore.showToast({
+          type: 'success',
+          message: `Work order #${ticket.ticketNumber} has been dispatched.`
+        });
+        this.ticketStore.loadTickets(); // refresh store
         this.onClose();
       },
       error: () => {
         this.isSubmitting = false;
-        this.notificationService.error('Failed to create ticket', 'Please review input details and retry.');
+        this.notificationStore.showToast({
+          type: 'error',
+          message: 'Please review input details and retry.'
+        });
       }
     });
   }

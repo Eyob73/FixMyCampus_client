@@ -1,11 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TicketService } from '../../../services/ticket.service';
+import { DashboardStore } from '../../../store/dashboard.store';
 import { AuthService } from '../../../services/auth.service';
-import { NotificationService } from '../../../services/notification.service';
+import { NotificationStore } from '../../../store/notification.store';
 import {
-  TechnicianDashboardStats,
   Ticket,
   TicketStatus,
 } from '../../../models/ticket.model';
@@ -477,84 +477,68 @@ import { PriorityBadge } from '../../../components/priority-badge/priority-badge
 })
 export class TechnicianDashboardComponent implements OnInit {
   readonly ticketService = inject(TicketService);
+  readonly dashboardStore = inject(DashboardStore);
   readonly authService = inject(AuthService);
-  private readonly notification = inject(NotificationService);
+  private readonly notificationStore = inject(NotificationStore);
 
-  readonly stats = this.ticketService.currentStats;
-  readonly recentTickets = signal<Ticket[]>([]);
-  readonly loading = signal<boolean>(false);
+  readonly stats = this.dashboardStore.technicianStats;
+  readonly recentTickets = computed(() => this.stats()?.recentTickets || []);
+  readonly loading = this.dashboardStore.isLoading;
 
   ngOnInit(): void {
     this.refreshData();
   }
 
   refreshData(): void {
-    this.loading.set(true);
-    this.ticketService.getDashboardStats().subscribe({
-      next: () => {},
-      error: (err) => {
-        this.notification.error('Failed to load dashboard statistics from backend API.');
-        this.loading.set(false);
-      },
-    });
-
-    this.ticketService.getTechnicianTickets({ pageSize: 6, sortBy: 'updatedAt', sortDirection: 'desc' }).subscribe({
-      next: (res) => {
-        this.recentTickets.set(res.tickets);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-      },
-    });
+    this.dashboardStore.loadTechnicianStats();
   }
 
   quickStartWork(ticket: Ticket): void {
     this.ticketService.updateStatus(ticket.id, 'IN_PROGRESS', 'Technician started work via quick action.').subscribe({
       next: () => {
-        this.notification.success(`Ticket #${ticket.id} status updated to IN PROGRESS.`);
+        this.notificationStore.showToast({ type: 'success', message: `Ticket #${ticket.id} status updated to IN PROGRESS.` });
         this.refreshData();
       },
       error: () => {
-        this.notification.error(`Failed to update ticket #${ticket.id}.`);
+        this.notificationStore.showToast({ type: 'error', message: `Failed to update ticket #${ticket.id}.` });
       },
     });
   }
 
   get completionRate(): number {
     const s = this.stats();
-    if (!s || s.totalAssigned === 0) return 0;
-    const completed = s.resolved + s.closed;
+    if (!s || !s.totalAssigned) return 0;
+    const completed = (s.resolved || 0) + (s.closed || 0);
     return Math.round((completed / s.totalAssigned) * 100);
   }
 
   get assignedPercent(): number {
     const s = this.stats();
-    if (!s || s.totalAssigned === 0) return 0;
-    return (s.newAssigned / s.totalAssigned) * 100;
+    if (!s || !s.totalAssigned) return 0;
+    return ((s.newAssigned || 0) / s.totalAssigned) * 100;
   }
 
   get inProgressPercent(): number {
     const s = this.stats();
-    if (!s || s.totalAssigned === 0) return 0;
-    return (s.inProgress / s.totalAssigned) * 100;
+    if (!s || !s.totalAssigned) return 0;
+    return ((s.inProgress || 0) / s.totalAssigned) * 100;
   }
 
   get resolvedPercent(): number {
     const s = this.stats();
-    if (!s || s.totalAssigned === 0) return 0;
-    return (s.resolved / s.totalAssigned) * 100;
+    if (!s || !s.totalAssigned) return 0;
+    return ((s.resolved || 0) / s.totalAssigned) * 100;
   }
 
   get closedPercent(): number {
     const s = this.stats();
-    if (!s || s.totalAssigned === 0) return 0;
-    return (s.closed / s.totalAssigned) * 100;
+    if (!s || !s.totalAssigned) return 0;
+    return ((s.closed || 0) / s.totalAssigned) * 100;
   }
 
   calcPriorityPercent(count: number | undefined): number {
     const s = this.stats();
-    if (!s || s.totalAssigned === 0 || !count) return 0;
+    if (!s || !s.totalAssigned || !count) return 0;
     return Math.min(100, Math.round((count / s.totalAssigned) * 100));
   }
 

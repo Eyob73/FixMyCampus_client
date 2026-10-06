@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TicketService } from '../../services/ticket.service';
 import { TicketCategory, TicketPriority } from '../../models/ticket.model';
-import { CAMPUS_BUILDINGS, TICKET_CATEGORIES } from '../../core/mock-data';
+import { MetadataService } from '../../services/metadata.service';
 import { PageContainerComponent } from '../../layout/page-container/page-container';
 import { FormFieldComponent } from '../../components/form-field/form-field';
 
@@ -34,8 +34,10 @@ export class ReportIssueComponent {
   private ticketService = inject(TicketService);
   private router = inject(Router);
 
-  buildings = CAMPUS_BUILDINGS;
-  categories = TICKET_CATEGORIES;
+  private metadataService = inject(MetadataService);
+
+  buildings = this.metadataService.buildings;
+  categories = this.metadataService.categories;
 
   submitting = signal<boolean>(false);
   submitSuccess = signal<string | null>(null);

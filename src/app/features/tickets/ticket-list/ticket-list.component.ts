@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,9 +6,10 @@ import { FilterBarComponent } from '../../../components/filter-bar/filter-bar.co
 import { StatusBadgeComponent } from '../../../ui/badge/status-badge.component';
 import { ConfirmModalComponent } from '../../../ui/confirm-modal/confirm-modal.component';
 import { TicketCreateModalComponent } from '../../../components/ticket-create-modal/ticket-create-modal.component';
-import { BuildingService } from '../../../services/building.service';
-import { NotificationService } from '../../../services/notification.service';
-import { TechnicianService } from '../../../services/technician.service';
+import { BuildingStore } from '../../../store/building.store';
+import { NotificationStore } from '../../../store/notification.store';
+import { TechnicianStore } from '../../../store/technician.store';
+import { TicketStore } from '../../../store/ticket.store';
 import { TicketService } from '../../../services/ticket.service';
 import { Ticket, TicketFilterParams, TicketStatus } from '../../../models';
 
@@ -40,9 +41,16 @@ export class TicketListComponent implements OnInit {
   showBulkStatusModal = false;
   bulkStatusTarget: TicketStatus = 'IN_PROGRESS';
 
+  public ticketStore = inject(TicketStore);
+  public buildingStore = inject(BuildingStore);
+  public technicianStore = inject(TechnicianStore);
+  private notificationStore = inject(NotificationStore);
+  private ticketService = inject(TicketService);
+  private route = inject(ActivatedRoute);
+
   // Filtered tickets
   filteredTickets = computed<Ticket[]>(() => {
-    let result = [...this.ticketService.tickets()];
+    let result = [...this.ticketStore.tickets()];
     const p = this.filterParams();
 
     if (p.search) {
@@ -89,15 +97,10 @@ export class TicketListComponent implements OnInit {
     return Math.ceil(this.filteredTickets().length / this.pageSize()) || 1;
   });
 
-  constructor(
-    public ticketService: TicketService,
-    public buildingService: BuildingService,
-    public technicianService: TechnicianService,
-    private notificationService: NotificationService,
-    private route: ActivatedRoute
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
+    this.ticketStore.loadTickets();
     this.route.queryParams.subscribe((params) => {
       if (params['status']) {
         this.filterParams.update((f) => ({ ...f, status: params['status'] }));
@@ -160,7 +163,11 @@ export class TicketListComponent implements OnInit {
     if (this.ticketToDelete) {
       this.ticketService.deleteTicket(this.ticketToDelete).subscribe({
         next: () => {
-          this.notificationService.success('Ticket Deleted', `Ticket #${this.ticketToDelete} has been removed.`);
+          this.notificationStore.showToast({
+            type: 'success',
+            message: `Ticket #${this.ticketToDelete} has been removed.`
+          });
+          this.ticketStore.loadTickets(); // reload
           this.showConfirmDelete = false;
           this.ticketToDelete = null;
         }
@@ -178,13 +185,13 @@ export class TicketListComponent implements OnInit {
     if (!ids.length) return;
 
     ids.forEach((id) => {
-      this.ticketService.updateStatus(id, this.bulkStatusTarget).subscribe();
+      this.ticketStore.updateTicketStatus({ id, status: this.bulkStatusTarget });
     });
 
-    this.notificationService.success(
-      'Bulk Update Applied',
-      `Updated ${ids.length} tickets to ${this.bulkStatusTarget}.`
-    );
+    this.notificationStore.showToast({
+      type: 'success',
+      message: `Updated ${ids.length} tickets to ${this.bulkStatusTarget}.`
+    });
     this.selectedTicketIds.set(new Set());
     this.showBulkStatusModal = false;
   }

@@ -62,7 +62,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          @for (tech of technicianService.technicians(); track tech.id) {
+          @for (tech of technicianStore.technicians(); track tech.id) {
             <tr>
               <td class="py-3 px-3 font-bold text-slate-900">{{ tech.name }}</td>
               <td class="py-3 px-3 text-slate-600">{{ tech.specialty }}</td>

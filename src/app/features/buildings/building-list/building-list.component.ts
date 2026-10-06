@@ -1,12 +1,12 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { StatusBadgeComponent } from '../../../ui/badge/status-badge.component';
 import { ConfirmModalComponent } from '../../../ui/confirm-modal/confirm-modal.component';
-import { BuildingService } from '../../../services/building.service';
-import { NotificationService } from '../../../services/notification.service';
-import { TicketService } from '../../../services/ticket.service';
+import { BuildingStore } from '../../../store/building.store';
+import { NotificationStore } from '../../../store/notification.store';
+import { TicketStore } from '../../../store/ticket.store';
 import { Building, CampusZone, CreateBuildingDto } from '../../../models';
 
 @Component({
@@ -17,6 +17,11 @@ import { Building, CampusZone, CreateBuildingDto } from '../../../models';
   styleUrl: './building-list.component.css'
 })
 export class BuildingListComponent {
+  public buildingStore = inject(BuildingStore);
+  public ticketStore = inject(TicketStore);
+  private notificationStore = inject(NotificationStore);
+  private fb = inject(FormBuilder);
+
   searchQuery = signal<string>('');
   zoneFilter = signal<CampusZone | 'ALL'>('ALL');
 
@@ -27,13 +32,13 @@ export class BuildingListComponent {
   buildingToDelete: Building | null = null;
 
   filteredBuildings = computed<Building[]>(() => {
-    let list = this.buildingService.buildings();
+    let list = this.buildingStore.buildings();
     const query = this.searchQuery().toLowerCase().trim();
     const zone = this.zoneFilter();
 
     if (query) {
       list = list.filter(
-        (b) =>
+        (b: Building) =>
           b.name.toLowerCase().includes(query) ||
           b.code.toLowerCase().includes(query) ||
           b.managerName.toLowerCase().includes(query)
@@ -41,18 +46,13 @@ export class BuildingListComponent {
     }
 
     if (zone !== 'ALL') {
-      list = list.filter((b) => b.zone === zone);
+      list = list.filter((b: Building) => b.zone === zone);
     }
 
     return list;
   });
 
-  constructor(
-    public buildingService: BuildingService,
-    public ticketService: TicketService,
-    private notificationService: NotificationService,
-    private fb: FormBuilder
-  ) {
+  constructor() {
     this.initForm();
   }
 
@@ -72,14 +72,14 @@ export class BuildingListComponent {
     if (this.addForm.invalid) return;
 
     const dto: CreateBuildingDto = this.addForm.value;
-    this.buildingService.createBuilding(dto).subscribe({
-      next: (bld) => {
-        this.notificationService.success('Facility Registered', `${bld.name} added to campus zones.`);
-        this.showAddModal = false;
-        this.addForm.reset();
-        this.initForm();
-      }
+    this.buildingStore.createBuilding(dto);
+    this.notificationStore.showToast({
+      type: 'success',
+      message: `${dto.name} added to campus zones.`
     });
+    this.showAddModal = false;
+    this.addForm.reset();
+    this.initForm();
   }
 
   promptDelete(bld: Building): void {
@@ -91,12 +91,12 @@ export class BuildingListComponent {
     if (!this.buildingToDelete) return;
     const name = this.buildingToDelete.name;
 
-    this.buildingService.deleteBuilding(this.buildingToDelete.id).subscribe({
-      next: () => {
-        this.notificationService.success('Facility Removed', `${name} archived.`);
-        this.showDeleteModal = false;
-        this.buildingToDelete = null;
-      }
+    this.buildingStore.deleteBuilding(this.buildingToDelete.id);
+    this.notificationStore.showToast({
+      type: 'success',
+      message: `${name} archived.`
     });
+    this.showDeleteModal = false;
+    this.buildingToDelete = null;
   }
 }

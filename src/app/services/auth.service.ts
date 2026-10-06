@@ -111,7 +111,7 @@ export class AuthService {
   }
 
   /**
-   * Update User Profile (Mock implementation for now since .NET API doesn't have the endpoint yet)
+   * Update User Profile
    */
   public updateProfile(dto: UpdateProfileDto): Observable<User> {
     const currentUser = this.currentUserSignal();
@@ -119,22 +119,22 @@ export class AuthService {
       return throwError(() => new Error('No user is currently logged in.'));
     }
 
-    const updatedUser: User = {
-      ...currentUser,
-      name: dto.name,
-      phone: dto.phone ?? currentUser.phone,
-      departmentOrHall: dto.departmentOrHall ?? currentUser.departmentOrHall,
-      affiliation: dto.affiliation ?? currentUser.affiliation,
-      notificationPreferences: dto.notificationPreferences ?? currentUser.notificationPreferences
-    };
-
-    this.currentUserSignal.set(updatedUser);
-    
-    // Update the stored user
-    const storage = localStorage.getItem(this.USER_KEY) ? localStorage : sessionStorage;
-    storage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
-
-    return of(updatedUser);
+    return this.http.put<User>(`${this.apiUrl}/profile`, dto).pipe(
+      map(updatedUser => {
+        // Fallback merge just in case API doesn't return full user
+        const mergedUser: User = {
+          ...currentUser,
+          ...updatedUser
+        };
+        this.currentUserSignal.set(mergedUser);
+        
+        // Update the stored user
+        const storage = localStorage.getItem(this.USER_KEY) ? localStorage : sessionStorage;
+        storage.setItem(this.USER_KEY, JSON.stringify(mergedUser));
+        
+        return mergedUser;
+      })
+    );
   }
 
   /**
@@ -153,7 +153,8 @@ export class AuthService {
 
     // Extract user profile
     const rawUser = response.user || response.data?.user || response;
-    const rawRole = (rawUser.role || response.role || '').toString().trim().toUpperCase();
+    const roleValue = rawUser.role || response.role || (response.roles && response.roles.length > 0 ? response.roles[0] : '');
+    const rawRole = roleValue.toString().trim().toUpperCase();
 
     // Check account status
     if (rawUser.isActive === false || response.isActive === false) {

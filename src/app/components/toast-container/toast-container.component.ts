@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService, ToastMessage } from '../../services/notification.service';
+import { NotificationStore } from '../../store/notification.store';
 
 @Component({
   selector: 'app-toast-container',
@@ -11,7 +12,7 @@ import { NotificationService, ToastMessage } from '../../services/notification.s
       class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"
       aria-live="polite"
     >
-      @for (toast of notificationService.toasts(); track toast.id) {
+      @for (toast of notificationStore.toasts(); track toast.id) {
         <div
           class="pointer-events-auto flex items-start gap-3 p-4 rounded-lg shadow-lg border text-sm transition-all duration-200 transform translate-y-0"
           [ngClass]="getToastClasses(toast.type)"
@@ -28,7 +29,7 @@ import { NotificationService, ToastMessage } from '../../services/notification.s
           </div>
           <button
             type="button"
-            (click)="notificationService.dismiss(toast.id)"
+            (click)="notificationStore.dismissToast(toast.id)"
             class="text-current opacity-60 hover:opacity-100 transition-opacity p-0.5 rounded"
             aria-label="Dismiss notification"
           >
@@ -40,7 +41,7 @@ import { NotificationService, ToastMessage } from '../../services/notification.s
   `,
 })
 export class ToastContainerComponent {
-  readonly notificationService = inject(NotificationService);
+  readonly notificationStore = inject(NotificationStore);
 
   getToastIcon(type: ToastMessage['type']): string {
     switch (type) {

@@ -28,3 +28,38 @@ export interface WeeklyVelocity {
   created: number;
   resolved: number;
 }
+
+export interface ReporterDashboardDto {
+  totalTickets: number;
+  newTickets: number;
+  assignedTickets: number;
+  inProgressTickets: number;
+  resolvedTickets: number;
+}
+
+export interface AdminDashboardDto {
+  totalTickets: number;
+  newTickets: number;
+  assignedTickets: number;
+  inProgressTickets: number;
+  resolvedTickets: number;
+  closedTickets: number;
+  unassignedTickets: number;
+  recentTickets: any[]; // Or Ticket[]
+}
+
+export interface TechnicianDashboardDto {
+  totalAssigned: number;
+  newAssigned: number;
+  inProgress: number;
+  resolved: number;
+  closed: number;
+  highPriority: number;
+  priorityCounts: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+  };
+  recentTickets: any[];
+}

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { TicketStore } from '../../../store/ticket.store';
 
 @Component({
   selector: 'app-technician-dashboard',
@@ -56,20 +57,29 @@ import { AuthService } from '../../../services/auth.service';
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
-              <span class="material-symbols-outlined text-2xl text-amber-600 mb-2">assignment</span>
-              <h3 class="text-sm font-semibold text-on-surface">Assigned Queue</h3>
-              <p class="text-xs text-on-surface-variant mt-1">Work orders waiting for on-site triage and component diagnostics.</p>
+            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant flex justify-between items-start">
+              <div>
+                <span class="material-symbols-outlined text-2xl text-amber-600 mb-2">assignment</span>
+                <h3 class="text-sm font-semibold text-on-surface">Assigned Queue</h3>
+                <p class="text-xs text-on-surface-variant mt-1">Work orders waiting for on-site triage.</p>
+              </div>
+              <span class="text-3xl font-bold text-amber-600">{{ ticketStore.currentStats()?.assignedTickets || 0 }}</span>
             </div>
-            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
-              <span class="material-symbols-outlined text-2xl text-sky-600 mb-2">build</span>
-              <h3 class="text-sm font-semibold text-on-surface">In-Progress Repairs</h3>
-              <p class="text-xs text-on-surface-variant mt-1">Active repair orders currently undergoing physical remediation.</p>
+            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant flex justify-between items-start">
+              <div>
+                <span class="material-symbols-outlined text-2xl text-sky-600 mb-2">build</span>
+                <h3 class="text-sm font-semibold text-on-surface">In-Progress Repairs</h3>
+                <p class="text-xs text-on-surface-variant mt-1">Active repair orders.</p>
+              </div>
+              <span class="text-3xl font-bold text-sky-600">{{ ticketStore.currentStats()?.inProgressTickets || 0 }}</span>
             </div>
-            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
-              <span class="material-symbols-outlined text-2xl text-emerald-600 mb-2">task_alt</span>
-              <h3 class="text-sm font-semibold text-on-surface">Completed Jobs</h3>
-              <p class="text-xs text-on-surface-variant mt-1">Resolved maintenance tickets awaiting supervisory quality signoff.</p>
+            <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant flex justify-between items-start">
+              <div>
+                <span class="material-symbols-outlined text-2xl text-emerald-600 mb-2">task_alt</span>
+                <h3 class="text-sm font-semibold text-on-surface">Completed Jobs</h3>
+                <p class="text-xs text-on-surface-variant mt-1">Resolved tickets awaiting signoff.</p>
+              </div>
+              <span class="text-3xl font-bold text-emerald-600">{{ ticketStore.currentStats()?.resolvedTickets || 0 }}</span>
             </div>
           </div>
         </div>
@@ -82,6 +92,14 @@ import { AuthService } from '../../../services/auth.service';
     </div>
   `
 })
-export class TechnicianDashboardComponent {
-  constructor(public authService: AuthService) {}
+export class TechnicianDashboardComponent implements OnInit {
+  readonly ticketStore = inject(TicketStore);
+
+  constructor(
+    public authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.ticketStore.loadDashboardStats();
+  }
 }

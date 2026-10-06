@@ -127,18 +127,24 @@ export interface TicketStats {
 }
 
 export interface TechnicianDashboardStats {
-  activeTickets: number;
-  urgentTickets: number;
-  resolvedToday: number;
-  avgResolutionTimeHours: number;
-  openTickets: Ticket[];
-  totalAssigned: number;
-  newAssigned: number;
-  inProgress: number;
-  resolved: number;
-  closed: number;
-  highPriority: number;
-  priorityCounts: {
+  assignedTickets: number;
+  inProgressTickets: number;
+  resolvedTickets: number;
+  recentTickets?: Ticket[];
+  
+  // legacy/mock fields
+  activeTickets?: number;
+  urgentTickets?: number;
+  resolvedToday?: number;
+  avgResolutionTimeHours?: number;
+  openTickets?: Ticket[];
+  totalAssigned?: number;
+  newAssigned?: number;
+  inProgress?: number;
+  resolved?: number;
+  closed?: number;
+  highPriority?: number;
+  priorityCounts?: {
     critical: number;
     high: number;
     medium: number;
