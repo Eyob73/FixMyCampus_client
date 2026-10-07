@@ -1,59 +1,85 @@
-# FixMyCampusClient
+# FixMyCampus — Campus Maintenance Tracking
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.0.
+FixMyCampus is a comprehensive issue tracking platform designed to bridge the gap between students (reporters) and campus administration (admins). It streamlines the process of reporting, assigning, and resolving campus maintenance complaints such as Wi-Fi dropouts, broken plumbing, and lighting failures.
 
-## Development server
+## Team Members & Responsibilities
 
-To start a local development server, run:
+- [Name] — Team Lead & Pitch
+- [Name] — Frontend Developer
+- [Name] — Backend Developer
+- [Name] — Database & Full-Stack Developer
+- [Name] — QA & Testing
 
-```bash
-ng serve
-```
+## Features and Workflows
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The application provides distinct interfaces and workflows for different user roles:
 
-## Code scaffolding
+### Reporter (Student/Staff)
+- **Dashboard**: View campus feed and personal ticket summary.
+- **Report Issue**: Submit new maintenance tickets with location (Building, Room), category, and detailed descriptions.
+- **Track Status**: Monitor the progress of submitted tickets (New -> Assigned -> In Progress -> Resolved).
+- **View History**: Access previously reported issues and their resolutions.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Administrator
+- **Admin Dashboard**: Overview of all campus tickets with advanced filtering.
+- **Manage Problems**: Review reported issues and update their statuses.
+- **Assign Technician**: Assign specific maintenance staff or technicians to open tickets.
+- **View History**: Track the lifecycle and history of all maintenance requests.
 
-```bash
-ng generate component component-name
-```
+## Tech Stack Used
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **Frontend**: Angular 22
+- **Backend**: ASP.NET Core Web API (.NET 10)
+- **Database**: Entity Framework Core with PostgreSQL
 
-```bash
-ng generate --help
-```
+## How to Run Locally
 
-## Building
+### Backend Setup
 
-To build the project run:
+1. Navigate to the backend API directory:
+   ```bash
+   cd FixMyCampus_API/FixMyCampus.Api
+   ```
+2. Restore .NET dependencies:
+   ```bash
+   dotnet restore
+   ```
+3. Update the database (ensure PostgreSQL is running and connection strings in `appsettings.json` are correct):
+   ```bash
+   dotnet ef database update
+   ```
+4. Run the API:
+   ```bash
+   dotnet run
+   ```
 
-```bash
-ng build
-```
+### Frontend Setup
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+1. Navigate to the frontend directory:
+   ```bash
+   cd FixMyCampus_client
+   ```
+2. Install npm packages:
+   ```bash
+   npm install
+   ```
+3. Start the Angular development server:
+   ```bash
+   ng serve
+   ```
+   Navigate to `http://localhost:4200/` in your browser.
 
-## Running unit tests
+## Test Accounts & Demo Credentials
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+- **Admin / Staff User**: admin@hackathon.local / Admin123!
+- **Standard User**: user@hackathon.local / User123!
+- **Technician User**: tech@hackathon.local / Technician123!
 
-```bash
-ng test
-```
+## Working Features
 
-## Running end-to-end tests
+- User Authentication (Login) for Admin and Reporters.
+- Reporter Dashboard displaying the campus feed and user's tickets.
+- Issue Reporting form with category, building, and room selection.
+- Admin Dashboard for viewing and filtering all tickets.
+- Ticket assignment and status lifecycle (New -> Assigned -> In Progress -> Resolved).
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
