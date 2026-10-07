@@ -49,11 +49,11 @@ export class SidebarComponent {
 
     if (this.authService.isReporter()) {
       return [
-        { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-        { label: 'Report Issue', icon: 'add_circle', route: '/report-issue' },
-        { label: 'My Tickets', icon: 'confirmation_number', route: '/my-tickets' },
-        { label: 'Notifications', icon: 'notifications', route: '/notifications', showBadge: true },
-        { label: 'Profile', icon: 'person', route: '/profile' }
+        { label: 'Dashboard', icon: 'dashboard', route: '/reporter/dashboard' },
+        { label: 'Report Issue', icon: 'add_circle', route: '/reporter/report-issue' },
+        { label: 'My Tickets', icon: 'confirmation_number', route: '/reporter/my-tickets' },
+        { label: 'Notifications', icon: 'notifications', route: '/reporter/notifications', showBadge: true },
+        { label: 'Profile', icon: 'person', route: '/reporter/profile' }
       ];
     }
 

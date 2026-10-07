@@ -28,10 +28,24 @@ export class TicketService {
   private mapBackendStatus(status: string): TicketStatus {
     const s = (status || '').toLowerCase();
     if (s === 'new') return 'NEW';
+    if (s === 'assigned') return 'ASSIGNED';
     if (s === 'inprogress' || s === 'in progress') return 'IN_PROGRESS';
     if (s === 'resolved') return 'RESOLVED';
     if (s === 'closed') return 'CLOSED';
     return 'NEW';
+  }
+
+  private mapBackendPriority(priority: any): any {
+    if (typeof priority === 'string') {
+      return priority.toUpperCase() || 'MEDIUM';
+    }
+    switch (priority) {
+      case 0: return 'LOW';
+      case 1: return 'MEDIUM';
+      case 2: return 'HIGH';
+      case 3: return 'CRITICAL';
+      default: return 'MEDIUM';
+    }
   }
 
   private mapToTicket(dto: any): Ticket {
@@ -46,8 +60,14 @@ export class TicketService {
       category: dto.category,
       building: dto.building,
       room: dto.room,
-      priority: 'MEDIUM',
+      priority: this.mapBackendPriority(dto.priority),
       status: this.mapBackendStatus(dto.status),
+      assignedTechnicianId: dto.assignedTechnician?.id,
+      assignedTechnicianName: dto.assignedTechnician?.fullName,
+      assignedTechnician: dto.assignedTechnician ? {
+        id: dto.assignedTechnician.id,
+        name: dto.assignedTechnician.fullName
+      } : undefined,
       attachments: [],
       activityLog: [],
       createdAt: dto.createdAt,
@@ -141,7 +161,7 @@ export class TicketService {
   }
   
   updatePriority(id: string, priority: string): Observable<Ticket> {
-    return this.http.patch<any>(`${this.baseUrl}/${id}/priority`, { priority }).pipe(
+    return this.http.patch<any>(`${this.baseUrl}/${id}/priority`, { priority: this.mapPriorityToInt(priority) }).pipe(
       map(t => this.mapToTicket(t))
     );
   }
@@ -202,11 +222,23 @@ export class TicketService {
     );
   }
 
+  private mapPriorityToInt(priority: string): number {
+    switch (priority) {
+      case 'LOW': return 0;
+      case 'MEDIUM': return 1;
+      case 'HIGH': return 2;
+      case 'CRITICAL': return 3;
+      default: return 1; // Default to MEDIUM
+    }
+  }
+
   createTicket(dto: CreateTicketDto): Observable<Ticket> {
     const payload = {
+      title: dto.title,
       category: dto.category,
       building: dto.building,
       room: dto.room,
+      priority: this.mapPriorityToInt(dto.priority),
       description: dto.description
     };
 

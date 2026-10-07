@@ -13,36 +13,28 @@
       </p>
     </div>
 
-    <button
-      type="button"
-      (click)="showAddModal = true"
-      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-900 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
-    >
+    <button type="button" (click)="openAddModal()"
+      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-900 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
       <span class="material-symbols-outlined text-base">person_add</span>
       Add Technician
     </button>
   </div>
 
   <!-- Search & Filter Bar -->
-  <div class="bg-white border border-slate-200 rounded-lg p-3 lg:p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+  <div
+    class="bg-white border border-slate-200 rounded-lg p-3 lg:p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
     <div class="relative flex-1 min-w-[240px] max-w-md">
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-      <input
-        type="text"
-        [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)"
+      <span
+        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+      <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
         placeholder="Search technician name, specialty, or email..."
-        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded text-sm focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
-      />
+        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded text-sm focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary" />
     </div>
 
     <div class="flex items-center gap-2">
       <label class="text-xs font-semibold text-slate-500">Status:</label>
-      <select
-        [ngModel]="statusFilter()"
-        (ngModelChange)="statusFilter.set($event)"
-        class="border border-slate-300 rounded px-3 py-2 bg-white text-xs font-semibold text-slate-700 cursor-pointer"
-      >
+      <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)"
+        class="border border-slate-300 rounded px-3 py-2 bg-white text-xs font-semibold text-slate-700 cursor-pointer">
         <option value="ALL">All Statuses</option>
         <option value="AVAILABLE">Available</option>
         <option value="BUSY">Busy</option>
@@ -55,253 +47,217 @@
   <!-- Technician Roster Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
     @for (tech of filteredTechnicians(); track tech.id) {
-      <div
-        (click)="openDetail(tech)"
-        class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs hover:border-primary hover:shadow-md transition-all duration-150 cursor-pointer flex flex-col justify-between space-y-4 group"
-      >
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0 group-hover:ring-2 group-hover:ring-primary transition-all">
-              <span class="material-symbols-outlined text-slate-500 text-2xl">person</span>
-            </div>
-            <div class="min-w-0">
-              <h3 class="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
-                {{ tech.name }}
-              </h3>
-              <p class="text-xs text-slate-500 truncate">{{ tech.specialty }}</p>
-              <span class="text-[11px] text-slate-400 block truncate">{{ tech.department }}</span>
-            </div>
+    <div (click)="openDetail(tech)"
+      class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs hover:border-primary hover:shadow-md transition-all duration-150 cursor-pointer flex flex-col justify-between space-y-4 group">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0 group-hover:ring-2 group-hover:ring-primary transition-all">
+            <span class="material-symbols-outlined text-slate-500 text-2xl">person</span>
           </div>
-
-          <app-status-badge [status]="tech.status"></app-status-badge>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-slate-50 rounded border border-slate-100 text-center">
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Active</span>
-            <span class="text-sm font-bold text-slate-800">{{ tech.activeTicketsCount }}</span>
-          </div>
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Resolved</span>
-            <span class="text-sm font-bold text-emerald-700">{{ tech.resolvedTicketsCount }}</span>
-          </div>
-          <div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase block">Rating</span>
-            <span class="text-sm font-bold text-amber-600 flex items-center justify-center gap-0.5">
-              ★ {{ tech.rating || 4.9 }}
-            </span>
+          <div class="min-w-0">
+            <h3 class="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
+              {{ tech.name }}
+            </h3>
+            <p class="text-xs text-slate-500 truncate">{{ tech.specialty }}</p>
+            <span class="text-[11px] text-slate-400 block truncate">{{ tech.department }}</span>
           </div>
         </div>
 
-        <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-          <span class="truncate">{{ tech.phone }}</span>
-          <div class="flex items-center gap-1">
-            <button
-              type="button"
-              (click)="promptDelete(tech, $event)"
-              class="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-              title="Remove from roster"
-            >
-              <span class="material-symbols-outlined text-base">delete</span>
-            </button>
-            <span class="text-primary font-semibold group-hover:underline">View Load &rarr;</span>
-          </div>
+        <app-status-badge [status]="tech.status"></app-status-badge>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-slate-50 rounded border border-slate-100 text-center">
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Active</span>
+          <span class="text-sm font-bold text-slate-800">{{ tech.activeTicketsCount }}</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Resolved</span>
+          <span class="text-sm font-bold text-emerald-700">{{ tech.resolvedTicketsCount }}</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Rating</span>
+          <span class="text-sm font-bold text-amber-600 flex items-center justify-center gap-0.5">
+            ★ {{ tech.rating || 4.9 }}
+          </span>
         </div>
       </div>
+
+      <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+        <span class="truncate">{{ tech.phone }}</span>
+        <div class="flex items-center gap-1">
+          <button type="button" (click)="promptDelete(tech, $event)"
+            class="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors" title="Remove from roster">
+            <span class="material-symbols-outlined text-base">delete</span>
+          </button>
+          <span class="text-primary font-semibold group-hover:underline">View Load &rarr;</span>
+        </div>
+      </div>
+    </div>
     } @empty {
-      <div class="col-span-full py-16 text-center text-slate-400 space-y-2 bg-white rounded-lg border border-slate-200">
-        <span class="material-symbols-outlined text-4xl text-slate-300">engineering</span>
-        <p class="text-sm font-semibold text-slate-700">No technicians found.</p>
-        <p class="text-xs text-slate-400">Try modifying search keywords or status filter.</p>
-      </div>
+    <div class="col-span-full py-16 text-center text-slate-400 space-y-2 bg-white rounded-lg border border-slate-200">
+      <span class="material-symbols-outlined text-4xl text-slate-300">engineering</span>
+      <p class="text-sm font-semibold text-slate-700">No technicians found.</p>
+      <p class="text-xs text-slate-400">Try modifying search keywords or status filter.</p>
+    </div>
     }
   </div>
 
-  <!-- Detail Drawer -->
-  @if (showDetailDrawer && selectedTechnician(); as tech) {
-    <div class="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-xs flex justify-end animate-fade-in">
-      <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between overflow-y-auto">
-        <!-- Drawer Header -->
-        <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center">
-              <span class="material-symbols-outlined text-slate-500 text-xl">person</span>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">{{ tech.name }}</h3>
-              <p class="text-xs text-primary font-medium">{{ tech.specialty }}</p>
-            </div>
-          </div>
-          <button (click)="closeDetail()" class="text-slate-400 hover:text-slate-600 p-1">
-            <span class="material-symbols-outlined text-xl">close</span>
-          </button>
+  <!-- Detail Modal -->
+  <ng-template #techDetailDialogTemplate>
+    @if (selectedTechnician(); as tech) {
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-slate-500 text-xl">person</span>
         </div>
-
-        <!-- Drawer Content -->
-        <div class="p-5 flex-1 space-y-6">
-          <div class="space-y-3 text-xs">
-            <div class="flex justify-between py-1.5 border-b border-slate-100">
-              <span class="text-slate-500">Status:</span>
-              <app-status-badge [status]="tech.status"></app-status-badge>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-slate-100">
-              <span class="text-slate-500">Email:</span>
-              <a [href]="'mailto:' + tech.email" class="text-primary font-medium hover:underline">{{ tech.email }}</a>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-slate-100">
-              <span class="text-slate-500">Phone:</span>
-              <span class="font-semibold text-slate-800">{{ tech.phone }}</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-slate-100">
-              <span class="text-slate-500">Department:</span>
-              <span class="text-slate-800">{{ tech.department }}</span>
-            </div>
-          </div>
-
-          <!-- Assigned Tickets -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
-              <span>Assigned Work Orders</span>
-              <span class="text-primary font-semibold font-mono">{{ selectedTechTickets().length }}</span>
-            </h4>
-
-            <div class="space-y-2">
-              @for (ticket of selectedTechTickets(); track ticket.id) {
-                <a
-                  [routerLink]="['/admin/tickets', ticket.ticketNumber]"
-                  (click)="closeDetail()"
-                  class="p-3 rounded-lg border border-slate-200 hover:border-primary block transition-all group"
-                >
-                  <div class="flex items-center justify-between text-xs mb-1">
-                    <span class="font-mono font-bold text-primary">{{ ticket.ticketNumber }}</span>
-                    <app-status-badge [status]="ticket.status"></app-status-badge>
-                  </div>
-                  <h5 class="text-xs font-bold text-slate-800 group-hover:text-primary transition-colors truncate">
-                    {{ ticket.title }}
-                  </h5>
-                  <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">domain</span>
-                    {{ ticket.building }}
-                  </p>
-                </a>
-              } @empty {
-                <p class="text-xs text-slate-400 py-6 text-center bg-slate-50 rounded-lg">
-                  No active tickets assigned currently.
-                </p>
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
-          <button
-            type="button"
-            (click)="closeDetail()"
-            class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-100"
-          >
-            Close
-          </button>
+        <div class="min-w-0">
+          <h3 class="text-base font-bold text-slate-900 m-0 truncate">{{ tech.name }}</h3>
+          <p class="text-xs text-primary font-medium m-0 truncate">{{ tech.specialty }}</p>
         </div>
       </div>
+      <button mat-icon-button (click)="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
-  }
+
+    <!-- Modal Content -->
+    <mat-dialog-content class="!p-6 !pt-4 custom-scrollbar">
+      <div class="space-y-6">
+        <div class="space-y-3 text-xs">
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Status:</span>
+            <app-status-badge [status]="tech.status"></app-status-badge>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Email:</span>
+            <a [href]="'mailto:' + tech.email" class="text-primary font-medium hover:underline truncate">{{ tech.email
+              }}</a>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Phone:</span>
+            <span class="font-semibold text-slate-800">{{ tech.phone }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Department:</span>
+            <span class="text-slate-800 truncate">{{ tech.department }}</span>
+          </div>
+        </div>
+
+        <!-- Assigned Tickets -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+            <span>Assigned Work Orders</span>
+            <span class="text-primary font-semibold font-mono">{{ selectedTechTickets().length }}</span>
+          </h4>
+
+          <div class="space-y-2">
+            @for (ticket of selectedTechTickets(); track ticket.id) {
+            <a [routerLink]="['/admin/tickets', ticket.ticketNumber]" (click)="closeDetail()"
+              class="p-3 rounded-lg border border-slate-200 hover:border-primary block transition-all group">
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-mono font-bold text-primary">{{ ticket.ticketNumber }}</span>
+                <app-status-badge [status]="ticket.status"></app-status-badge>
+              </div>
+              <h5 class="text-xs font-bold text-slate-800 group-hover:text-primary transition-colors truncate">
+                {{ ticket.title }}
+              </h5>
+              <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">domain</span>
+                {{ ticket.building }}
+              </p>
+            </a>
+            } @empty {
+            <p class="text-xs text-slate-400 py-6 text-center bg-slate-50 rounded-lg">
+              No active tickets assigned currently.
+            </p>
+            }
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="!px-6 !py-4 border-t border-slate-100 bg-slate-50/50">
+      <button mat-button (click)="closeDetail()" class="!text-slate-600 font-medium">Close</button>
+    </mat-dialog-actions>
+    }
+  </ng-template>
 
   <!-- Add Technician Modal -->
-  @if (showAddModal) {
-    <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4 animate-fade-in">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-bold text-slate-900">Add Maintenance Specialist</h3>
-          <button (click)="showAddModal = false" class="text-slate-400 hover:text-slate-600">
-            <span class="material-symbols-outlined">close</span>
-          </button>
+  <ng-template #addTechDialogTemplate>
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 text-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-xl">person_add</span>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 m-0 leading-tight">Add Maintenance Specialist</h3>
+        </div>
+      </div>
+      <button mat-icon-button (click)="closeAddModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <mat-dialog-content class="!p-6 !pt-4 custom-scrollbar">
+      <form [formGroup]="addForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
+          <input type="text" formControlName="name" placeholder="e.g. Liam Gallagher"
+            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
         </div>
 
-        <form [formGroup]="addForm" (ngSubmit)="submitNewTech()" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
-            <input
-              type="text"
-              formControlName="name"
-              placeholder="e.g. Liam Gallagher"
-              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white"
-            />
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Email *</label>
+            <input type="email" formControlName="email" placeholder="name@facilities.campus.edu"
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone *</label>
+            <input type="text" formControlName="phone" placeholder="(555) 000-0000"
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
+          </div>
+        </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Email *</label>
-              <input
-                type="email"
-                formControlName="email"
-                placeholder="name@facilities.campus.edu"
-                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Phone *</label>
-              <input
-                type="text"
-                formControlName="phone"
-                placeholder="(555) 000-0000"
-                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white"
-              />
-            </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Specialty *</label>
+            <input type="text" formControlName="specialty" placeholder="e.g. Master Plumber"
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+            <select formControlName="status"
+              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white">
+              <option value="AVAILABLE">Available</option>
+              <option value="BUSY">Busy</option>
+              <option value="ON_CALL">On Call</option>
+              <option value="OFF_DUTY">Off Duty</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </mat-dialog-content>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Specialty *</label>
-              <input
-                type="text"
-                formControlName="specialty"
-                placeholder="e.g. Master Plumber"
-                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
-              <select
-                formControlName="status"
-                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white"
-              >
-                <option value="AVAILABLE">Available</option>
-                <option value="BUSY">Busy</option>
-                <option value="ON_CALL">On Call</option>
-                <option value="OFF_DUTY">Off Duty</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-            <button
-              type="button"
-              (click)="showAddModal = false"
-              class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              [disabled]="addForm.invalid"
-              class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-blue-900 disabled:opacity-50 rounded"
-            >
-              Save Technician
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
+    <!-- Modal Actions -->
+    <mat-dialog-actions align="end" class="!px-6 !py-4 border-t border-slate-100 bg-slate-50/50">
+      <button mat-button (click)="closeAddModal()" class="!text-slate-600">Cancel</button>
+      <button mat-flat-button color="primary" [disabled]="addForm.invalid" (click)="submitNewTech()"
+        class="!rounded-lg !px-6">
+        Save Technician
+      </button>
+    </mat-dialog-actions>
+  </ng-template>
 
   <!-- Delete Modal -->
-  <app-confirm-modal
-    [isOpen]="showDeleteModal"
-    title="Remove Technician"
+  <app-confirm-modal [isOpen]="showDeleteModal" title="Remove Technician"
     [message]="'Are you sure you want to remove ' + technicianToDelete?.name + ' from the staff roster?'"
-    confirmText="Remove"
-    [isDanger]="true"
-    (confirm)="confirmDelete()"
-    (cancel)="showDeleteModal = false"
-  ></app-confirm-modal>
+    confirmText="Remove" [isDanger]="true" (confirm)="confirmDelete()"
+    (cancel)="showDeleteModal = false"></app-confirm-modal>
 </div>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { HeaderComponent } from '../header/header';
-import { ToastComponent } from '../../ui/toast/toast.component';
+
 import { TicketCreateModalComponent } from '../../components/ticket-create-modal/ticket-create-modal.component';
 
 @Component({
@@ -14,7 +14,6 @@ import { TicketCreateModalComponent } from '../../components/ticket-create-modal
     RouterModule,
     SidebarComponent,
     HeaderComponent,
-    ToastComponent,
     TicketCreateModalComponent
   ],
   template: `
@@ -42,8 +41,6 @@ import { TicketCreateModalComponent } from '../../components/ticket-create-modal
         (closeModal)="showCreateModal = false"
       ></app-ticket-create-modal>
 
-      <!-- Toast Alerts Container -->
-      <app-toast></app-toast>
     </div>
   `
 })

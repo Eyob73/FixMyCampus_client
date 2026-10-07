@@ -7,46 +7,53 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div
-      class="bg-white border border-slate-200 rounded-lg p-5 transition-all duration-150 relative overflow-hidden group"
+      class="bg-white border border-slate-200 rounded-[14px] p-[1.125rem_1.25rem] transition-all duration-200 relative overflow-hidden group flex items-center gap-4"
       [ngClass]="{
-        'hover:border-slate-300 hover:shadow-md cursor-pointer': clickable,
-        'ring-2 ring-primary border-primary': active
+        'hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)] hover:border-primary cursor-pointer': clickable,
+        'border-primary shadow-[0_8px_24px_rgba(0,0,0,0.18)]': active
       }"
       (click)="onClick()"
     >
-      <div class="flex items-center justify-between gap-3 mb-3">
-        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ label }}</span>
-        <div
-          class="w-9 h-9 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
-          [ngClass]="iconContainerClass"
-        >
-          <span class="material-symbols-outlined text-lg" [ngClass]="iconColorClass">
-            {{ icon }}
-          </span>
-        </div>
+      <div
+        class="w-[44px] h-[44px] rounded-[12px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
+        [ngClass]="iconContainerClass"
+      >
+        <span class="material-symbols-outlined text-[1.25rem] w-[1.25rem] h-[1.25rem] flex items-center justify-center" [ngClass]="iconColorClass">
+          {{ icon }}
+        </span>
       </div>
 
-      <div class="flex items-baseline justify-between gap-2">
-        <span class="text-2xl lg:text-3xl font-bold text-slate-900 font-stat-numeric tracking-tight">
-          {{ value }}
-        </span>
+      <div class="flex flex-col gap-[0.15rem] flex-1">
+        <div class="flex justify-between items-center gap-2">
+          <span class="text-[0.9rem] font-semibold text-slate-900 tracking-tight">{{ label }}</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-[1.5rem] font-bold text-slate-900 font-stat-numeric tracking-tight leading-none">
+            {{ value }}
+          </span>
+        </div>
         @if (trendText) {
           <span
-            class="text-xs font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-0.5"
+            class="text-[0.775rem] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-0.5 mt-1"
             [ngClass]="trendPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
           >
-            <span class="material-symbols-outlined text-xs">
+            <span class="material-symbols-outlined text-[0.775rem]">
               {{ trendPositive ? 'trending_up' : 'trending_down' }}
             </span>
             {{ trendText }}
           </span>
         }
+        @if (subtext) {
+          <p class="text-[0.775rem] text-slate-500 m-0">
+            {{ subtext }}
+          </p>
+        }
       </div>
 
-      @if (subtext) {
-        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-          {{ subtext }}
-        </p>
+      @if (clickable) {
+        <span class="material-symbols-outlined text-[1.1rem] w-[1.1rem] h-[1.1rem] text-slate-400 group-hover:text-primary transition-colors">
+          chevron_right
+        </span>
       }
     </div>
   `

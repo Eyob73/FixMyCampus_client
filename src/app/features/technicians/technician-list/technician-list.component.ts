@@ -1,18 +1,21 @@
-import { Component, computed, signal, OnInit, inject } from '@angular/core';
+import { Component, computed, signal, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import { StatusBadgeComponent } from '../../../ui/badge/status-badge.component';
 import { ConfirmModalComponent } from '../../../ui/confirm-modal/confirm-modal.component';
 import { NotificationStore } from '../../../store/notification.store';
 import { TechnicianStore } from '../../../store/technician.store';
 import { TicketStore } from '../../../store/ticket.store';
 import { CreateTechnicianDto, Technician, TechnicianStatus, Ticket } from '../../../models';
+import { TechnicianService } from '../../../services/technician.service';
 
 @Component({
   selector: 'app-technician-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, StatusBadgeComponent, ConfirmModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, StatusBadgeComponent, ConfirmModalComponent, MatDialogModule, MatButtonModule],
   templateUrl: './technician-list.component.html',
   styleUrl: './technician-list.component.css'
 })
@@ -21,16 +24,23 @@ export class TechnicianListComponent implements OnInit {
   public ticketStore = inject(TicketStore);
   private notificationStore = inject(NotificationStore);
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  private technicianService = inject(TechnicianService);
 
   searchQuery = signal<string>('');
   statusFilter = signal<TechnicianStatus | 'ALL'>('ALL');
 
   // Modals
-  showAddModal = false;
+  @ViewChild('addTechDialogTemplate') addTechDialogTemplate!: TemplateRef<any>;
+  @ViewChild('techDetailDialogTemplate') techDetailDialogTemplate!: TemplateRef<any>;
+  private addDialogRef: MatDialogRef<any> | null = null;
+  private detailDialogRef: MatDialogRef<any> | null = null;
+  
   addForm!: FormGroup;
+  isSubmitting = signal<boolean>(false);
+  errorMessage = signal<string | null>(null);
 
   selectedTechnician = signal<Technician | null>(null);
-  showDetailDrawer = false;
 
   showDeleteModal = false;
   technicianToDelete: Technician | null = null;
@@ -86,27 +96,65 @@ export class TechnicianListComponent implements OnInit {
 
   openDetail(tech: Technician): void {
     this.selectedTechnician.set(tech);
-    this.showDetailDrawer = true;
+    this.detailDialogRef = this.dialog.open(this.techDetailDialogTemplate, {
+      width: '500px',
+      panelClass: 'custom-dialog-container'
+    });
   }
 
   closeDetail(): void {
-    this.showDetailDrawer = false;
+    if (this.detailDialogRef) {
+      this.detailDialogRef.close();
+      this.detailDialogRef = null;
+    }
     this.selectedTechnician.set(null);
+  }
+
+  openAddModal(): void {
+    this.addForm.reset();
+    this.initForm();
+    this.errorMessage.set(null);
+    this.isSubmitting.set(false);
+    this.addDialogRef = this.dialog.open(this.addTechDialogTemplate, {
+      width: '500px',
+      panelClass: 'custom-dialog-container',
+      disableClose: true // force using buttons
+    });
+  }
+
+  closeAddModal(): void {
+    if (this.addDialogRef) {
+      this.addDialogRef.close();
+      this.addDialogRef = null;
+    }
   }
 
   submitNewTech(): void {
     if (this.addForm.invalid) return;
 
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
     const dto: CreateTechnicianDto = this.addForm.value;
-    // For now we don't have create in TechnicianStore rxMethod but we can assume addTechnician or skip real call
-    // Assuming technicianStore.addTechnician exists, or just use NotificationStore
-    this.notificationStore.showToast({
-      type: 'success',
-      message: `${dto.name} added to staff roster.`
+
+    this.technicianService.createTechnician(dto).subscribe({
+      next: (newTech: Technician) => {
+        this.isSubmitting.set(false);
+        this.notificationStore.showToast({
+          type: 'success',
+          message: `${newTech.name} added to staff roster.`
+        });
+        this.technicianStore.loadTechnicians(); // Refresh list from backend
+        this.closeAddModal();
+      },
+      error: (err: any) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(err?.error?.message || 'Failed to add technician. Please try again.');
+        this.notificationStore.showToast({
+          type: 'error',
+          message: 'Error creating technician.'
+        });
+      }
     });
-    this.showAddModal = false;
-    this.addForm.reset();
-    this.initForm();
   }
 
   promptDelete(tech: Technician, event: Event): void {

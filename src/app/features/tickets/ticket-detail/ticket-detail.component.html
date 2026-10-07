@@ -79,7 +79,7 @@
           <!-- Delete Action -->
           <button
             type="button"
-            (click)="showDeleteModal = true"
+            (click)="openDeleteModal()"
             class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
             title="Delete Ticket"
           >
@@ -112,7 +112,7 @@
                 @if (isStepCompleted(step) && !isStepActive(step)) {
                   <span class="material-symbols-outlined text-base">check</span>
                 } @else {
-                  <span>{{ idx + 1 }}</span>
+                  <span [ngClass]="{'text-white': isStepCompleted(step) || isStepActive(step)}">{{ idx + 1 }}</span>
                 }
               </div>
 
@@ -186,7 +186,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               @for (att of t.attachments; track att.id) {
                 <div
-                  (click)="previewImageUrl = att.fileUrl"
+                  (click)="openImagePreview(att.fileUrl)"
                   class="group relative rounded-lg overflow-hidden border border-slate-200 cursor-pointer shadow-2xs hover:border-primary transition-all"
                 >
                   <img
@@ -421,11 +421,11 @@
             <div class="p-3 bg-slate-50 rounded border border-slate-200/80 space-y-1 text-[11px]">
               <div class="flex justify-between text-slate-500">
                 <span>Target Resolution:</span>
-                <span class="font-semibold text-slate-800">4 Hours</span>
+                <span class="font-semibold text-slate-800">{{ getTargetResolution() }}</span>
               </div>
               <div class="flex justify-between text-slate-500">
                 <span>SLA Expiration:</span>
-                <span class="font-semibold text-emerald-700">Within Threshold</span>
+                <span class="font-semibold text-emerald-700">{{ getSlaStatus() }}</span>
               </div>
             </div>
           </div>
@@ -434,135 +434,4 @@
     </div>
   </div>
 
-  <!-- Assign Technician Modal -->
-  @if (showAssignModal) {
-    <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-fade-in">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-bold text-slate-900">Assign Maintenance Technician</h3>
-          <button (click)="showAssignModal = false" class="text-slate-400 hover:text-slate-600">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Select Technician</label>
-          <select
-            [(ngModel)]="selectedTechId"
-            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded"
-          >
-            <option value="" disabled>-- Choose a specialist --</option>
-            @for (tech of technicianStore.technicians(); track tech.id) {
-              <option [value]="tech.id">
-                {{ tech.name }} ({{ tech.specialty }}) - {{ tech.status }}
-              </option>
-            }
-          </select>
-        </div>
-
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-          <button
-            type="button"
-            (click)="showAssignModal = false"
-            class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            [disabled]="!selectedTechId"
-            (click)="confirmAssign()"
-            class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-blue-900 disabled:opacity-50 rounded"
-          >
-            Confirm Assignment
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Update Status Modal -->
-  @if (showStatusModal) {
-    <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-fade-in">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-bold text-slate-900">Update Work Order Status</h3>
-          <button (click)="showStatusModal = false" class="text-slate-400 hover:text-slate-600">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">New Status</label>
-          <select
-            [(ngModel)]="targetStatus"
-            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded"
-          >
-            <option value="NEW">NEW (Unassigned)</option>
-            <option value="ASSIGNED">ASSIGNED</option>
-            <option value="IN_PROGRESS">IN_PROGRESS (Active Repair)</option>
-            <option value="RESOLVED">RESOLVED (Fixed)</option>
-            <option value="CLOSED">CLOSED (Inspected & Archived)</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Transition Note / Audit Comment</label>
-          <textarea
-            [(ngModel)]="statusComment"
-            rows="2"
-            placeholder="Add context for this status transition..."
-            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded"
-          ></textarea>
-        </div>
-
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-          <button
-            type="button"
-            (click)="showStatusModal = false"
-            class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            (click)="confirmStatusUpdate()"
-            class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-blue-900 rounded"
-          >
-            Save Status
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Image Enlargement Lightbox Modal -->
-  @if (previewImageUrl) {
-    <div
-      (click)="previewImageUrl = null"
-      class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
-    >
-      <div class="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-lg">
-        <img [src]="previewImageUrl" class="max-w-full max-h-[85vh] object-contain mx-auto rounded shadow-2xl" />
-        <button
-          type="button"
-          (click)="previewImageUrl = null"
-          class="absolute top-3 right-3 text-white bg-slate-900/60 p-2 rounded-full hover:bg-slate-900"
-        >
-          <span class="material-symbols-outlined text-xl">close</span>
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- Delete Modal -->
-  <app-confirm-modal
-    [isOpen]="showDeleteModal"
-    title="Delete Work Order"
-    [message]="'Are you sure you want to delete ticket #' + t.ticketNumber + '?'"
-    confirmText="Delete"
-    [isDanger]="true"
-    (confirm)="confirmDelete()"
-    (cancel)="showDeleteModal = false"
-  ></app-confirm-modal>
 }

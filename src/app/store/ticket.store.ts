@@ -136,6 +136,26 @@ export const TicketStore = signalStore(
       )
     ),
 
+    // Update ticket priority
+    updatePriority: rxMethod<{ id: string; priority: string }>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true })),
+        switchMap(({ id, priority }) => ticketService.updatePriority(id, priority).pipe(
+          tap((updatedTicket) => patchState(store, (state) => ({
+            tickets: state.tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t),
+            selectedTicket: state.selectedTicket?.id === updatedTicket.id ? updatedTicket : state.selectedTicket,
+            isLoading: false,
+            lastUpdated: new Date()
+          }))),
+          catchError((err) => {
+            console.error('Update priority failed:', err);
+            patchState(store, { isLoading: false });
+            return of(null);
+          })
+        ))
+      )
+    ),
+
     // Load technician tickets
     loadTechnicianTickets: rxMethod<any>(
       pipe(
@@ -199,7 +219,8 @@ export const TicketStore = signalStore(
             isLoading: false,
             lastUpdated: new Date()
           }))),
-          catchError(() => {
+          catchError((err) => {
+            console.error('Assign technician failed:', err);
             patchState(store, { isLoading: false });
             return of(null);
           })

@@ -5,7 +5,7 @@
   <!-- Main Content Wrapper (Shifted 256px on lg screens) -->
   <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
     <!-- Top Nav Header -->
-    <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+    <app-header (toggleSidebar)="toggleSidebar()" class="sticky top-0 z-20 block"></app-header>
 
     <!-- Routed Page Content -->
     <router-outlet></router-outlet>

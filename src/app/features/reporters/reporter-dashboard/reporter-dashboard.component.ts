@@ -42,50 +42,52 @@ import { DashboardStore } from '../../../store/dashboard.store';
       </header>
 
       <!-- Main Portal Body -->
-      <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 sm:p-8 shadow-xs">
-          <div class="flex items-start justify-between flex-wrap gap-4 border-b border-outline-variant pb-4">
-            <div>
-              <h2 class="text-xl font-bold text-on-surface">Campus Issue Reporting</h2>
-              <p class="text-xs text-on-surface-variant mt-1">Submit facilities maintenance requests and track resolution status in real-time.</p>
+      <main class="flex-1 w-full p-4 sm:p-6">
+        <div class="w-full py-2">
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-[14px] p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-outline-variant pb-3 flex-wrap gap-4">
+              <div>
+                <h2 class="text-[17px] font-semibold text-on-surface m-0">Campus Issue Reporting</h2>
+                <p class="text-[13.5px] text-on-surface-variant m-0 mt-[3px]">Submit facilities maintenance requests and track resolution status in real-time.</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Dispatch Open
+              </span>
             </div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Dispatch Open
-            </span>
-          </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <a routerLink="/reporter/tickets/new" class="block p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary transition-colors cursor-pointer group">
-              <div class="flex justify-between items-start">
-                <div>
-                  <span class="material-symbols-outlined text-2xl text-primary mb-2 group-hover:scale-110 transition-transform">add_task</span>
-                  <h3 class="text-sm font-semibold text-on-surface">Submit New Request</h3>
-                  <p class="text-xs text-on-surface-variant mt-1">Report electrical, plumbing, HVAC, or structural campus issues.</p>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-[14px]">
+              <a routerLink="/reporter/tickets/new" class="block p-[1.125rem_1.25rem] rounded-[14px] bg-surface-container-low border border-outline-variant hover:border-primary hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition-all duration-200 cursor-pointer group">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="material-symbols-outlined text-[1.5rem] text-primary mb-2 group-hover:scale-110 transition-transform">add_task</span>
+                    <h3 class="text-[0.9rem] font-semibold text-on-surface tracking-tight m-0">Submit New Request</h3>
+                    <p class="text-[0.775rem] text-on-surface-variant mt-1 mb-0">Report electrical, plumbing, HVAC, or structural campus issues.</p>
+                  </div>
+                  <span class="text-[1.5rem] font-bold font-mono text-primary leading-none">{{ dashboardStore.reporterStats()?.totalTickets ?? 0 }}</span>
                 </div>
-                <span class="text-3xl font-bold text-primary">{{ dashboardStore.reporterStats()?.totalTickets ?? 0 }}</span>
-              </div>
-            </a>
-            <a routerLink="/reporter/tickets" [queryParams]="{ status: 'OPEN' }" class="block p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:border-secondary transition-colors cursor-pointer group">
-              <div class="flex justify-between items-start">
-                <div>
-                  <span class="material-symbols-outlined text-2xl text-secondary mb-2 group-hover:scale-110 transition-transform">pending_actions</span>
-                  <h3 class="text-sm font-semibold text-on-surface">Active Reports</h3>
-                  <p class="text-xs text-on-surface-variant mt-1">Track progress on issues submitted by your department.</p>
+              </a>
+              <a routerLink="/reporter/tickets" [queryParams]="{ status: 'OPEN' }" class="block p-[1.125rem_1.25rem] rounded-[14px] bg-surface-container-low border border-outline-variant hover:border-secondary hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition-all duration-200 cursor-pointer group">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="material-symbols-outlined text-[1.5rem] text-secondary mb-2 group-hover:scale-110 transition-transform">pending_actions</span>
+                    <h3 class="text-[0.9rem] font-semibold text-on-surface tracking-tight m-0">Active Reports</h3>
+                    <p class="text-[0.775rem] text-on-surface-variant mt-1 mb-0">Track progress on issues submitted by your department.</p>
+                  </div>
+                  <span class="text-[1.5rem] font-bold font-mono text-secondary leading-none">{{ (dashboardStore.reporterStats()?.newTickets ?? 0) + (dashboardStore.reporterStats()?.assignedTickets ?? 0) + (dashboardStore.reporterStats()?.inProgressTickets ?? 0) }}</span>
                 </div>
-                <span class="text-3xl font-bold text-secondary">{{ (dashboardStore.reporterStats()?.newTickets ?? 0) + (dashboardStore.reporterStats()?.assignedTickets ?? 0) + (dashboardStore.reporterStats()?.inProgressTickets ?? 0) }}</span>
-              </div>
-            </a>
-            <a routerLink="/reporter/tickets" [queryParams]="{ status: 'RESOLVED' }" class="block p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:border-tertiary-container transition-colors cursor-pointer group">
-              <div class="flex justify-between items-start">
-                <div>
-                  <span class="material-symbols-outlined text-2xl text-tertiary-container mb-2 group-hover:scale-110 transition-transform">verified</span>
-                  <h3 class="text-sm font-semibold text-on-surface">Resolved Tickets</h3>
-                  <p class="text-xs text-on-surface-variant mt-1">Review inspection sign-offs and completed maintenance work orders.</p>
+              </a>
+              <a routerLink="/reporter/tickets" [queryParams]="{ status: 'RESOLVED' }" class="block p-[1.125rem_1.25rem] rounded-[14px] bg-surface-container-low border border-outline-variant hover:border-tertiary-container hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition-all duration-200 cursor-pointer group">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="material-symbols-outlined text-[1.5rem] text-tertiary-container mb-2 group-hover:scale-110 transition-transform">verified</span>
+                    <h3 class="text-[0.9rem] font-semibold text-on-surface tracking-tight m-0">Resolved Tickets</h3>
+                    <p class="text-[0.775rem] text-on-surface-variant mt-1 mb-0">Review inspection sign-offs and completed maintenance work orders.</p>
+                  </div>
+                  <span class="text-[1.5rem] font-bold font-mono text-tertiary-container leading-none">{{ dashboardStore.reporterStats()?.resolvedTickets ?? 0 }}</span>
                 </div>
-                <span class="text-3xl font-bold text-tertiary-container">{{ dashboardStore.reporterStats()?.resolvedTickets ?? 0 }}</span>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
         </div>
       </main>

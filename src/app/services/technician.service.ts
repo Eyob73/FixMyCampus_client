@@ -14,22 +14,7 @@ export class TechnicianService {
   constructor(private http: HttpClient) {}
 
   public getTechnicians(): Observable<Technician[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(apiTechs => apiTechs.map((t, index) => ({
-        id: t.id,
-        name: t.fullName || t.name,
-        email: t.email,
-        phone: '(555) 000-0000',
-        department: 'General Maintenance',
-        specialty: 'General',
-        status: (index % 2 === 0 ? 'AVAILABLE' : 'BUSY') as any,
-        assignedTicketCount: 0,
-        activeTicketsCount: 0,
-        resolvedTicketsCount: 0,
-        rating: 5.0,
-        createdAt: new Date().toISOString()
-      })))
-    );
+    return this.http.get<Technician[]>(this.apiUrl);
   }
 
   public getTechnicianById(id: string): Observable<Technician> {

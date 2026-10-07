@@ -11,7 +11,10 @@ import { TicketStore } from '../../store/ticket.store';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './header.html',
-  styleUrl: './header.css'
+  styleUrl: './header.css',
+  host: {
+    class: 'sticky top-0 z-50 block w-full'
+  }
 })
 export class HeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
@@ -37,13 +40,7 @@ export class HeaderComponent {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
-  get notifications(): Array<{ id: string; title: string; time: string; icon: string; type: string }> {
-    return [
-      { id: '1', title: 'Emergency: Lab 304 temp spike above 78°F', time: '12m ago', icon: 'error', type: 'danger' },
-      { id: '2', title: 'Ticket #T-1078 was marked Resolved', time: '45m ago', icon: 'check_circle', type: 'success' },
-      { id: '3', title: 'Hydraulic maintenance scheduled', time: '2h ago', icon: 'schedule', type: 'info' }
-    ];
-  }
+
 
   onSearchSubmit(event?: Event): void {
     if (event) {
@@ -91,7 +88,13 @@ export class HeaderComponent {
 
   goToTickets(): void {
     this.closeNotifs();
-    this.router.navigate(['/admin/tickets']);
+    if (this.authService.isAdmin()) {
+      this.router.navigate(['/admin/tickets']);
+    } else if (this.authService.isTechnician()) {
+      this.router.navigate(['/technician/tickets']);
+    } else {
+      this.router.navigate(['/reporter/my-tickets']);
+    }
   }
 
   onLogout(): void {

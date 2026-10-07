@@ -1,43 +1,41 @@
-<div class="space-y-6">
+<div class="w-full py-2">
   <!-- Top Welcome & Operational Status Header -->
-  <div class="bg-white border border-slate-200 rounded-lg p-5 lg:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
     <div>
-      <div class="flex items-center gap-2 mb-1">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Live Campus Feed</span>
-      </div>
-      <h2 class="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">Facilities Operations & Work Orders</h2>
-      <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+      <h1 class="m-0 text-[22px] font-bold tracking-tight text-slate-900">
+        Facilities Operations & Work Orders
+      </h1>
+      <p class="mt-[3px] mb-0 text-[13px] text-slate-500">
         Central monitoring for university physical plant, structural maintenance, and technician dispatches.
       </p>
     </div>
 
     <!-- Quick Action Toolbar -->
-    <div class="flex flex-wrap items-center gap-2.5">
+    <div class="flex items-center gap-[10px]">
       <button
         type="button"
         (click)="exportReport()"
-        class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded shadow-2xs transition-colors"
+        class="flex items-center gap-[6px] text-slate-500 border border-slate-200 rounded-[10px] h-[38px] text-[13px] font-semibold px-[14px] bg-white transition-all duration-200 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 shadow-sm"
       >
-        <span class="material-symbols-outlined text-base text-slate-500">download</span>
+        <span class="material-symbols-outlined text-[18px] w-[18px] h-[18px]">download</span>
         Export CSV
       </button>
 
       <button
         type="button"
         (click)="broadcastAlert()"
-        class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded shadow-2xs transition-colors"
+        class="flex items-center gap-[6px] text-slate-500 border border-slate-200 rounded-[10px] h-[38px] text-[13px] font-semibold px-[14px] bg-white transition-all duration-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 shadow-sm"
       >
-        <span class="material-symbols-outlined text-base text-amber-500">campaign</span>
+        <span class="material-symbols-outlined text-[18px] w-[18px] h-[18px] text-amber-500">campaign</span>
         Campus Notice
       </button>
 
       <button
         type="button"
         (click)="viewAllTickets()"
-        class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary hover:bg-blue-900 text-white text-xs font-semibold rounded shadow-xs transition-colors"
+        class="flex items-center gap-[6px] text-white border border-primary rounded-[10px] h-[38px] text-[13px] font-semibold px-[14px] bg-primary transition-all duration-200 hover:bg-blue-700 hover:border-blue-700 shadow-sm"
       >
-        <span class="material-symbols-outlined text-base">format_list_bulleted</span>
+        <span class="material-symbols-outlined text-[18px] w-[18px] h-[18px]">format_list_bulleted</span>
         View All Tickets
       </button>
     </div>
@@ -45,7 +43,7 @@
 
   <!-- 6 Metric KPI Cards Grid -->
   @if (dashboardStore.adminStats(); as m) {
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 mb-6">
       <!-- Total Tickets -->
       <app-stat-card
         label="Total Tickets"
@@ -124,18 +122,18 @@
   }
 
   <!-- Operational Statistics & Velocity Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-[14px] mb-6 items-stretch">
     <!-- Category Distribution -->
-    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs space-y-4">
+    <div class="bg-white border border-slate-200 rounded-[14px] p-5 shadow-sm space-y-4 flex flex-col min-h-[105px]">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-primary text-xl">pie_chart</span>
-          <h3 class="text-sm font-bold text-slate-900">Work Orders by Category</h3>
+          <h3 class="text-[17px] font-semibold text-slate-900 m-0">Work Orders by Category</h3>
         </div>
-        <span class="text-xs font-semibold text-slate-400">Total: {{ ticketStore.tickets().length }}</span>
+        <span class="text-[13.5px] font-medium text-slate-500">Total: {{ ticketStore.tickets().length }}</span>
       </div>
 
-      <div class="space-y-3">
+      <div class="space-y-3 flex-1">
         @for (c of dashboardStore.categoryMetrics(); track c.category) {
           <div class="space-y-1">
             <div class="flex items-center justify-between text-xs font-medium">
@@ -170,39 +168,39 @@
     </div>
 
     <!-- Priority Breakdown -->
-    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs space-y-4">
+    <div class="bg-white border border-slate-200 rounded-[14px] p-5 shadow-sm space-y-4 flex flex-col min-h-[105px]">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-rose-600 text-xl">priority_high</span>
-          <h3 class="text-sm font-bold text-slate-900">Severity Distribution</h3>
+          <h3 class="text-[17px] font-semibold text-slate-900 m-0">Severity Distribution</h3>
         </div>
-        <span class="text-xs font-semibold text-slate-400">Resolution SLA</span>
+        <span class="text-[13.5px] font-medium text-slate-500">Resolution SLA</span>
       </div>
 
-      <div class="space-y-3.5">
+      <div class="space-y-3.5 flex-1">
         @for (p of dashboardStore.priorityMetrics(); track p.priority) {
           <div class="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
             <div class="flex items-center gap-2.5">
               <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="p.color"></span>
               <div>
-                <h4 class="text-xs font-bold text-slate-800">{{ p.priority }}</h4>
-                <p class="text-[10px] text-slate-400">
+                <h4 class="text-[13.5px] font-semibold text-slate-800 m-0">{{ p.priority }}</h4>
+                <p class="text-[11px] text-slate-400 m-0 mt-0.5">
                   {{ p.priority === 'CRITICAL' ? '< 4h response' : p.priority === 'HIGH' ? '< 12h response' : '< 48h response' }}
                 </p>
               </div>
             </div>
-            <span class="text-base font-bold text-slate-900 font-stat-numeric">{{ p.count }}</span>
+            <span class="text-[1.1rem] font-bold text-slate-900 font-stat-numeric">{{ p.count }}</span>
           </div>
         }
       </div>
     </div>
 
     <!-- Weekly Throughput Velocity -->
-    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs space-y-4">
+    <div class="bg-white border border-slate-200 rounded-[14px] p-5 shadow-sm space-y-4 flex flex-col min-h-[105px]">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-emerald-600 text-xl">insights</span>
-          <h3 class="text-sm font-bold text-slate-900">Weekly Throughput</h3>
+          <h3 class="text-[17px] font-semibold text-slate-900 m-0">Weekly Throughput</h3>
         </div>
         <div class="flex items-center gap-3 text-[11px] font-semibold">
           <span class="flex items-center gap-1 text-primary">
@@ -215,7 +213,7 @@
       </div>
 
       <!-- Mini Bar Visualization -->
-      <div class="h-44 flex items-end justify-between gap-2 pt-4 px-2">
+      <div class="h-44 flex items-end justify-between gap-2 pt-4 px-2 flex-1">
         @for (v of dashboardStore.weeklyVelocity(); track v.day) {
           <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
             <div class="w-full flex items-end justify-center gap-1 h-32">
@@ -239,11 +237,11 @@
     </div>
   </div>
 
-  <!-- Recent Tickets Table (Matching Stitch Admin Dashboard) -->
-  <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-2xs space-y-0">
-    <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50">
+  <!-- Recent Tickets Table -->
+  <div class="bg-white border border-slate-200 rounded-[14px] overflow-hidden shadow-sm space-y-0">
+    <div class="p-4 sm:px-5 sm:py-[1.125rem] border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50">
       <div class="flex items-center gap-3">
-        <h3 class="text-sm font-bold text-slate-900">
+        <h3 class="text-[17px] font-semibold text-slate-900 m-0">
           @if (selectedStatusFilter() !== 'ALL') {
             Filtered Tickets ({{ selectedStatusFilter() }})
           } @else {
@@ -268,10 +266,10 @@
         <button
           type="button"
           (click)="viewAllTickets(selectedStatusFilter())"
-          class="text-xs font-bold text-primary hover:text-blue-900 hover:underline inline-flex items-center gap-1"
+          class="text-[13px] font-bold text-primary hover:text-blue-900 hover:underline inline-flex items-center gap-1"
         >
           View Full Ticket Table
-          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          <span class="material-symbols-outlined text-[17px]">arrow_forward</span>
         </button>
       </div>
     </div>
@@ -281,21 +279,22 @@
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            <th class="py-3 px-4 w-4"></th>
-            <th class="py-3 px-4">Ticket</th>
-            <th class="py-3 px-4">Category</th>
-            <th class="py-3 px-4">Building / Room</th>
-            <th class="py-3 px-4">Reporter</th>
-            <th class="py-3 px-4">Technician</th>
-            <th class="py-3 px-4">Status</th>
-            <th class="py-3 px-4 text-right">Action</th>
+            <th class="py-3 px-5 w-4"></th>
+            <th class="py-3 px-5 whitespace-nowrap">Ticket ID</th>
+            <th class="py-3 px-5">Title</th>
+            <th class="py-3 px-5">Category</th>
+            <th class="py-3 px-5">Building / Room</th>
+            <th class="py-3 px-5">Reporter</th>
+            <th class="py-3 px-5">Technician</th>
+            <th class="py-3 px-5">Status</th>
+            <th class="py-3 px-5 text-right">Action</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100 text-xs">
+        <tbody class="divide-y divide-slate-100 text-[13px]">
           @for (ticket of filteredRecentTickets(); track ticket.id) {
             <tr class="hover:bg-slate-50/80 transition-colors group">
               <!-- Priority Indicator Bar -->
-              <td class="py-3 pl-3 pr-0 w-1">
+              <td class="py-3 pl-5 pr-0 w-1">
                 <div
                   class="w-1.5 h-8 rounded-full"
                   [ngClass]="{
@@ -308,14 +307,23 @@
                 ></div>
               </td>
 
-              <!-- Ticket ID & Title -->
-              <td class="py-3 px-4 max-w-xs">
+              <!-- Ticket ID -->
+              <td class="py-3 px-5 whitespace-nowrap">
                 <a
                   [routerLink]="['/admin/tickets', ticket.ticketNumber]"
-                  class="font-bold text-slate-900 hover:text-primary transition-colors flex items-center gap-1.5"
+                  class="font-mono text-primary font-bold text-[11px] hover:underline"
                 >
-                  <span class="font-mono text-primary font-bold text-xs">{{ ticket.ticketNumber }}</span>
-                  <span class="truncate block max-w-[220px]" [title]="ticket.title">{{ ticket.title }}</span>
+                  {{ ticket.ticketNumber }}
+                </a>
+              </td>
+              <!-- Title -->
+              <td class="py-3 px-5 max-w-xs">
+                <a
+                  [routerLink]="['/admin/tickets', ticket.ticketNumber]"
+                  class="font-bold text-slate-900 hover:text-primary transition-colors block truncate max-w-[220px]"
+                  [title]="ticket.title"
+                >
+                  {{ ticket.title }}
                 </a>
                 <span class="text-[11px] text-slate-400 mt-0.5 block">
                   Created {{ ticket.createdAt | date:'short' }}
@@ -323,14 +331,14 @@
               </td>
 
               <!-- Category -->
-              <td class="py-3 px-4">
+              <td class="py-3 px-5">
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">
                   {{ ticket.category }}
                 </span>
               </td>
 
               <!-- Building & Room -->
-              <td class="py-3 px-4">
+              <td class="py-3 px-5">
                 <div class="font-medium text-slate-800 truncate max-w-[160px]" [title]="ticket.building">
                   {{ ticket.building }}
                 </div>
@@ -340,13 +348,13 @@
               </td>
 
               <!-- Reporter -->
-              <td class="py-3 px-4">
+              <td class="py-3 px-5">
                 <div class="font-medium text-slate-800">{{ ticket.reporterName }}</div>
                 <div class="text-[11px] text-slate-400">{{ ticket.reporterRole || 'Reporter' }}</div>
               </td>
 
               <!-- Technician -->
-              <td class="py-3 px-4">
+              <td class="py-3 px-5">
                 @if (ticket.assignedTechnicianName) {
                   <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center border border-slate-200">
@@ -365,26 +373,25 @@
               </td>
 
               <!-- Status Badge -->
-              <td class="py-3 px-4">
+              <td class="py-3 px-5">
                 <app-status-badge [status]="ticket.status"></app-status-badge>
               </td>
 
               <!-- Action Link -->
-              <td class="py-3 px-4 text-right">
+              <td class="py-3 px-5 text-right">
                 <a
                   [routerLink]="['/admin/tickets', ticket.ticketNumber]"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-blue-50 rounded transition-colors"
+                  class="inline-flex items-center justify-center w-8 h-8 text-slate-400 hover:text-primary hover:bg-blue-50 rounded-full transition-colors"
                 >
-                  Details
-                  <span class="material-symbols-outlined text-sm">chevron_right</span>
+                  <span class="material-symbols-outlined text-[1.1rem]">chevron_right</span>
                 </a>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="8" class="py-12 text-center text-slate-400">
+              <td colspan="9" class="py-12 text-center text-slate-400">
                 <span class="material-symbols-outlined text-3xl mb-2 text-slate-300">inbox</span>
-                <p class="text-sm font-medium">No tickets match the selected filter.</p>
+                <p class="text-[13.5px] font-medium m-0">No tickets match the selected filter.</p>
               </td>
             </tr>
           }

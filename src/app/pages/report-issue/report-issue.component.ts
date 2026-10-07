@@ -50,7 +50,7 @@ export class ReportIssueComponent {
     category: ['', [Validators.required]],
     building: ['', [Validators.required]],
     room: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
-    priority: ['medium' as TicketPriority, [Validators.required]],
+    priority: ['MEDIUM' as TicketPriority, [Validators.required]],
     description: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(2000)]],
     additionalDetails: ['']
   });
@@ -183,7 +183,7 @@ export class ReportIssueComponent {
 
           // Redirect to ticket details page after brief moment
           setTimeout(() => {
-            this.router.navigate(['/ticket', createdTicket.id]);
+            this.router.navigate(['/reporter/ticket', createdTicket.id]);
           }, 1200);
         },
         error: (err) => {
