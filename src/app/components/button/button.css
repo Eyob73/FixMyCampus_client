@@ -1,7 +1,0 @@
-:host {
-  display: inline-block;
-}
-:host(.full-width) {
-  display: block;
-  width: 100%;
-}
