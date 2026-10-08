@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
 import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.component';
 import { technicianGuard } from './core/guards/technician.guard';
-import { adminGuard } from './guards/admin.guard';
-import { roleGuard } from './guards/role.guard';
+import { adminGuard } from './core/guards/admin.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -27,35 +27,35 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
+        loadComponent: () => import('./features/admin/dashboard/dashboard.component').then((m) => m.DashboardComponent)
       },
       {
         path: 'tickets',
-        loadComponent: () => import('./features/tickets/ticket-list/ticket-list.component').then((m) => m.TicketListComponent)
+        loadComponent: () => import('./features/admin/tickets/ticket-list/ticket-list.component').then((m) => m.TicketListComponent)
       },
       {
         path: 'tickets/:id',
-        loadComponent: () => import('./features/tickets/ticket-detail/ticket-detail.component').then((m) => m.TicketDetailComponent)
+        loadComponent: () => import('./features/admin/tickets/ticket-detail/ticket-detail.component').then((m) => m.TicketDetailComponent)
       },
       {
         path: 'technicians',
-        loadComponent: () => import('./features/technicians/technician-list/technician-list.component').then((m) => m.TechnicianListComponent)
+        loadComponent: () => import('./features/admin/technicians/technician-list/technician-list.component').then((m) => m.TechnicianListComponent)
       },
       {
         path: 'reporters',
-        loadComponent: () => import('./features/reporters/reporter-list/reporter-list.component').then((m) => m.ReporterListComponent)
+        loadComponent: () => import('./features/admin/reporters/reporter-list/reporter-list.component').then((m) => m.ReporterListComponent)
       },
       {
         path: 'buildings',
-        loadComponent: () => import('./features/buildings/building-list/building-list.component').then((m) => m.BuildingListComponent)
+        loadComponent: () => import('./features/admin/buildings/building-list/building-list.component').then((m) => m.BuildingListComponent)
       },
       {
         path: 'reports',
-        loadComponent: () => import('./features/reports/reports.component').then((m) => m.ReportsComponent)
+        loadComponent: () => import('./features/admin/reports/reports.component').then((m) => m.ReportsComponent)
       },
       {
         path: 'settings',
-        loadComponent: () => import('./features/settings/settings.component').then((m) => m.SettingsComponent)
+        loadComponent: () => import('./features/admin/settings/settings.component').then((m) => m.SettingsComponent)
       }
     ]
   },
@@ -72,13 +72,13 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./pages/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+          import('./features/reporter/dashboard/dashboard.component').then((m) => m.DashboardComponent),
         title: 'FixMyCampus - Reporter Dashboard'
       },
       {
         path: 'report-issue',
         loadComponent: () =>
-          import('./pages/report-issue/report-issue.component').then(
+          import('./features/reporter/report-issue/report-issue.component').then(
             (m) => m.ReportIssueComponent
           ),
         title: 'FixMyCampus - Report Campus Issue'
@@ -86,13 +86,13 @@ export const routes: Routes = [
       {
         path: 'my-tickets',
         loadComponent: () =>
-          import('./pages/my-tickets/my-tickets.component').then((m) => m.MyTicketsComponent),
+          import('./features/reporter/my-tickets/my-tickets.component').then((m) => m.MyTicketsComponent),
         title: 'FixMyCampus - My Submitted Tickets'
       },
       {
         path: 'ticket/:id',
         loadComponent: () =>
-          import('./pages/ticket-details/ticket-details.component').then(
+          import('./features/reporter/ticket-details/ticket-details.component').then(
             (m) => m.TicketDetailsComponent
           ),
         title: 'FixMyCampus - Ticket Details'
@@ -100,7 +100,7 @@ export const routes: Routes = [
       {
         path: 'notifications',
         loadComponent: () =>
-          import('./pages/notifications/notifications.component').then(
+          import('./features/reporter/notifications/notifications.component').then(
             (m) => m.NotificationsComponent
           ),
         title: 'FixMyCampus - Notifications'
@@ -108,7 +108,7 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () =>
-          import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
+          import('./features/reporter/profile/profile.component').then((m) => m.ProfileComponent),
         title: 'FixMyCampus - Reporter Profile'
       }
     ]
