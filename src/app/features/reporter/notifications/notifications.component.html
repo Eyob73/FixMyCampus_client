@@ -80,7 +80,7 @@
       <div
         class="p-4 sm:p-5 flex items-start justify-between gap-4 transition-colors group cursor-pointer"
         [ngClass]="item.read ? 'hover:bg-[#F8FAFC]' : 'bg-[#EFF4FF]/25 hover:bg-[#EFF4FF]/40 border-l-4 border-l-[#1E3A8A]'"
-        [routerLink]="item.ticketId ? ['/ticket', item.ticketId] : null"
+        [routerLink]="item.ticketId ? ['/reporter/ticket', item.ticketId] : null"
       >
         <div class="flex items-start space-x-3.5 flex-1">
           <!-- Icon Badge -->
