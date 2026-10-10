@@ -92,17 +92,27 @@ export class AuthService {
 
         const httpError = error as HttpErrorResponse;
         let errorMessage = 'An unexpected error occurred during authentication.';
+        
+        const backendMessage = (httpError.error?.message || httpError.error?.Message || '').toLowerCase();
 
         if (httpError.status === 401) {
-          errorMessage = 'Invalid university email or password. Please verify your credentials and try again.';
+          if (backendMessage.includes('locked out')) {
+            errorMessage = 'Your account has been locked due to too many failed attempts. Please try again after 15 minutes.';
+          } else if (backendMessage.includes('confirm')) {
+            errorMessage = 'Please confirm your email address before signing in.';
+          } else {
+            errorMessage = 'Invalid university email or password. Please verify your credentials and try again.';
+          }
         } else if (httpError.status === 403) {
           errorMessage = 'This account has been deactivated or disabled. Please contact campus facilities administration.';
+        } else if (httpError.status === 429) {
+          errorMessage = 'Too many requests. Please try again later.';
         } else if (httpError.status === 404) {
           errorMessage = 'Authentication endpoint not found (HTTP 404). Please ensure the backend API is running.';
         } else if (httpError.status === 0) {
           errorMessage = 'Unable to reach the authentication server. Please check your network connection or ensure the API service is active.';
-        } else if (httpError.error?.message) {
-          errorMessage = httpError.error.message;
+        } else if (backendMessage) {
+          errorMessage = httpError.error?.message || httpError.error?.Message;
         }
 
         return throwError(() => new Error(errorMessage));

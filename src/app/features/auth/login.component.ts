@@ -21,13 +21,13 @@ export class LoginComponent implements OnInit {
   returnUrl: string | null = null;
 
   private readonly notificationStore = inject(NotificationStore);
- 
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();

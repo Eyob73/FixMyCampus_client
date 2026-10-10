@@ -112,7 +112,7 @@
           @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
           <p class="text-[11px] text-error mt-1">Password is required.</p>
           } @else if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')) {
-          <p class="text-[11px] text-error mt-1">Password must be at least 6 characters.</p>
+          <p class="text-[11px] text-error mt-1">Password must be at least 12 characters.</p>
           }
         </div>
 
