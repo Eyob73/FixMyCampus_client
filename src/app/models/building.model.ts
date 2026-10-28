@@ -8,10 +8,11 @@ export interface Building {
   floors: number;
   totalRooms: number;
   activeTicketsCount: number;
-  managerName: string;
-  managerContact: string;
+  managerName?: string;
+  managerContact?: string;
   status: 'OPERATIONAL' | 'MAINTENANCE_SURGE' | 'RESTRICTED';
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CreateBuildingDto {
@@ -20,6 +21,18 @@ export interface CreateBuildingDto {
   zone: CampusZone;
   floors: number;
   totalRooms: number;
-  managerName: string;
-  managerContact: string;
+  managerName?: string;
+  managerContact?: string;
+  status?: 'OPERATIONAL' | 'MAINTENANCE_SURGE' | 'RESTRICTED';
+}
+
+export interface UpdateBuildingDto {
+  code?: string;
+  name?: string;
+  zone?: CampusZone;
+  floors?: number;
+  totalRooms?: number;
+  managerName?: string;
+  managerContact?: string;
+  status?: 'OPERATIONAL' | 'MAINTENANCE_SURGE' | 'RESTRICTED';
 }

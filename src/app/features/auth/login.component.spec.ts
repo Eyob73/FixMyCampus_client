@@ -3,14 +3,14 @@ import { provideRouter, Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
-import { NotificationService } from '../../services/notification.service';
+import { NotificationStore } from '../../store/notification.store';
 import { AuthResponse } from '../../models';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let authServiceSpy: any;
-  let notificationServiceSpy: any;
+  let notificationStoreSpy: any;
   let routerSpy: any;
 
   beforeEach(async () => {
@@ -21,11 +21,8 @@ describe('LoginComponent', () => {
       login: vi.fn()
     };
 
-    notificationServiceSpy = {
-      success: vi.fn(),
-      error: vi.fn(),
-      warning: vi.fn(),
-      info: vi.fn()
+    notificationStoreSpy = {
+      showToast: vi.fn()
     };
 
     routerSpy = {
@@ -38,7 +35,7 @@ describe('LoginComponent', () => {
       providers: [
         provideRouter([]),
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: NotificationService, useValue: notificationServiceSpy },
+        { provide: NotificationStore, useValue: notificationStoreSpy },
         { provide: Router, useValue: routerSpy },
         {
           provide: ActivatedRoute,
@@ -120,7 +117,7 @@ describe('LoginComponent', () => {
       password: 'validAdminPassword',
       rememberMe: true
     });
-    expect(notificationServiceSpy.success).toHaveBeenCalled();
+    expect(notificationStoreSpy.showToast).toHaveBeenCalled();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin/dashboard']);
     expect(component.isSubmitting()).toBe(false);
     expect(component.errorMessage()).toBeNull();
@@ -139,7 +136,10 @@ describe('LoginComponent', () => {
     component.onSubmit();
 
     expect(component.errorMessage()).toBe(errorMessage);
-    expect(notificationServiceSpy.error).toHaveBeenCalledWith('Sign In Failed', errorMessage);
+    expect(notificationStoreSpy.showToast).toHaveBeenCalledWith({
+      type: 'error',
+      message: errorMessage
+    });
     expect(routerSpy.navigate).not.toHaveBeenCalled();
     expect(component.isSubmitting()).toBe(false);
   });

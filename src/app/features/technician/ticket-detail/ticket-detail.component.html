@@ -67,7 +67,7 @@
         <p class="text-xs text-[#64748B] flex flex-wrap items-center gap-x-2 gap-y-1">
           <span class="flex items-center gap-1 text-[#334155] font-medium">
             <span class="material-symbols-outlined text-[15px] text-[#006398]">apartment</span>
-            {{ ticket()!.building }} &bull; {{ ticket()!.room || 'General Area' }}
+            {{ ticket()!.building }} &bull; {{ ticket()!.floor ? (ticket()!.floor + ' &bull; ') : '' }}{{ ticket()!.room || 'General Area' }}
           </span>
           <span>&bull;</span>
           <span>Reported on {{ formatFullDate(ticket()!.createdAt) }}</span>
@@ -196,7 +196,7 @@
               </label>
               <div class="flex items-center gap-2 text-sm text-[#0F172A] font-medium">
                 <span class="material-symbols-outlined text-[18px] text-[#006398]">apartment</span>
-                <span>{{ ticket()!.building }} &bull; {{ ticket()!.room || 'General' }}</span>
+                <span>{{ ticket()!.building }} &bull; {{ ticket()!.floor ? (ticket()!.floor + ' &bull; ') : '' }}{{ ticket()!.room || 'General' }}</span>
               </div>
             </div>
 
@@ -220,7 +220,7 @@
               </label>
               <div class="flex items-center justify-between flex-wrap gap-3 bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-lg">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-[#E0E7FF] text-[#1E3A8A] flex items-center justify-center font-bold text-xs">
+                  <div class="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#1E3A8A] flex items-center justify-center font-bold text-xs">
                     {{ ticket()!.reporterName?.charAt(0) || '?' }}
                   </div>
                   <div>
@@ -275,24 +275,25 @@
           <!-- Existing Reporter Attachments -->
           @if (reporterAttachments.length > 0) {
             <div class="space-y-2 border-t border-slate-100 pt-4">
-              <label class="text-xs font-semibold text-[#64748B] block uppercase tracking-wider">
-                Reporter Attachments
-              </label>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-semibold text-[#64748B] block uppercase tracking-wider">
+                  Reported Issue Images ({{ reporterAttachments.length }})
+                </label>
+                <span class="text-[11px] text-[#64748B]">Click image to inspect</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 @for (att of reporterAttachments; track att.id) {
-                  <div class="flex items-center gap-2 p-2 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg text-xs">
-                    <span class="material-symbols-outlined text-base text-[#1E3A8A]">image</span>
-                    <div class="flex flex-col">
-                      <span class="font-medium text-[#0F172A]">{{ att.fileName }}</span>
-                      <span class="text-[10px] text-[#64748B]">{{ att.fileSize }}</span>
+                  <div
+                    (click)="openPreview(att)"
+                    class="group relative border border-slate-200 rounded-lg overflow-hidden bg-slate-50 cursor-pointer hover:shadow-md transition-all hover:border-[#1E3A8A]"
+                  >
+                    <div class="aspect-video bg-slate-100 overflow-hidden flex items-center justify-center">
+                      <img [src]="att.fileUrl" [alt]="att.fileName" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     </div>
-                    <a
-                      [href]="att.fileUrl"
-                      target="_blank"
-                      class="ml-2 text-xs text-[#1E3A8A] font-semibold hover:underline"
-                    >
-                      View
-                    </a>
+                    <div class="p-2 text-xs truncate bg-white">
+                      <p class="font-medium text-[#0F172A] truncate">{{ att.fileName }}</p>
+                      <p class="text-[10px] text-[#64748B]">{{ att.fileSize }}</p>
+                    </div>
                   </div>
                 }
               </div>
@@ -351,61 +352,168 @@
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[#1E3A8A]">photo_camera</span>
-              <h3 class="text-base font-bold text-[#0F172A]">Supporting Evidence & Repair Photos</h3>
+              <h3 class="text-base font-bold text-[#0F172A]">Supporting Evidence &amp; Repair Photos</h3>
             </div>
-            <span class="text-xs text-[#64748B]">Before/After & Documents</span>
+            <span class="text-xs text-[#64748B]">Resolution Evidence</span>
           </div>
 
-          <!-- Upload Drag & Drop Area -->
+          <!-- Hidden inputs for Camera and Gallery -->
+          <input
+            #evidenceGalleryInput
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onFileSelected($event)"
+            class="hidden"
+          />
+          <input
+            #evidenceCameraInput
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            (change)="onEvidenceCameraCaptured($event)"
+            class="hidden"
+          />
+
+          <!-- Upload Interface & Drag & Drop Zone -->
           <div
+            (dragover)="$event.preventDefault()"
+            (drop)="onFileDrop($event)"
             class="border-2 border-dashed border-[#CBD5E1] hover:border-[#1E3A8A] rounded-xl p-5 text-center transition-colors bg-[#F8FAFC]"
           >
-            <input
-              type="file"
-              id="evidenceFileInput"
-              (change)="onFileSelected($event)"
-              accept="image/*,.pdf,.doc,.docx"
-              class="hidden"
-            />
-            <label for="evidenceFileInput" class="cursor-pointer block space-y-2">
-              <span class="material-symbols-outlined text-3xl text-[#1E3A8A]">cloud_upload</span>
-              <div class="text-xs text-[#0F172A]">
-                <span class="font-semibold text-[#1E3A8A] hover:underline">Choose evidence file</span>
-                <span> or drag &amp; drop photos</span>
+            <div class="flex flex-col items-center space-y-3">
+              <div class="w-12 h-12 rounded-full bg-[#EFF6FF] text-[#1E3A8A] flex items-center justify-center border border-[#BFDBFE]">
+                <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
               </div>
-              <p class="text-[11px] text-[#64748B]">Supports JPEG, PNG, PDF up to 10MB</p>
-            </label>
-          </div>
-
-          <!-- Staged File Preview (Before Submission) -->
-          @if (stagedFile) {
-            <div class="bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-3 flex items-center justify-between gap-3 text-xs">
-              <div class="flex items-center gap-2 min-w-0">
-                <span class="material-symbols-outlined text-lg text-[#1E3A8A]">attach_file</span>
-                <div class="truncate">
-                  <p class="font-semibold text-[#1E3A8A] truncate">{{ stagedFile.name }}</p>
-                  <p class="text-[11px] text-[#64748B]">{{ stagedFileSize }}</p>
-                </div>
+              <div class="space-y-1">
+                <p class="text-xs font-bold text-[#0F172A]">
+                  Add Repair Evidence Photos
+                </p>
+                <p class="text-[11px] text-[#64748B]">
+                  Photograph completed repairs directly or select images from your gallery
+                </p>
               </div>
 
-              <div class="flex items-center gap-2 shrink-0">
+              <!-- Two Clearly Labeled Action Options -->
+              <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full max-w-sm pt-1">
+                <!-- Option 1: Take Photo -->
                 <button
                   type="button"
-                  (click)="cancelStagedFile()"
-                  class="px-2 py-1 text-xs text-[#DC2626] hover:bg-white rounded transition-colors"
+                  (click)="takeEvidencePhoto()"
+                  class="w-full sm:w-1/2 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1E3A8A] border border-[#BFDBFE] rounded-lg text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer focus:ring-2 focus:ring-[#1E3A8A] focus:outline-hidden"
+                  aria-label="Take Photo with camera"
                 >
-                  Cancel
+                  <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                  <span>Take Photo</span>
                 </button>
+
+                <!-- Option 2: Upload from Gallery -->
+                <button
+                  type="button"
+                  (click)="evidenceGalleryInput.click()"
+                  class="w-full sm:w-1/2 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-slate-400 rounded-lg text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer focus:ring-2 focus:ring-[#1E3A8A] focus:outline-hidden"
+                  aria-label="Upload from Gallery or files"
+                >
+                  <span class="material-symbols-outlined text-[18px]">photo_library</span>
+                  <span>Upload from Gallery</span>
+                </button>
+              </div>
+
+              <p class="text-[11px] text-[#64748B] pt-1">
+                or drag &amp; drop photos here • Supports JPEG, PNG, WebP up to 10MB each (max 5)
+              </p>
+            </div>
+          </div>
+
+          <!-- Validation Error Banner -->
+          @if (evidenceUploadError()) {
+            <div class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm shrink-0">error</span>
+              <span>{{ evidenceUploadError() }}</span>
+            </div>
+          }
+
+          <!-- Staged Previews (Before upload) -->
+          @if (stagedEvidencePreviews().length > 0) {
+            <div class="space-y-3 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-[#1E3A8A]">
+                    Staged Photos ({{ stagedEvidencePreviews().length }} of 5)
+                  </span>
+                  <span class="text-[10px] text-[#64748B] ml-2">Click thumbnail to preview</span>
+                </div>
+                <button
+                  type="button"
+                  (click)="cancelStagedFiles()"
+                  class="text-xs text-[#DC2626] hover:underline cursor-pointer"
+                >
+                  Clear All
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                @for (item of stagedEvidencePreviews(); track $index) {
+                  <div class="relative group border border-[#BFDBFE] rounded-lg overflow-hidden bg-white shadow-xs">
+                    <div
+                      class="aspect-video bg-slate-100 overflow-hidden flex items-center justify-center cursor-pointer relative"
+                      (click)="openStagedPreview(item)"
+                      title="Click to view full preview"
+                    >
+                      <img [src]="item.previewUrl" [alt]="item.name" class="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
+                      <span class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 text-white transition-opacity">
+                        <span class="material-symbols-outlined text-base">visibility</span>
+                      </span>
+                    </div>
+                    <div class="p-1.5 text-[11px] truncate">
+                      <div class="flex items-center gap-1 truncate">
+                        <p class="font-medium text-[#0F172A] truncate">{{ item.name }}</p>
+                        @if (item.isCameraCapture) {
+                          <span class="inline-flex items-center text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1 rounded shrink-0">
+                            Camera
+                          </span>
+                        }
+                      </div>
+                      <p class="text-[10px] text-[#64748B]">{{ item.sizeFormatted }}</p>
+                    </div>
+                    <div class="absolute top-1 right-1 flex items-center gap-1">
+                      @if (item.isCameraCapture) {
+                        <button
+                          type="button"
+                          (click)="retakeStagedEvidence($index)"
+                          class="w-6 h-6 rounded-full bg-slate-900/70 hover:bg-[#1E3A8A] text-white flex items-center justify-center transition-colors cursor-pointer"
+                          title="Retake photo"
+                          aria-label="Retake photo"
+                        >
+                          <span class="material-symbols-outlined text-[13px]">refresh</span>
+                        </button>
+                      }
+                      <button
+                        type="button"
+                        (click)="removeStagedEvidence($index)"
+                        class="w-6 h-6 rounded-full bg-slate-900/70 hover:bg-red-600 text-white flex items-center justify-center transition-colors cursor-pointer"
+                        title="Remove image"
+                        aria-label="Remove image"
+                      >
+                        <span class="material-symbols-outlined text-[14px]">close</span>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="flex justify-end pt-2 border-t border-[#BFDBFE]">
                 <button
                   type="button"
                   (click)="uploadStagedEvidence()"
                   [disabled]="uploadingEvidence()"
-                  class="px-3 py-1 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white rounded text-xs font-semibold flex items-center gap-1 transition-colors disabled:opacity-50"
+                  class="px-4 py-2 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
                 >
                   @if (uploadingEvidence()) {
                     <span class="material-symbols-outlined text-xs animate-spin">progress_activity</span>
                   }
-                  <span>Upload</span>
+                  <span class="material-symbols-outlined text-sm">upload</span>
+                  <span>Upload {{ stagedEvidencePreviews().length }} Evidence Photo(s)</span>
                 </button>
               </div>
             </div>
@@ -414,27 +522,33 @@
           <!-- Uploaded Evidence Gallery -->
           @if (evidenceAttachments.length > 0) {
             <div class="space-y-2 pt-2">
-              <h4 class="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Uploaded Evidence Files</h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-semibold text-[#64748B] uppercase tracking-wider">
+                  Uploaded Evidence Files ({{ evidenceAttachments.length }})
+                </h4>
+                <span class="text-[11px] text-[#64748B]">Click to preview full size</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 @for (att of evidenceAttachments; track att.id) {
-                  <div class="border border-[#E2E8F0] rounded-lg p-3 bg-white flex items-center justify-between gap-2 shadow-xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <span class="material-symbols-outlined text-xl text-[#10B981]">image</span>
-                      <div class="truncate">
-                        <p class="text-xs font-semibold text-[#0F172A] truncate">{{ att.fileName }}</p>
-                        <p class="text-[10px] text-[#64748B]">{{ att.fileSize }} bytes &bull; On {{ att.uploadedAt | date:'short' }}</p>
-                      </div>
+                  <div
+                    (click)="openPreview(att)"
+                    class="group relative border border-slate-200 rounded-lg overflow-hidden bg-white cursor-pointer hover:shadow-md transition-all hover:border-[#10B981]"
+                  >
+                    <div class="aspect-video bg-slate-100 overflow-hidden flex items-center justify-center">
+                      <img [src]="att.fileUrl" [alt]="att.fileName" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     </div>
-                    <a
-                      [href]="att.fileUrl"
-                      target="_blank"
-                      class="px-2 py-1 text-xs text-[#1E3A8A] font-semibold hover:bg-slate-100 rounded"
-                    >
-                      View
-                    </a>
+                    <div class="p-2 text-xs truncate">
+                      <p class="font-medium text-[#0F172A] truncate">{{ att.fileName }}</p>
+                      <p class="text-[10px] text-[#64748B]">{{ att.fileSize }} &bull; {{ att.uploadedAt | date:'short' }}</p>
+                    </div>
                   </div>
                 }
               </div>
+            </div>
+          } @else {
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-center text-xs text-[#64748B]">
+              <span class="material-symbols-outlined text-2xl text-slate-400 block mb-1">image_not_supported</span>
+              No resolution evidence uploaded yet. Add photos before or after completing repair.
             </div>
           }
         </div>

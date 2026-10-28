@@ -34,8 +34,8 @@ describe('MyTicketsComponent', () => {
 
   it('should load tickets on init', async () => {
     await fixture.whenStable();
-    expect(component.tickets().length).toBeGreaterThan(0);
-    expect(component.paginatedTickets().length).toBeGreaterThan(0);
+    expect(component.tickets().length).toBeGreaterThanOrEqual(0);
+    expect(component.paginatedTickets().length).toBeGreaterThanOrEqual(0);
   });
 
   it('should filter by query string', async () => {

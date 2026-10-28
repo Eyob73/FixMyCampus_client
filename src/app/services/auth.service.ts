@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, catchError, map, tap, throwError, of } from 'rxjs';
+import { Observable, BehaviorSubject, catchError, filter, map, switchMap, take, tap, throwError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthResponse, LoginRequest, User, UserRole, UpdateProfileDto } from '../models';
 
@@ -12,17 +12,19 @@ export const SUPPORTED_ROLES: readonly UserRole[] = ['ADMIN', 'TECHNICIAN', 'REP
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
-  private readonly TOKEN_KEY = 'fmc_auth_token';
+  private readonly ACCESS_TOKEN_KEY = 'accessToken';
+  private readonly REFRESH_TOKEN_KEY = 'refreshToken';
+  private readonly LEGACY_TOKEN_KEY = 'fmc_auth_token';
+  private readonly LEGACY_REFRESH_TOKEN_KEY = 'fmc_refresh_token';
   private readonly USER_KEY = 'fmc_auth_user';
 
   private readonly currentUserSignal = signal<User | null>(this.getStoredUser());
   public readonly currentUser = this.currentUserSignal.asReadonly();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
-
+  // Concurrency coordinator for refresh token single-flight execution
+  private isRefreshing = false;
+  private readonly refreshTokenSubject = new BehaviorSubject<string | null>(null);
+  private refreshTimer: any = null;
   private getStoredUser(): User | null {
     try {
       const stored = localStorage.getItem(this.USER_KEY) || sessionStorage.getItem(this.USER_KEY);
@@ -32,8 +34,150 @@ export class AuthService {
     }
   }
 
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event) => {
+        if (event.key === this.ACCESS_TOKEN_KEY || event.key === this.LEGACY_TOKEN_KEY) {
+          if (event.newValue) {
+            this.scheduleTokenRefresh(event.newValue);
+          } else {
+            this.currentUserSignal.set(null);
+            this.cancelTokenRefresh();
+          }
+        }
+      });
+
+      // Schedule refresh on initialization if token exists and valid
+      const currentToken = this.getToken();
+      if (currentToken && !this.isTokenExpired(currentToken)) {
+        this.scheduleTokenRefresh(currentToken);
+      }
+    }
+  }
+
+  public setTokens(accessToken: string, refreshToken?: string, rememberMe: boolean = true): void {
+    const primaryStorage = rememberMe ? localStorage : sessionStorage;
+    const secondaryStorage = rememberMe ? sessionStorage : localStorage;
+
+    primaryStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+    primaryStorage.setItem(this.LEGACY_TOKEN_KEY, accessToken);
+    secondaryStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    secondaryStorage.removeItem(this.LEGACY_TOKEN_KEY);
+
+    if (refreshToken) {
+      primaryStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+      primaryStorage.setItem(this.LEGACY_REFRESH_TOKEN_KEY, refreshToken);
+      secondaryStorage.removeItem(this.REFRESH_TOKEN_KEY);
+      secondaryStorage.removeItem(this.LEGACY_REFRESH_TOKEN_KEY);
+    }
+
+    this.scheduleTokenRefresh(accessToken);
+  }
+
+  public setToken(token: string): void {
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
+    localStorage.setItem(this.LEGACY_TOKEN_KEY, token);
+  }
+
   public getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
+    return (
+      localStorage.getItem(this.ACCESS_TOKEN_KEY) ||
+      localStorage.getItem(this.LEGACY_TOKEN_KEY) ||
+      sessionStorage.getItem(this.ACCESS_TOKEN_KEY) ||
+      sessionStorage.getItem(this.LEGACY_TOKEN_KEY)
+    );
+  }
+
+  public setRefreshToken(refreshToken: string): void {
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+    localStorage.setItem(this.LEGACY_REFRESH_TOKEN_KEY, refreshToken);
+  }
+
+  public getRefreshToken(): string | null {
+    return (
+      localStorage.getItem(this.REFRESH_TOKEN_KEY) ||
+      localStorage.getItem(this.LEGACY_REFRESH_TOKEN_KEY) ||
+      sessionStorage.getItem(this.REFRESH_TOKEN_KEY) ||
+      sessionStorage.getItem(this.LEGACY_REFRESH_TOKEN_KEY)
+    );
+  }
+
+  public removeTokens(): void {
+    this.cancelTokenRefresh();
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    localStorage.removeItem(this.LEGACY_TOKEN_KEY);
+    localStorage.removeItem(this.LEGACY_REFRESH_TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    sessionStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(this.LEGACY_TOKEN_KEY);
+    sessionStorage.removeItem(this.LEGACY_REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(this.USER_KEY);
+  }
+
+  public removeToken(): void {
+    this.removeTokens();
+  }
+
+  public decodeToken(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
+  public isTokenExpired(token?: string | null, bufferSeconds = 30): boolean {
+    const t = token ?? this.getToken();
+    if (!t) return true;
+    const decoded = this.decodeToken(t);
+    if (!decoded || !decoded.exp) return true;
+    const expiresAtMs = decoded.exp * 1000;
+    return Date.now() >= (expiresAtMs - (bufferSeconds * 1000));
+  }
+
+  public scheduleTokenRefresh(token?: string | null): void {
+    this.cancelTokenRefresh();
+    const t = token ?? this.getToken();
+    if (!t || typeof window === 'undefined') return;
+
+    const decoded = this.decodeToken(t);
+    if (!decoded || !decoded.exp) return;
+
+    const expiresAtMs = decoded.exp * 1000;
+    const now = Date.now();
+    // Proactively refresh 2 minutes before access token expiry
+    const refreshBufferMs = 2 * 60 * 1000;
+    let delayMs = expiresAtMs - now - refreshBufferMs;
+
+    // If already within buffer or expired, schedule shortly
+    if (delayMs <= 0) {
+      delayMs = 5000;
+    }
+
+    this.refreshTimer = setTimeout(() => {
+      this.refresh().subscribe({
+        error: (err) => {
+          // If refresh fails due to temporary network error, retry after 15 seconds
+          if (err?.status === 0 || (err?.status >= 500 && err?.status <= 504)) {
+            this.refreshTimer = setTimeout(() => this.scheduleTokenRefresh(), 15000);
+          }
+        }
+      });
+    }, delayMs);
+  }
+
+  public cancelTokenRefresh(): void {
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = null;
+    }
   }
 
   public isAuthenticated(): boolean {
@@ -60,6 +204,13 @@ export class AuthService {
     return this.currentUserSignal();
   }
 
+  private isRememberMe(): boolean {
+    return (
+      localStorage.getItem(this.ACCESS_TOKEN_KEY) !== null ||
+      localStorage.getItem(this.LEGACY_TOKEN_KEY) !== null
+    );
+  }
+
   /**
    * Determine redirect route based on verified role
    */
@@ -80,7 +231,7 @@ export class AuthService {
    * Primary authentication method calling backend login endpoint
    */
   public login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials, { withCredentials: true }).pipe(
       map((response) => this.processAuthResponse(response, credentials.rememberMe ?? false)),
       tap((authData) => {
         this.currentUserSignal.set(authData.user);
@@ -121,6 +272,78 @@ export class AuthService {
   }
 
   /**
+   * Request a new access token using the refresh token (via HttpOnly cookie or fallback body)
+   */
+  public refresh(): Observable<AuthResponse> {
+    const refreshToken = this.getRefreshToken();
+    const payload = refreshToken ? { refreshToken } : {};
+
+    return this.http.post<any>(`${this.apiUrl}/refresh`, payload, { withCredentials: true }).pipe(
+      map((response) => this.processAuthResponse(response, this.isRememberMe())),
+      tap((authData) => {
+        const token = authData.token;
+        if (token) {
+          this.setTokens(token, authData.refreshToken);
+        }
+        this.currentUserSignal.set(authData.user);
+      })
+    );
+  }
+
+  public refreshToken(): Observable<AuthResponse> {
+    return this.refresh();
+  }
+
+  /**
+   * Coordinates single-flight refresh for concurrent 401 errors across multiple API requests
+   */
+  public handle401Error(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
+
+      return this.refreshToken().pipe(
+        switchMap((authData) => {
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(authData.token);
+          return next(
+            req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${authData.token}`,
+                'X-Refresh-Retry': 'true'
+              },
+              withCredentials: true
+            })
+          );
+        }),
+        catchError((refreshError) => {
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(null);
+          this.logout(true);
+          return throwError(() => refreshError);
+        })
+      );
+    } else {
+      // Refresh already in flight: wait until new token is emitted, then retry request
+      return this.refreshTokenSubject.pipe(
+        filter((token): token is string => token !== null),
+        take(1),
+        switchMap((token) => {
+          return next(
+            req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${token}`,
+                'X-Refresh-Retry': 'true'
+              },
+              withCredentials: true
+            })
+          );
+        })
+      );
+    }
+  }
+
+  /**
    * Update User Profile
    */
   public updateProfile(dto: UpdateProfileDto): Observable<User> {
@@ -129,16 +352,14 @@ export class AuthService {
       return throwError(() => new Error('No user is currently logged in.'));
     }
 
-    return this.http.put<User>(`${this.apiUrl}/profile`, dto).pipe(
+    return this.http.put<User>(`${this.apiUrl}/profile`, dto, { withCredentials: true }).pipe(
       map(updatedUser => {
-        // Fallback merge just in case API doesn't return full user
         const mergedUser: User = {
           ...currentUser,
           ...updatedUser
         };
         this.currentUserSignal.set(mergedUser);
         
-        // Update the stored user
         const storage = localStorage.getItem(this.USER_KEY) ? localStorage : sessionStorage;
         storage.setItem(this.USER_KEY, JSON.stringify(mergedUser));
         
@@ -173,7 +394,6 @@ export class AuthService {
 
     // Validate supported role
     if (!rawRole || !SUPPORTED_ROLES.includes(rawRole as UserRole)) {
-      // Per specification: Do not redirect to an unauthorized page. Display error and log for debugging.
       console.error(
         '[AuthService] Unknown or unsupported user role returned from authentication backend:',
         rawRole,
@@ -194,19 +414,10 @@ export class AuthService {
       isActive: true
     };
 
-    // Store token and user without storing sensitive password
+    // Store token and user
+    this.setTokens(token, response.refreshToken, rememberMe);
     const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem(this.TOKEN_KEY, token);
     storage.setItem(this.USER_KEY, JSON.stringify(validatedUser));
-
-    // Clear the other storage to prevent conflicts
-    if (rememberMe) {
-      sessionStorage.removeItem(this.TOKEN_KEY);
-      sessionStorage.removeItem(this.USER_KEY);
-    } else {
-      localStorage.removeItem(this.TOKEN_KEY);
-      localStorage.removeItem(this.USER_KEY);
-    }
 
     return {
       user: validatedUser,
@@ -216,12 +427,17 @@ export class AuthService {
     };
   }
 
-  public logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
-    sessionStorage.removeItem(this.TOKEN_KEY);
-    sessionStorage.removeItem(this.USER_KEY);
+  public logout(redirect: boolean = true): void {
+    const refreshToken = this.getRefreshToken();
+    this.http.post<any>(`${this.apiUrl}/logout`, { refreshToken: refreshToken || null }, { withCredentials: true }).subscribe({
+      error: () => {}
+    });
+
+    this.removeTokens();
     this.currentUserSignal.set(null);
-    this.router.navigate(['/login']);
+
+    if (redirect) {
+      this.router.navigate(['/login']);
+    }
   }
 }

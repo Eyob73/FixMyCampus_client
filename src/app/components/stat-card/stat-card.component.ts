@@ -1,68 +1,56 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-stat-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatCardModule],
   template: `
-    <div
-      class="bg-white border border-slate-200 rounded-[14px] p-[1.125rem_1.25rem] transition-all duration-200 relative overflow-hidden group flex items-center gap-4"
-      [ngClass]="{
-        'hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)] hover:border-primary cursor-pointer': clickable,
-        'border-primary shadow-[0_8px_24px_rgba(0,0,0,0.18)]': active
-      }"
+    <mat-card
+      appearance="outlined"
+      class="!bg-white !border-[#E2E8F0] !rounded-[14px] p-[1.125rem_1.25rem] !shadow-sm cursor-default"
       (click)="onClick()"
     >
-      <div
-        class="w-[44px] h-[44px] rounded-[12px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
-        [ngClass]="iconContainerClass"
-      >
-        <span class="material-symbols-outlined text-[1.25rem] w-[1.25rem] h-[1.25rem] flex items-center justify-center" [ngClass]="iconColorClass">
-          {{ icon }}
-        </span>
-      </div>
-
-      <div class="flex flex-col gap-[0.15rem] flex-1">
-        <div class="flex justify-between items-center gap-2">
-          <span class="text-[0.9rem] font-semibold text-slate-900 tracking-tight">{{ label }}</span>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-[1.5rem] font-bold text-slate-900 font-stat-numeric tracking-tight leading-none">
-            {{ value }}
+      <div class="flex items-center justify-between">
+        <span class="text-[0.9rem] font-semibold text-[#0F172A] tracking-tight">{{ label }}</span>
+        <div
+          class="w-[44px] h-[44px] rounded-[12px] flex items-center justify-center border shrink-0 transition-transform"
+          [ngClass]="iconContainerClass"
+        >
+          <span class="material-symbols-outlined text-[1.25rem]">
+            {{ icon }}
           </span>
         </div>
+      </div>
+
+      <div class="mt-3 flex items-baseline space-x-2">
+        <span class="text-[1.5rem] font-bold font-mono text-[#0F172A] leading-none">
+          {{ value }}
+        </span>
         @if (trendText) {
           <span
-            class="text-[0.775rem] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-0.5 mt-1"
-            [ngClass]="trendPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
+            class="text-[11px] font-semibold px-1.5 py-0.5 rounded"
+            [ngClass]="badgeClass"
           >
-            <span class="material-symbols-outlined text-[0.775rem]">
-              {{ trendPositive ? 'trending_up' : 'trending_down' }}
-            </span>
             {{ trendText }}
           </span>
         }
-        @if (subtext) {
-          <p class="text-[0.775rem] text-slate-500 m-0">
-            {{ subtext }}
-          </p>
-        }
       </div>
 
-      @if (clickable) {
-        <span class="material-symbols-outlined text-[1.1rem] w-[1.1rem] h-[1.1rem] text-slate-400 group-hover:text-primary transition-colors">
-          chevron_right
-        </span>
+      @if (subtext) {
+        <p class="mt-1 text-[0.775rem] text-[#64748B] m-0">
+          {{ subtext }}
+        </p>
       }
-    </div>
+    </mat-card>
   `
 })
 export class StatCardComponent {
   @Input({ required: true }) label!: string;
   @Input({ required: true }) value!: number | string;
   @Input({ required: true }) icon!: string;
-  @Input() iconVariant: 'primary' | 'amber' | 'sky' | 'emerald' | 'rose' | 'indigo' | 'slate' = 'primary';
+  @Input() iconVariant: 'primary' | 'amber' | 'sky' | 'emerald' | 'rose' | 'cyan' | 'slate' = 'primary';
   @Input() trendText?: string;
   @Input() trendPositive = true;
   @Input() subtext?: string;
@@ -80,40 +68,40 @@ export class StatCardComponent {
   get iconContainerClass(): string {
     switch (this.iconVariant) {
       case 'amber':
-        return 'bg-amber-50 border border-amber-200/60';
+        return 'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]';
       case 'sky':
-        return 'bg-sky-50 border border-sky-200/60';
+        return 'bg-[#F0F9FF] text-[#0284C7] border-[#BAE6FD]';
       case 'emerald':
-        return 'bg-emerald-50 border border-emerald-200/60';
+        return 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]';
       case 'rose':
-        return 'bg-rose-50 border border-rose-200/60';
-      case 'indigo':
-        return 'bg-indigo-50 border border-indigo-200/60';
+        return 'bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]';
+      case 'cyan':
+        return 'bg-[#ECFEFF] text-[#0891B2] border-[#A5F3FC]';
       case 'slate':
-        return 'bg-slate-100 border border-slate-200';
+        return 'bg-[#F1F5F9] text-[#475569] border-[#CBD5E1]';
       case 'primary':
       default:
-        return 'bg-blue-50 border border-blue-200/60';
+        return 'bg-[#EFF6FF] text-[#1E3A8A] border-[#DBEAFE]';
     }
   }
 
-  get iconColorClass(): string {
+  get badgeClass(): string {
     switch (this.iconVariant) {
       case 'amber':
-        return 'text-amber-600';
+        return 'text-[#D97706] bg-[#FFFBEB]';
       case 'sky':
-        return 'text-sky-600';
+        return 'text-[#0284C7] bg-[#F0F9FF]';
       case 'emerald':
-        return 'text-emerald-600';
+        return 'text-[#10B981] bg-[#ECFDF5]';
       case 'rose':
-        return 'text-rose-600';
-      case 'indigo':
-        return 'text-indigo-600';
+        return 'text-[#DC2626] bg-[#FEF2F2]';
+      case 'cyan':
+        return 'text-[#0891B2] bg-[#ECFEFF]';
       case 'slate':
-        return 'text-slate-600';
+        return 'text-[#475569] bg-[#F1F5F9]';
       case 'primary':
       default:
-        return 'text-primary';
+        return 'text-[#1E3A8A] bg-[#EFF6FF]';
     }
   }
 }

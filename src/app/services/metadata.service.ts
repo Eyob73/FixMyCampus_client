@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -17,12 +18,16 @@ export class MetadataService {
   }
 
   loadMetadata() {
-    this.http.get<string[]>(`${this.baseUrl}/buildings`).subscribe(data => {
-      this.buildings.set(data);
+    this.http.get<string[]>(`${this.baseUrl}/buildings`).pipe(
+      catchError(() => of([]))
+    ).subscribe(data => {
+      this.buildings.set(data || []);
     });
 
-    this.http.get<string[]>(`${this.baseUrl}/categories`).subscribe(data => {
-      this.categories.set(data);
+    this.http.get<string[]>(`${this.baseUrl}/categories`).pipe(
+      catchError(() => of([]))
+    ).subscribe(data => {
+      this.categories.set(data || []);
     });
   }
 }

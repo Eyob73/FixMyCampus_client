@@ -7,9 +7,10 @@ import { StatusBadgeComponent } from '../../../../ui/badge/status-badge.componen
 import { NotificationStore } from '../../../../store/notification.store';
 import { TechnicianStore } from '../../../../store/technician.store';
 import { TicketStore } from '../../../../store/ticket.store';
-import { Technician, Ticket, TicketPriority, TicketStatus } from '../../../../models';
+import { Technician, Ticket, TicketPriority, TicketStatus, TicketAttachment } from '../../../../models';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { ImageLightboxDialogComponent } from '../../../../ui/image-lightbox-dialog/image-lightbox-dialog.component';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -30,6 +31,18 @@ export class TicketDetailComponent implements OnInit {
   // Let's use ticketStore.selectedTicket
   ticket = this.ticketStore.selectedTicket;
   isLoading = this.ticketStore.isLoading;
+
+  get reportedImages(): TicketAttachment[] {
+    const t = this.ticket();
+    if (!t?.attachments) return [];
+    return t.attachments.filter(a => a.category !== 'ResolutionEvidence');
+  }
+
+  get resolutionEvidenceImages(): TicketAttachment[] {
+    const t = this.ticket();
+    if (!t?.attachments) return [];
+    return t.attachments.filter(a => a.category === 'ResolutionEvidence');
+  }
 
   // Note composer
   newNoteText = '';
@@ -115,12 +128,23 @@ export class TicketDetailComponent implements OnInit {
     });
   }
 
-  openImagePreview(url: string): void {
+  openImagePreview(item: TicketAttachment | string): void {
+    const data = typeof item === 'string'
+      ? { url: item, fileName: 'Attachment', fileSize: '', category: '', uploadedAt: '' }
+      : {
+          url: item.fileUrl,
+          fileName: item.fileName,
+          fileSize: typeof item.fileSize === 'number' ? this.formatFileSize(item.fileSize) : (item.fileSize || ''),
+          category: item.category,
+          uploadedAt: item.uploadedAt,
+          uploaderName: item.uploaderName
+        };
+
     this.dialog.open(ImageLightboxDialogComponent, {
-      panelClass: 'lightbox-dialog',
-      data: { url },
-      maxWidth: '90vw',
-      maxHeight: '90vh'
+      data,
+      width: '750px',
+      maxWidth: '92vw',
+      maxHeight: '92vh'
     });
   }
 
@@ -159,6 +183,13 @@ export class TicketDetailComponent implements OnInit {
       case 'LOW': return 'Routine';
       default: return 'N/A';
     }
+  }
+
+  formatFileSize(bytes?: number): string {
+    if (!bytes) return '0 B';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   getSlaStatus(): string {
@@ -263,29 +294,6 @@ export class UpdateStatusDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<UpdateStatusDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { status: TicketStatus, comment: string }
-  ) {}
-}
-
-@Component({
-  selector: 'app-image-lightbox-dialog',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule],
-  template: `
-    <div class="relative bg-transparent p-0 m-0 overflow-hidden rounded-lg flex justify-center items-center">
-      <img [src]="data.url" class="max-w-full max-h-[85vh] object-contain mx-auto shadow-2xl" />
-      <button type="button" mat-dialog-close class="absolute top-3 right-3 text-white bg-slate-900/60 border-0 p-2 rounded-full cursor-pointer hover:bg-slate-900 flex">
-        <span class="material-symbols-outlined text-xl">close</span>
-      </button>
-    </div>
-  `,
-  styles: [`
-    :host { display: block; background: transparent; }
-  `]
-})
-export class ImageLightboxDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ImageLightboxDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { url: string }
   ) {}
 }
 

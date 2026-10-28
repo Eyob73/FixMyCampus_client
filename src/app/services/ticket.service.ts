@@ -12,14 +12,19 @@ import {
   TicketStats,
   CreateTicketDto,
   TicketFilter,
-  TicketComment
+  TicketComment,
+  TicketImage,
+  ImageCategory,
+  TicketAttachment
 } from '../models/ticket.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TicketService {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   
   private readonly baseUrl = `${environment.apiUrl}/Tickets`;
   private readonly techUrl = `${environment.apiUrl}/Technician`;
@@ -49,17 +54,46 @@ export class TicketService {
   }
 
   private mapToTicket(dto: any): Ticket {
+    const rawImages = dto.images || [];
+    const images: TicketImage[] = rawImages.map((img: any) => ({
+      id: img.id,
+      ticketId: img.ticketId || dto.id,
+      category: (img.category === 2 || img.category === 'ResolutionEvidence') ? 'ResolutionEvidence' : 'ReportedIssue',
+      url: img.url
+        ? (img.url.startsWith('http') ? img.url : `${environment.apiUrl.replace(/\/api\/?$/, '')}${img.url}`)
+        : `${environment.apiUrl}/Tickets/${img.ticketId || dto.id}/images/${img.id}/file`,
+      fileName: img.fileName,
+      contentType: img.contentType,
+      fileSize: img.fileSize,
+      uploaderId: img.uploaderId,
+      uploaderName: img.uploaderName || '',
+      uploadedAt: img.uploadedAt
+    }));
+
+    const attachments: TicketAttachment[] = images.map(img => ({
+      id: img.id,
+      ticketId: img.ticketId,
+      category: img.category,
+      fileName: img.fileName,
+      fileUrl: img.url,
+      fileType: img.contentType,
+      fileSize: img.fileSize,
+      uploadedAt: img.uploadedAt,
+      uploaderName: img.uploaderName
+    }));
+
     return {
       id: dto.id,
       ticketNumber: dto.id.toString(),
       reporterId: dto.reporter?.id,
       reporterName: dto.reporter?.firstName ? `${dto.reporter.firstName} ${dto.reporter.lastName}` : (dto.reporter?.email || 'Unknown'),
       reporterEmail: dto.reporter?.email,
-      title: dto.description?.substring(0, 50) || `${dto.category} Issue`,
+      title: dto.title || dto.Title || dto.description?.substring(0, 50) || `${dto.category} Issue`,
       description: dto.description,
       category: dto.category,
-      building: dto.building,
-      room: dto.room,
+      building: dto.building || dto.Building,
+      floor: dto.floor || dto.Floor || undefined,
+      room: dto.room || dto.Room || undefined,
       priority: this.mapBackendPriority(dto.priority),
       status: this.mapBackendStatus(dto.status),
       assignedTechnicianId: dto.assignedTechnician?.id,
@@ -68,7 +102,8 @@ export class TicketService {
         id: dto.assignedTechnician.id,
         name: dto.assignedTechnician.fullName
       } : undefined,
-      attachments: [],
+      images,
+      attachments,
       activityLog: [],
       createdAt: dto.createdAt,
       updatedAt: dto.updatedAt || dto.createdAt,
@@ -147,17 +182,46 @@ export class TicketService {
     );
   }
 
-  updateStatus(id: string, newStatus: TicketStatus, note?: string): Observable<Ticket> {
-    let endpoint = 'start';
-    let body: any = {};
-    if (newStatus === 'RESOLVED') {
-      endpoint = 'resolve';
-      body = { resolutionNote: note };
+  private mapStatusToInt(status: TicketStatus | string): number {
+    const s = (status || '').toUpperCase();
+    switch (s) {
+      case 'NEW': return 0;
+      case 'ASSIGNED': return 1;
+      case 'IN_PROGRESS': return 2;
+      case 'RESOLVED': return 3;
+      case 'CLOSED': return 4;
+      default: return 0;
     }
-    
-    return this.http.put<any>(`${this.techUrl}/tickets/${id}/${endpoint}`, body).pipe(
-      switchMap(() => this.getTechnicianTicketById(id))
+  }
+
+  updateStatus(id: string, newStatus: TicketStatus, note?: string): Observable<Ticket> {
+    const role = this.authService.getUserRole();
+
+    // If technician lifecycle endpoints are appropriate:
+    if (role === 'TECHNICIAN' && newStatus === 'IN_PROGRESS') {
+      return this.http.put<any>(`${this.techUrl}/tickets/${id}/start`, {}).pipe(
+        switchMap(() => this.getTicketById(id))
+      );
+    }
+    if (role === 'TECHNICIAN' && newStatus === 'RESOLVED') {
+      return this.http.put<any>(`${this.techUrl}/tickets/${id}/resolve`, { resolutionNote: note }).pipe(
+        switchMap(() => this.getTicketById(id))
+      );
+    }
+
+    // For Admin (e.g. CLOSED or any lifecycle status) or fallback:
+    const payload = {
+      status: this.mapStatusToInt(newStatus),
+      note: note || undefined
+    };
+
+    return this.http.put<any>(`${this.baseUrl}/${id}/status`, payload).pipe(
+      switchMap(() => this.getTicketById(id))
     );
+  }
+
+  updateTicketStatus(id: string, newStatus: TicketStatus, note?: string): Observable<Ticket> {
+    return this.updateStatus(id, newStatus, note);
   }
   
   updatePriority(id: string, priority: string): Observable<Ticket> {
@@ -233,10 +297,30 @@ export class TicketService {
   }
 
   createTicket(dto: CreateTicketDto): Observable<Ticket> {
+    if (dto.attachments && dto.attachments.length > 0) {
+      const formData = new FormData();
+      formData.append('title', dto.title);
+      formData.append('category', dto.category);
+      formData.append('building', dto.building);
+      if (dto.floor) formData.append('floor', dto.floor);
+      if (dto.room) formData.append('room', dto.room);
+      formData.append('priority', dto.priority);
+      formData.append('description', dto.description);
+
+      for (const file of dto.attachments) {
+        formData.append('files', file, file.name);
+      }
+
+      return this.http.post<any>(`${this.baseUrl}`, formData).pipe(
+        map(t => this.mapToTicket(t))
+      );
+    }
+
     const payload = {
       title: dto.title,
       category: dto.category,
       building: dto.building,
+      floor: dto.floor,
       room: dto.room,
       priority: this.mapPriorityToInt(dto.priority),
       description: dto.description
@@ -245,6 +329,22 @@ export class TicketService {
     return this.http.post<any>(`${this.baseUrl}`, payload).pipe(
       map(t => this.mapToTicket(t))
     );
+  }
+
+  uploadResolutionImages(ticketId: string, files: File[]): Observable<TicketImage[]> {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file, file.name);
+    }
+    return this.http.post<TicketImage[]>(`${this.techUrl}/tickets/${ticketId}/images`, formData);
+  }
+
+  uploadTicketImages(ticketId: string, files: File[]): Observable<TicketImage[]> {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file, file.name);
+    }
+    return this.http.post<TicketImage[]>(`${this.baseUrl}/${ticketId}/images`, formData);
   }
 
   addComment(ticketId: string, content: string): Observable<TicketComment> {

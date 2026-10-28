@@ -12,11 +12,12 @@ import {
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-technician-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent],
+  imports: [CommonModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent, MatCardModule],
   templateUrl: './technician-dashboard.component.html',
 })
 export class TechnicianDashboardComponent implements OnInit {

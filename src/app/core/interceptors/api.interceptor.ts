@@ -10,15 +10,18 @@ export const apiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
   const authService = inject(AuthService);
   const token = authService.getToken();
 
-  let authReq = req;
+  const setHeaders: Record<string, string> = {
+    'X-Requested-With': 'XMLHttpRequest'
+  };
+
   if (token && !req.headers.has('Authorization')) {
-    authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    });
+    setHeaders['Authorization'] = `Bearer ${token}`;
   }
+
+  const authReq = req.clone({
+    setHeaders,
+    withCredentials: true
+  });
 
   return next(authReq);
 };

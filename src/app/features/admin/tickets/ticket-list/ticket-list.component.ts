@@ -17,6 +17,7 @@ import { TicketService } from '../../../../services/ticket.service';
 import { Ticket, TicketFilterParams, TicketStatus } from '../../../../models';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { ImageLightboxDialogComponent } from '../../../../ui/image-lightbox-dialog/image-lightbox-dialog.component';
 
 @Component({
   selector: 'app-ticket-list',
@@ -210,6 +211,20 @@ export class TicketListComponent implements OnInit, AfterViewInit {
       message: `Updated ${ids.length} tickets to ${this.bulkStatusTarget}.`
     });
     this.selectedTicketIds.set(new Set());
+  }
+
+  openImagePreview(item: any): void {
+    const url = item?.fileUrl || item?.url;
+    if (!url) return;
+    this.dialog.open(ImageLightboxDialogComponent, {
+      data: {
+        url,
+        fileName: item.fileName
+      },
+      width: '750px',
+      maxWidth: '92vw',
+      maxHeight: '92vh'
+    });
   }
 }
 

@@ -7,6 +7,7 @@ describe('StatusBadge', () => {
   let component: StatusBadge;
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [StatusBadge]
     }).compileComponents();

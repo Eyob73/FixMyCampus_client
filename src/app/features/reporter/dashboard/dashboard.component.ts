@@ -6,6 +6,7 @@ import { AuthService } from '../../../services/auth.service';
 import { Ticket, TicketStats } from '../../../models/ticket.model';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
+import { MatCardModule } from '@angular/material/card';
 import { MetadataService } from '../../../services/metadata.service';
 import { TicketStore } from '../../../store/ticket.store';
 
@@ -17,7 +18,8 @@ import { TicketStore } from '../../../store/ticket.store';
     RouterModule,
     FormsModule,
     StatusBadge,
-    PageContainerComponent
+    PageContainerComponent,
+    MatCardModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { StatCardComponent } from '../../../components/stat-card/stat-card.component';
 import { StatusBadgeComponent } from '../../../ui/badge/status-badge.component';
+import { MatCardModule } from '@angular/material/card';
 import { DashboardService } from '../../../services/dashboard.service';
 import { DashboardStore } from '../../../store/dashboard.store';
 import { TicketStore } from '../../../store/ticket.store';
@@ -12,7 +13,7 @@ import { Ticket } from '../../../models';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, StatCardComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, StatCardComponent, StatusBadgeComponent, MatCardModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -71,16 +72,17 @@ export class DashboardComponent implements OnInit {
   }
 
   exportReport(): void {
+    const total = this.ticketStore.tickets().length;
     this.notificationStore.showToast({
       type: 'success',
-      message: 'CSV report generated for 8 active facilities and 15 work orders.'
+      message: `CSV report generated for ${total} active work orders.`
     });
   }
 
   broadcastAlert(): void {
     this.notificationStore.showToast({
       type: 'info',
-      message: 'Chilled water pipeline maintenance scheduled for Science Quad between 18:00 - 22:00.'
+      message: 'Maintenance alert notification broadcasted to facilities staff.'
     });
   }
 }

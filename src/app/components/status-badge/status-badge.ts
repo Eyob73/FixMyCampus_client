@@ -51,8 +51,8 @@ export class StatusBadge {
       case 'submitted':
         return {
           label: 'New',
-          classes: 'text-[#4F46E5] bg-[#EEF2FF] border-[#C7D2FE]',
-          dotColor: 'bg-[#4F46E5]'
+          classes: 'text-[#2563EB] bg-[#EFF6FF] border-[#BFDBFE]',
+          dotColor: 'bg-[#2563EB]'
         };
       case 'assigned':
         return {

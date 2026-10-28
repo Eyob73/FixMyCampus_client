@@ -75,7 +75,7 @@ export class NotificationsComponent implements OnInit {
       case 'ticket_closed':
         return 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]';
       case 'new_comment':
-        return 'bg-[#EFF4FF] text-[#1E3A8A] border-[#C7D2FE]';
+        return 'bg-[#EFF4FF] text-[#1E3A8A] border-[#BFDBFE]';
       case 'ticket_created':
       default:
         return 'bg-[#F8FAFC] text-[#64748B] border-[#CBD5E1]';

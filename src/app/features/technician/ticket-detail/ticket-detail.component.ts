@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { TicketService } from '../../../services/ticket.service';
 import { TicketStore } from '../../../store/ticket.store';
 import { AuthService } from '../../../services/auth.service';
@@ -17,6 +18,8 @@ import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
 import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm-modal.component';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
+import { ImageLightboxDialogComponent } from '../../../ui/image-lightbox-dialog/image-lightbox-dialog.component';
+import { CameraCaptureDialogComponent, CameraCaptureResult } from '../../../ui/camera-capture-dialog/camera-capture-dialog.component';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -25,12 +28,15 @@ import { PageContainerComponent } from '../../../layout/page-container/page-cont
   templateUrl: './ticket-detail.component.html',
 })
 export class TicketDetailComponent implements OnInit {
+  @ViewChild('evidenceGalleryInput') evidenceGalleryInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('evidenceCameraInput') evidenceCameraInput?: ElementRef<HTMLInputElement>;
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly ticketService = inject(TicketService);
   readonly ticketStore = inject(TicketStore);
   readonly authService = inject(AuthService);
   private readonly notificationStore = inject(NotificationStore);
+  private readonly dialog = inject(MatDialog);
 
   readonly ticket = this.ticketStore.selectedTicket;
   readonly loading = signal<boolean>(false);
@@ -46,9 +52,9 @@ export class TicketDetailComponent implements OnInit {
   newNoteType: WorkNoteType = 'DIAGNOSIS';
   newNoteContent = '';
 
-  // Staged evidence file
-  stagedFile: File | null = null;
-  stagedFileSize = '';
+  // Staged resolution evidence files (multi-image support)
+  stagedEvidencePreviews = signal<Array<{ file: File; name: string; sizeFormatted: string; previewUrl: string; isCameraCapture?: boolean }>>([]);
+  evidenceUploadError = signal<string | null>(null);
 
   // Resolution modal
   showResolutionModal = false;
@@ -91,11 +97,11 @@ export class TicketDetailComponent implements OnInit {
   }
 
   get reporterAttachments(): TicketAttachment[] {
-    return (this.ticket()?.attachments || []);
+    return (this.ticket()?.attachments || []).filter(a => a.category !== 'ResolutionEvidence');
   }
 
   get evidenceAttachments(): TicketAttachment[] {
-    return [];
+    return (this.ticket()?.attachments || []).filter(a => a.category === 'ResolutionEvidence');
   }
 
   get sortedActivities() {
@@ -221,49 +227,196 @@ export class TicketDetailComponent implements OnInit {
       });
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.stagedFile = file;
-      this.stagedFileSize = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+  isMobileDevice(): boolean {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints > 1 && !/Windows NT/i.test(navigator.userAgent));
+  }
+
+  takeEvidencePhoto(): void {
+    if (this.stagedEvidencePreviews().length >= 5) {
+      this.evidenceUploadError.set('You have reached the maximum limit of 5 resolution evidence images.');
+      return;
+    }
+
+    if (this.isMobileDevice()) {
+      if (this.evidenceCameraInput?.nativeElement) {
+        this.evidenceCameraInput.nativeElement.click();
+      }
+    } else {
+      this.openEvidenceCameraDialog();
     }
   }
 
-  cancelStagedFile(): void {
-    this.stagedFile = null;
-    this.stagedFileSize = '';
+  openEvidenceCameraDialog(): void {
+    const dialogRef = this.dialog.open(CameraCaptureDialogComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Take Repair Evidence Photo',
+        subtitle: 'Capture completed repair work or equipment status as evidence'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: CameraCaptureResult | null) => {
+      if (!result) return;
+      if (result.action === 'choose_file') {
+        this.evidenceGalleryInput?.nativeElement.click();
+      } else if (result.file) {
+        this.addEvidenceFiles([result.file], true);
+      }
+    });
+  }
+
+  onEvidenceCameraCaptured(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.addEvidenceFiles(Array.from(input.files), true);
+      input.value = '';
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addEvidenceFiles(Array.from(input.files), false);
+      input.value = '';
+    }
+  }
+
+  onFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer?.files) {
+      this.addEvidenceFiles(Array.from(event.dataTransfer.files), false);
+    }
+  }
+
+  addEvidenceFiles(files: File[], isCamera = false): void {
+    this.evidenceUploadError.set(null);
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp'];
+    const current = this.stagedEvidencePreviews();
+
+    if (current.length >= 5) {
+      this.evidenceUploadError.set('You have reached the maximum limit of 5 resolution evidence images.');
+      return;
+    }
+
+    const newItems: Array<{ file: File; name: string; sizeFormatted: string; previewUrl: string; isCameraCapture?: boolean }> = [];
+    for (const file of files) {
+      if (current.length + newItems.length >= 5) {
+        this.evidenceUploadError.set('Maximum of 5 images can be attached. Extra files were ignored.');
+        break;
+      }
+
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      const isAllowedExt = allowedExts.includes(ext);
+      const isAllowedMime = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp';
+
+      if (!isAllowedExt && !isAllowedMime) {
+        this.evidenceUploadError.set(`"${file.name}" has an unsupported format. Only JPEG, PNG, and WebP are allowed.`);
+        continue;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        this.evidenceUploadError.set(`"${file.name}" exceeds the maximum allowed file size of 10 MB.`);
+        continue;
+      }
+
+      newItems.push({
+        file,
+        name: file.name,
+        sizeFormatted: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        previewUrl: URL.createObjectURL(file),
+        isCameraCapture: isCamera
+      });
+    }
+
+    if (newItems.length > 0) {
+      this.stagedEvidencePreviews.update(curr => [...curr, ...newItems].slice(0, 5));
+    }
+  }
+
+  openStagedPreview(item: { previewUrl: string; name: string; sizeFormatted: string; isCameraCapture?: boolean }): void {
+    this.dialog.open(ImageLightboxDialogComponent, {
+      data: {
+        url: item.previewUrl,
+        fileName: item.name,
+        fileSize: item.sizeFormatted,
+        category: item.isCameraCapture ? 'Camera Capture' : 'Resolution Evidence'
+      },
+      width: '750px',
+      maxWidth: '92vw',
+      maxHeight: '92vh'
+    });
+  }
+
+  retakeStagedEvidence(index: number): void {
+    this.removeStagedEvidence(index);
+    this.takeEvidencePhoto();
+  }
+
+  removeStagedEvidence(index: number): void {
+    this.stagedEvidencePreviews.update(list => {
+      const copy = [...list];
+      const removed = copy.splice(index, 1);
+      if (removed[0]?.previewUrl) {
+        URL.revokeObjectURL(removed[0].previewUrl);
+      }
+      return copy;
+    });
+    this.evidenceUploadError.set(null);
+  }
+
+  cancelStagedFiles(): void {
+    const list = this.stagedEvidencePreviews();
+    for (const item of list) {
+      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+    }
+    this.stagedEvidencePreviews.set([]);
+    this.evidenceUploadError.set(null);
   }
 
   uploadStagedEvidence(): void {
     const current = this.ticket();
-    if (!current || !this.stagedFile) return;
+    const previews = this.stagedEvidencePreviews();
+    if (!current || previews.length === 0) return;
 
     this.uploadingEvidence.set(true);
-    const mockUrl =
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80';
+    this.evidenceUploadError.set(null);
+    const filesToUpload = previews.map(p => p.file);
 
-    this.ticketService
-      .uploadAttachment(current.id, {
-        fileName: this.stagedFile.name,
-        fileUrl: mockUrl,
-        fileSize: this.stagedFileSize,
-        fileType: this.stagedFile.type || 'image/jpeg',
-        isEvidence: true,
-      })
-      .subscribe({
-        next: () => {
-          this.notificationStore.showToast({ type: 'success', message: `Evidence file "${this.stagedFile?.name}" uploaded.` });
-          this.ticketStore.loadTicketById(current.id);
-          this.stagedFile = null;
-          this.stagedFileSize = '';
-          this.uploadingEvidence.set(false);
-        },
-        error: () => {
-          this.notificationStore.showToast({ type: 'error', message: 'Failed to upload evidence file.' });
-          this.uploadingEvidence.set(false);
-        },
-      });
+    this.ticketService.uploadResolutionImages(current.id, filesToUpload).subscribe({
+      next: () => {
+        this.notificationStore.showToast({
+          type: 'success',
+          message: `${filesToUpload.length} resolution evidence image(s) uploaded successfully.`
+        });
+        for (const item of previews) {
+          if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+        }
+        this.stagedEvidencePreviews.set([]);
+        this.uploadingEvidence.set(false);
+        this.ticketStore.loadTicketById(current.id);
+      },
+      error: (err) => {
+        const msg = err?.error?.message || err?.error?.Message || 'Failed to upload resolution evidence images.';
+        this.evidenceUploadError.set(msg);
+        this.notificationStore.showToast({ type: 'error', message: msg });
+        this.uploadingEvidence.set(false);
+      }
+    });
+  }
+
+  openPreview(attachment: TicketAttachment): void {
+    this.dialog.open(ImageLightboxDialogComponent, {
+      data: {
+        url: attachment.fileUrl,
+        fileName: attachment.fileName
+      },
+      width: '750px',
+      maxWidth: '92vw',
+      maxHeight: '92vh'
+    });
   }
 
   printWorkOrder(): void {

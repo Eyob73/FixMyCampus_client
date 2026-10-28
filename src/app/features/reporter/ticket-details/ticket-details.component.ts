@@ -2,12 +2,14 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { TicketService } from '../../../services/ticket.service';
 import { AuthService } from '../../../services/auth.service';
 import { Ticket, TicketAttachment } from '../../../models/ticket.model';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { TicketStatusTracker } from '../../../components/ticket-status-tracker/ticket-status-tracker';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
+import { ImageLightboxDialogComponent } from '../../../ui/image-lightbox-dialog/image-lightbox-dialog.component';
 
 @Component({
   selector: 'app-ticket-details',
@@ -28,6 +30,7 @@ export class TicketDetailsComponent implements OnInit {
   private router = inject(Router);
   private ticketService = inject(TicketService);
   private authService = inject(AuthService);
+  private dialog = inject(MatDialog);
 
   ticket = signal<Ticket | null>(null);
   loading = signal<boolean>(true);
@@ -38,8 +41,13 @@ export class TicketDetailsComponent implements OnInit {
   submittingComment = signal<boolean>(false);
   commentError = signal<string | null>(null);
 
-  // Selected image for modal preview
-  previewAttachment = signal<TicketAttachment | null>(null);
+  get reportedImages(): TicketAttachment[] {
+    return (this.ticket()?.attachments || []).filter(a => a.category !== 'ResolutionEvidence');
+  }
+
+  get resolutionEvidenceImages(): TicketAttachment[] {
+    return (this.ticket()?.attachments || []).filter(a => a.category === 'ResolutionEvidence');
+  }
 
   currentUser = this.authService.currentUser;
 
@@ -108,10 +116,14 @@ export class TicketDetailsComponent implements OnInit {
   }
 
   openPreview(attachment: TicketAttachment): void {
-    this.previewAttachment.set(attachment);
-  }
-
-  closePreview(): void {
-    this.previewAttachment.set(null);
+    this.dialog.open(ImageLightboxDialogComponent, {
+      data: {
+        url: attachment.fileUrl,
+        fileName: attachment.fileName
+      },
+      width: '750px',
+      maxWidth: '92vw',
+      maxHeight: '92vh'
+    });
   }
 }

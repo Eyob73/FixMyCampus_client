@@ -2,14 +2,16 @@ import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NotificationStore } from '../../store/notification.store';
 import { AuthService } from '../../services/auth.service';
 import { TicketStore } from '../../store/ticket.store';
+import { LogoutDialogComponent } from '../../ui/logout-dialog/logout-dialog.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, MatDialogModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
   host: {
@@ -24,6 +26,7 @@ export class HeaderComponent {
   notificationStore = inject(NotificationStore);
   authService = inject(AuthService);
   ticketStore = inject(TicketStore);
+  dialog = inject(MatDialog);
 
   searchQuery = '';
   showNotifMenu = signal<boolean>(false);
@@ -99,9 +102,16 @@ export class HeaderComponent {
 
   onLogout(): void {
     this.closeMenus();
-    if (confirm('Are you sure you want to sign out?')) {
-      this.authService.logout();
-      this.router.navigate(['/dashboard']);
-    }
+    const dialogRef = this.dialog.open(LogoutDialogComponent, {
+      width: '420px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.authService.logout();
+      }
+    });
   }
 }

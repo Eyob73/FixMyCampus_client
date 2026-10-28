@@ -33,9 +33,7 @@ export const TechnicianStore = signalStore(
           tap(() => patchState(store, { isLoading: true, error: null })),
           switchMap(() => technicianService.getTechnicians().pipe(
             tap((technicians) => {
-              if (technicians && technicians.length) {
-                patchState(store, { technicians, isLoading: false });
-              }
+              patchState(store, { technicians: technicians || [], isLoading: false });
             }),
             catchError((err) => {
               patchState(store, { isLoading: false, error: 'Failed to load technicians' });

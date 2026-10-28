@@ -2,13 +2,31 @@ export type TicketStatus = 'NEW' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'CL
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type TicketCategory = 'HVAC' | 'PLUMBING' | 'ELECTRICAL' | 'STRUCTURAL' | 'IT_SECURITY' | 'GROUNDS' | 'GENERAL';
 
+export type ImageCategory = 'ReportedIssue' | 'ResolutionEvidence';
+
+export interface TicketImage {
+  id: string;
+  ticketId: string;
+  category: ImageCategory;
+  url: string;
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  uploaderId: string;
+  uploaderName: string;
+  uploadedAt: string;
+}
+
 export interface TicketAttachment {
   id: string;
+  ticketId?: string;
+  category?: ImageCategory;
   fileName: string;
   fileUrl: string;
   fileType: string;
   fileSize: number;
   uploadedAt: string;
+  uploaderName?: string;
 }
 
 export interface TicketActivity {
@@ -54,6 +72,7 @@ export interface Ticket {
   updatedAt: string;
   resolvedAt?: string;
   attachments?: TicketAttachment[];
+  images?: TicketImage[];
   activityLog?: TicketActivity[];
   internalNotes?: string[];
   comments?: TicketComment[];
@@ -127,29 +146,22 @@ export interface TicketStats {
 }
 
 export interface TechnicianDashboardStats {
-  assignedTickets: number;
-  inProgressTickets: number;
-  resolvedTickets: number;
-  recentTickets?: Ticket[];
-  
-  // legacy/mock fields
-  activeTickets?: number;
-  urgentTickets?: number;
-  resolvedToday?: number;
-  avgResolutionTimeHours?: number;
-  openTickets?: Ticket[];
-  totalAssigned?: number;
-  newAssigned?: number;
-  inProgress?: number;
-  resolved?: number;
-  closed?: number;
-  highPriority?: number;
-  priorityCounts?: {
+  totalAssigned: number;
+  newAssigned: number;
+  inProgress: number;
+  resolved: number;
+  closed: number;
+  highPriority: number;
+  priorityCounts: {
     critical: number;
     high: number;
     medium: number;
     low: number;
   };
+  recentTickets?: Ticket[];
+  assignedTickets?: number;
+  inProgressTickets?: number;
+  resolvedTickets?: number;
 }
 
 export interface TicketFilterOptions {

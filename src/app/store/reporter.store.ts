@@ -32,9 +32,7 @@ export const ReporterStore = signalStore(
           tap(() => patchState(store, { isLoading: true, error: null })),
           switchMap(() => reporterService.getReporters().pipe(
             tap((reporters) => {
-              if (reporters && reporters.length) {
-                patchState(store, { reporters, isLoading: false });
-              }
+              patchState(store, { reporters: reporters || [], isLoading: false });
             }),
             catchError((err) => {
               patchState(store, { isLoading: false, error: 'Failed to load reporters' });

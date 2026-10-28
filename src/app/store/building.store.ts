@@ -33,9 +33,7 @@ export const BuildingStore = signalStore(
           tap(() => patchState(store, { isLoading: true, error: null })),
           switchMap(() => buildingService.getBuildings().pipe(
             tap((buildings) => {
-              if (buildings && buildings.length) {
-                patchState(store, { buildings, isLoading: false });
-              }
+              patchState(store, { buildings: buildings || [], isLoading: false });
             }),
             catchError((err) => {
               patchState(store, { isLoading: false, error: 'Failed to load buildings' });
@@ -66,7 +64,7 @@ export const BuildingStore = signalStore(
           tap(() => patchState(store, { isLoading: true, error: null })),
           switchMap(({ id, partial }) => buildingService.updateBuilding(id, partial).pipe(
             tap((updatedBuilding) => {
-              const updated = store.buildings().map(b => b.id === id ? { ...b, ...partial } : b);
+              const updated = store.buildings().map(b => b.id === id ? { ...b, ...(updatedBuilding || partial) } : b);
               patchState(store, { buildings: updated, isLoading: false });
             }),
             catchError((err) => {

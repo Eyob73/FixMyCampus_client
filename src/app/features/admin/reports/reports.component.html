@@ -20,27 +20,63 @@
 
   <!-- KPI Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs">
-      <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Campus SLA Compliance</span>
-      <span class="text-3xl font-bold text-emerald-600 font-stat-numeric">96.4%</span>
-      <p class="text-xs text-slate-400 mt-1">Target is 92.0% (Exceeding baseline)</p>
-    </div>
+    <!-- Card 1: SLA Compliance -->
+    <mat-card
+      appearance="outlined"
+      class="!bg-white !border-[#E2E8F0] !rounded-[14px] p-[1.125rem_1.25rem] !shadow-sm cursor-default"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[0.9rem] font-semibold text-[#0F172A] tracking-tight">SLA Compliance</span>
+        <div class="w-[44px] h-[44px] rounded-[12px] bg-[#ECFDF5] text-[#10B981] flex items-center justify-center border border-[#A7F3D0]">
+          <span class="material-symbols-outlined text-[1.25rem]">verified</span>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline space-x-2">
+        <span class="text-[1.5rem] font-bold font-mono text-[#0F172A] leading-none">96.4%</span>
+        <span class="text-[11px] font-semibold text-[#10B981] bg-[#ECFDF5] px-1.5 py-0.5 rounded">Exceeding Target</span>
+      </div>
+      <p class="mt-1 text-[0.775rem] text-[#64748B] m-0">Target is 92.0% baseline</p>
+    </mat-card>
 
-    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs">
-      <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Mean Time to Dispatch</span>
-      <span class="text-3xl font-bold text-slate-900 font-stat-numeric">24m</span>
-      <p class="text-xs text-slate-400 mt-1">-8m improvement from last month</p>
-    </div>
+    <!-- Card 2: Mean Time to Dispatch -->
+    <mat-card
+      appearance="outlined"
+      class="!bg-white !border-[#E2E8F0] !rounded-[14px] p-[1.125rem_1.25rem] !shadow-sm cursor-default"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[0.9rem] font-semibold text-[#0F172A] tracking-tight">Mean Time to Dispatch</span>
+        <div class="w-[44px] h-[44px] rounded-[12px] bg-[#EFF6FF] text-[#1E3A8A] flex items-center justify-center border border-[#DBEAFE]">
+          <span class="material-symbols-outlined text-[1.25rem]">speed</span>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline space-x-2">
+        <span class="text-[1.5rem] font-bold font-mono text-[#0F172A] leading-none">24m</span>
+        <span class="text-[11px] font-semibold text-[#1E3A8A] bg-[#EFF6FF] px-1.5 py-0.5 rounded">-8m Faster</span>
+      </div>
+      <p class="mt-1 text-[0.775rem] text-[#64748B] m-0">Average dispatch turnaround</p>
+    </mat-card>
 
-    <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs">
-      <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Mean Time to Resolution</span>
-      <span class="text-3xl font-bold text-slate-900 font-stat-numeric">4.8h</span>
-      <p class="text-xs text-slate-400 mt-1">Across all 5 physical categories</p>
-    </div>
+    <!-- Card 3: Mean Time to Resolution -->
+    <mat-card
+      appearance="outlined"
+      class="!bg-white !border-[#E2E8F0] !rounded-[14px] p-[1.125rem_1.25rem] !shadow-sm cursor-default"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-[0.9rem] font-semibold text-[#0F172A] tracking-tight">Mean Time to Resolution</span>
+        <div class="w-[44px] h-[44px] rounded-[12px] bg-[#F0F9FF] text-[#0284C7] flex items-center justify-center border border-[#BAE6FD]">
+          <span class="material-symbols-outlined text-[1.25rem]">timer</span>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline space-x-2">
+        <span class="text-[1.5rem] font-bold font-mono text-[#0F172A] leading-none">4.8h</span>
+        <span class="text-[11px] font-semibold text-[#0284C7] bg-[#F0F9FF] px-1.5 py-0.5 rounded">All Categories</span>
+      </div>
+      <p class="mt-1 text-[0.775rem] text-[#64748B] m-0">Mean repair completion duration</p>
+    </mat-card>
   </div>
 
   <!-- Technician Utilization Table -->
-  <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-2xs space-y-4 p-5">
+  <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-lg overflow-hidden !shadow-2xs space-y-4 p-5">
     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
       <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
         <span class="material-symbols-outlined text-primary text-xl">manage_accounts</span>
@@ -86,5 +122,5 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </mat-card>
 </div>

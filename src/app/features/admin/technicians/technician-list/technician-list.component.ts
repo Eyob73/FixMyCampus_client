@@ -168,7 +168,7 @@ export class TechnicianListComponent implements OnInit {
     const techId = this.technicianToDelete.id;
     const name = this.technicianToDelete.name;
 
-    // We can assume technicianStore.deleteTechnician exists or just simulate
+    this.technicianStore.deleteTechnician(techId);
     this.notificationStore.showToast({
       type: 'success',
       message: `${name} removed from roster.`

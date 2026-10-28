@@ -128,7 +128,8 @@ export const TicketStore = signalStore(
             isLoading: false,
             lastUpdated: new Date()
           }))),
-          catchError(() => {
+          catchError((err) => {
+            console.error('Update status failed:', err);
             patchState(store, { isLoading: false });
             return of(null);
           })

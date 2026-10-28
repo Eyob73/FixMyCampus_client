@@ -190,13 +190,83 @@ describe('AuthService', () => {
 
   it('should clear all tokens and navigate to /login on logout', () => {
     localStorage.setItem('fmc_auth_token', 'token');
+    localStorage.setItem('fmc_refresh_token', 'refresh-token');
     sessionStorage.setItem('fmc_auth_token', 'token');
 
     service.logout();
 
+    const logoutReq = httpTesting.expectOne(`${environment.apiUrl}/auth/logout`);
+    expect(logoutReq.request.method).toBe('POST');
+    logoutReq.flush({ message: 'Logged out successfully.' });
+
     expect(localStorage.getItem('fmc_auth_token')).toBeNull();
+    expect(localStorage.getItem('fmc_refresh_token')).toBeNull();
     expect(sessionStorage.getItem('fmc_auth_token')).toBeNull();
     expect(service.isAuthenticated()).toBe(false);
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
   });
+
+  it('should request a new access token via refreshToken and update storage', () => {
+    localStorage.setItem('fmc_auth_token', 'old-access-token');
+    localStorage.setItem('fmc_refresh_token', 'old-refresh-token');
+
+    const mockResponse = {
+      accessToken: 'new-access-token-999',
+      refreshToken: 'new-refresh-token-888',
+      expiresIn: 900,
+      user: {
+        id: 'usr-1',
+        name: 'Jane Doe',
+        email: 'jane@univ.edu',
+        role: 'ADMIN',
+        isActive: true
+      }
+    };
+
+    service.refreshToken().subscribe((res) => {
+      expect(res.token).toBe('new-access-token-999');
+      expect(res.refreshToken).toBe('new-refresh-token-888');
+      expect(service.getToken()).toBe('new-access-token-999');
+      expect(service.getRefreshToken()).toBe('new-refresh-token-888');
+      expect(localStorage.getItem('accessToken')).toBe('new-access-token-999');
+      expect(localStorage.getItem('refreshToken')).toBe('new-refresh-token-888');
+    });
+
+    const req = httpTesting.expectOne(`${environment.apiUrl}/auth/refresh`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockResponse);
+  });
+
+  it('should set and remove tokens via setTokens and removeTokens', () => {
+    service.setTokens('access-123', 'refresh-456');
+    expect(service.getToken()).toBe('access-123');
+    expect(service.getRefreshToken()).toBe('refresh-456');
+    expect(localStorage.getItem('accessToken')).toBe('access-123');
+    expect(localStorage.getItem('refreshToken')).toBe('refresh-456');
+
+    service.removeTokens();
+    expect(service.getToken()).toBeNull();
+    expect(service.getRefreshToken()).toBeNull();
+    expect(localStorage.getItem('accessToken')).toBeNull();
+    expect(localStorage.getItem('refreshToken')).toBeNull();
+  });
+
+  it('should correctly check if token is expired', () => {
+    // Generate valid future token payload: exp in 1 hour
+    const futureExp = Math.floor(Date.now() / 1000) + 3600;
+    const futurePayload = btoa(JSON.stringify({ exp: futureExp }));
+    const validJwt = `header.${futurePayload}.signature`;
+
+    expect(service.isTokenExpired(validJwt)).toBe(false);
+
+    // Generate expired token payload: exp 1 hour ago
+    const pastExp = Math.floor(Date.now() / 1000) - 3600;
+    const pastPayload = btoa(JSON.stringify({ exp: pastExp }));
+    const expiredJwt = `header.${pastPayload}.signature`;
+
+    expect(service.isTokenExpired(expiredJwt)).toBe(true);
+    expect(service.isTokenExpired(null)).toBe(true);
+  });
 });
+

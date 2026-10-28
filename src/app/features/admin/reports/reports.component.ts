@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 import { DashboardService } from '../../../services/dashboard.service';
 import { TechnicianStore } from '../../../store/technician.store';
 import { TicketStore } from '../../../store/ticket.store';
@@ -8,7 +9,7 @@ import { NotificationStore } from '../../../store/notification.store';
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatCardModule],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.css'
 })
@@ -24,7 +25,7 @@ export class ReportsComponent {
   exportAudit(): void {
     this.notificationStore.showToast({
       type: 'success',
-      message: 'Download initiated for complete facilities operational logs (Q3/Q4).'
+      message: 'Download initiated for facilities operational audit logs.'
     });
   }
 }

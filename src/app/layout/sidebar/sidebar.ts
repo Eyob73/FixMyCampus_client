@@ -1,9 +1,12 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
 import { TicketStore } from '../../store/ticket.store';
+import { DashboardStore } from '../../store/dashboard.store';
 import { NotificationStore } from '../../store/notification.store';
+import { LogoutDialogComponent } from '../../ui/logout-dialog/logout-dialog.component';
 
 interface NavItem {
   label: string;
@@ -16,7 +19,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatDialogModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
@@ -26,8 +29,10 @@ export class SidebarComponent {
 
   authService = inject(AuthService);
   ticketStore = inject(TicketStore);
+  dashboardStore = inject(DashboardStore);
   notificationStore = inject(NotificationStore);
   router = inject(Router);
+  dialog = inject(MatDialog);
 
   unreadCount = this.notificationStore.unreadCount;
   currentUser = this.authService.currentUser;
@@ -39,8 +44,7 @@ export class SidebarComponent {
 
   get navItems(): NavItem[] {
     if (this.authService.isTechnician()) {
-      const inProgress = this.ticketStore.currentStats()?.inProgress ?? 0;
-      const newAssigned = this.ticketStore.currentStats()?.newAssigned ?? 0;
+      const newAssigned = this.dashboardStore.technicianStats()?.newAssigned ?? 0;
       return [
         { label: 'Dashboard', route: '/technician/dashboard', icon: 'dashboard' },
         { label: 'My Tickets', route: '/technician/tickets', icon: 'confirmation_number', badge: newAssigned > 0 ? newAssigned : undefined },
@@ -79,10 +83,18 @@ export class SidebarComponent {
   }
 
   onLogout(): void {
-    if (confirm('Are you sure you want to sign out?')) {
-      this.authService.logout();
-      this.router.navigate(['/dashboard']);
-    }
+    const dialogRef = this.dialog.open(LogoutDialogComponent, {
+      width: '420px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.closeSidebar.emit();
+        this.authService.logout();
+      }
+    });
   }
 
   logout(): void {

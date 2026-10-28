@@ -2,11 +2,13 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { TicketService } from '../../../services/ticket.service';
 import { Ticket, TicketStatus, TicketPriority } from '../../../models/ticket.model';
 import { MetadataService } from '../../../services/metadata.service';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
+import { ImageLightboxDialogComponent } from '../../../ui/image-lightbox-dialog/image-lightbox-dialog.component';
 
 @Component({
   selector: 'app-my-tickets',
@@ -26,6 +28,7 @@ export class MyTicketsComponent implements OnInit {
   private ticketService = inject(TicketService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   tickets = signal<Ticket[]>([]);
   loading = signal<boolean>(true);
@@ -164,5 +167,18 @@ export class MyTicketsComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
     }
+  }
+
+  openImagePreview(image?: { url: string; fileName?: string }): void {
+    if (!image?.url) return;
+    this.dialog.open(ImageLightboxDialogComponent, {
+      data: {
+        url: image.url,
+        fileName: image.fileName
+      },
+      width: '750px',
+      maxWidth: '92vw',
+      maxHeight: '92vh'
+    });
   }
 }

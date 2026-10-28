@@ -3,7 +3,7 @@
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div class="space-y-1">
       <div class="flex items-center space-x-2 text-xs text-[#64748B]">
-        <a routerLink="/dashboard" class="hover:text-[#1E3A8A] flex items-center space-x-1">
+        <a routerLink="/reporter/dashboard" class="hover:text-[#1E3A8A] flex items-center space-x-1">
           <span class="material-symbols-outlined text-[14px]">home</span>
           <span>Dashboard</span>
         </a>
@@ -18,7 +18,7 @@
 
     <div>
       <a
-        routerLink="/report-issue"
+        routerLink="/reporter/report-issue"
         class="inline-flex items-center space-x-2 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white h-[38px] px-4 rounded text-sm font-semibold shadow-sm transition-colors"
       >
         <span class="material-symbols-outlined text-[18px]">add</span>
@@ -161,17 +161,46 @@
 
                 <!-- Issue Title + Location -->
                 <td class="py-3.5 px-5">
-                  <div class="flex flex-col">
-                    <a
-                      [routerLink]="['/reporter/ticket', ticket.id]"
-                      class="text-xs font-semibold text-[#0F172A] group-hover:text-[#1E3A8A] transition-colors line-clamp-1"
-                    >
-                      {{ ticket.title }}
-                    </a>
-                    <span class="text-[11px] text-[#64748B] flex items-center space-x-1 mt-0.5">
-                      <span class="material-symbols-outlined text-[13px] text-[#94A3B8]">location_on</span>
-                      <span>{{ ticket.building }} · {{ ticket.room }}</span>
-                    </span>
+                  <div class="flex items-center space-x-3">
+                    @if (ticket.images && ticket.images.length > 0) {
+                      <div
+                        (click)="$event.stopPropagation(); openImagePreview(ticket.images[0])"
+                        class="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-100 border border-[#E2E8F0] shrink-0 cursor-pointer group/img hover:border-[#1E3A8A] transition-colors"
+                        title="Click to view photo"
+                      >
+                        <img
+                          [src]="ticket.images[0].url"
+                          [alt]="ticket.images[0].fileName"
+                          class="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-200"
+                        />
+                        <div class="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 flex items-center justify-center transition-colors">
+                          <span class="material-symbols-outlined text-white text-[16px] opacity-0 group-hover/img:opacity-100 drop-shadow">zoom_in</span>
+                        </div>
+                      </div>
+                    }
+                    <div class="flex flex-col min-w-0">
+                      <div class="flex items-center space-x-1.5">
+                        <a
+                          [routerLink]="['/reporter/ticket', ticket.id]"
+                          class="text-xs font-semibold text-[#0F172A] group-hover:text-[#1E3A8A] transition-colors line-clamp-1"
+                        >
+                          {{ ticket.title }}
+                        </a>
+                        @if (ticket.images && ticket.images.length > 0) {
+                          <span
+                            (click)="$event.stopPropagation(); openImagePreview(ticket.images[0])"
+                            class="inline-flex items-center text-[#64748B] hover:text-[#1E3A8A] cursor-pointer p-0.5 rounded hover:bg-slate-100 transition-colors"
+                            [title]="ticket.images.length + ' photo(s) attached - click to view'"
+                          >
+                            <span class="material-symbols-outlined text-[15px]">photo_camera</span>
+                          </span>
+                        }
+                      </div>
+                      <span class="text-[11px] text-[#64748B] flex items-center space-x-1 mt-0.5">
+                        <span class="material-symbols-outlined text-[13px] text-[#94A3B8]">location_on</span>
+                        <span>{{ ticket.building }} · {{ ticket.floor ? (ticket.floor + ' · ') : '' }}{{ ticket.room }}</span>
+                      </span>
+                    </div>
                   </div>
                 </td>
 
@@ -238,7 +267,7 @@
                         </button>
                       } @else {
                         <a
-                          routerLink="/report-issue"
+                          routerLink="/reporter/report-issue"
                           class="inline-flex items-center space-x-1.5 px-4 py-2 rounded text-xs font-semibold bg-[#1E3A8A] text-white hover:bg-[#1D4ED8]"
                         >
                           <span class="material-symbols-outlined text-[16px]">add</span>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, TemplateRef, inject, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, TemplateRef, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { TechnicianStore } from '../../store/technician.store';
 import { TicketService } from '../../services/ticket.service';
 import { TicketStore } from '../../store/ticket.store';
 import { CreateTicketDto, TicketCategory, TicketPriority } from '../../models';
+import { CameraCaptureDialogComponent, CameraCaptureResult } from '../../ui/camera-capture-dialog/camera-capture-dialog.component';
 
 @Component({
   selector: 'app-ticket-create-modal',
@@ -160,6 +161,76 @@ import { CreateTicketDto, TicketCategory, TicketPriority } from '../../models';
               <p class="text-xs text-rose-500 mt-1">Please provide descriptive details (min 10 chars).</p>
             }
           </div>
+
+          <!-- Attach Images Section -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Attach Images (Optional, max 5)
+            </label>
+            <div class="border border-dashed border-slate-300 rounded-lg p-3 text-center bg-slate-50">
+              <input
+                #modalGalleryInput
+                type="file"
+                (change)="onFilesSelected($event)"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                class="hidden"
+              />
+              <input
+                #modalCameraInput
+                type="file"
+                (change)="onCameraCaptured($event)"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment"
+                class="hidden"
+              />
+              <div class="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  (click)="takePhoto()"
+                  class="px-3 py-1.5 bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1E3A8A] border border-[#BFDBFE] rounded text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                  <span>Take Photo</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="modalGalleryInput.click()"
+                  class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-[16px]">photo_library</span>
+                  <span>Upload from Gallery</span>
+                </button>
+              </div>
+              <p class="text-[10px] text-slate-500 mt-1.5">JPEG, PNG, or WebP up to 10MB each</p>
+            </div>
+
+            @if (fileError) {
+              <p class="text-xs text-rose-600 mt-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">error</span>
+                {{ fileError }}
+              </p>
+            }
+
+            @if (selectedPreviews.length > 0) {
+              <div class="grid grid-cols-3 gap-2 mt-2">
+                @for (item of selectedPreviews; track $index) {
+                  <div class="relative group rounded border border-slate-200 overflow-hidden bg-white">
+                    <img [src]="item.previewUrl" [alt]="item.file.name" class="w-full h-16 object-cover" />
+                    <button
+                      type="button"
+                      (click)="removeFile($index)"
+                      class="absolute top-1 right-1 w-5 h-5 bg-slate-900/70 hover:bg-rose-600 text-white rounded-full flex items-center justify-center text-xs"
+                      title="Remove"
+                    >
+                      <span class="material-symbols-outlined text-[12px]">close</span>
+                    </button>
+                    <p class="text-[10px] text-slate-600 truncate p-1">{{ item.file.name }}</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
         </form>
       </mat-dialog-content>
 
@@ -184,11 +255,16 @@ export class TicketCreateModalComponent implements OnInit, OnChanges {
   @Output() closeModal = new EventEmitter<void>();
 
   @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
+  @ViewChild('modalGalleryInput') modalGalleryInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('modalCameraInput') modalCameraInput?: ElementRef<HTMLInputElement>;
   private dialog = inject(MatDialog);
   private dialogRef: MatDialogRef<any> | null = null;
 
   form!: FormGroup;
   isSubmitting = false;
+  selectedFiles: File[] = [];
+  selectedPreviews: Array<{ file: File; previewUrl: string }> = [];
+  fileError: string | null = null;
 
   readonly buildingStore = inject(BuildingStore);
   readonly technicianStore = inject(TechnicianStore);
@@ -223,7 +299,7 @@ export class TicketCreateModalComponent implements OnInit, OnChanges {
   }
 
   private initForm(): void {
-    const defaultBuilding = this.buildingStore.buildings()[0]?.name || 'Physical Sciences Hall & Labs';
+    const defaultBuilding = this.buildingStore.buildings()[0]?.name || '';
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
@@ -236,9 +312,114 @@ export class TicketCreateModalComponent implements OnInit, OnChanges {
     });
   }
 
+  isMobileDevice(): boolean {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints > 1 && !/Windows NT/i.test(navigator.userAgent));
+  }
+
+  takePhoto(): void {
+    if (this.selectedFiles.length >= 5) {
+      this.fileError = 'Maximum of 5 images allowed.';
+      return;
+    }
+
+    if (this.isMobileDevice()) {
+      if (this.modalCameraInput?.nativeElement) {
+        this.modalCameraInput.nativeElement.click();
+      }
+    } else {
+      this.openCameraDialog();
+    }
+  }
+
+  openCameraDialog(): void {
+    const dialogRef = this.dialog.open(CameraCaptureDialogComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Take Work Order Photo',
+        subtitle: 'Capture a photo of the maintenance location or issue'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: CameraCaptureResult | null) => {
+      if (!result) return;
+      if (result.action === 'choose_file') {
+        this.modalGalleryInput?.nativeElement.click();
+      } else if (result.file) {
+        this.addFiles([result.file]);
+      }
+    });
+  }
+
+  onCameraCaptured(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.addFiles(Array.from(input.files));
+      input.value = '';
+    }
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+    this.addFiles(Array.from(input.files));
+    input.value = '';
+  }
+
+  addFiles(files: File[]): void {
+    this.fileError = null;
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    const maxFiles = 5;
+
+    for (const file of files) {
+      if (this.selectedFiles.length >= maxFiles) {
+        this.fileError = 'Maximum of 5 images allowed.';
+        break;
+      }
+
+      if (!allowed.includes(file.type)) {
+        this.fileError = `File "${file.name}" has an unsupported format. Only JPEG, PNG, and WebP are allowed.`;
+        continue;
+      }
+
+      if (file.size > maxFileSize) {
+        this.fileError = `File "${file.name}" exceeds the 10 MB size limit.`;
+        continue;
+      }
+
+      this.selectedFiles.push(file);
+      this.selectedPreviews.push({
+        file,
+        previewUrl: URL.createObjectURL(file)
+      });
+    }
+  }
+
+  removeFile(index: number): void {
+    const removed = this.selectedPreviews.splice(index, 1);
+    if (removed[0]?.previewUrl) {
+      URL.revokeObjectURL(removed[0].previewUrl);
+    }
+    this.selectedFiles.splice(index, 1);
+    this.fileError = null;
+  }
+
+  private clearFiles(): void {
+    for (const item of this.selectedPreviews) {
+      URL.revokeObjectURL(item.previewUrl);
+    }
+    this.selectedPreviews = [];
+    this.selectedFiles = [];
+    this.fileError = null;
+  }
+
   onClose(): void {
     this.form.reset();
     this.initForm();
+    this.clearFiles();
     this.closeModal.emit();
   }
 
@@ -256,7 +437,8 @@ export class TicketCreateModalComponent implements OnInit, OnChanges {
       building: val.building,
       floor: val.floor || undefined,
       room: val.room || undefined,
-      assignedTechnicianId: val.assignedTechnicianId || undefined
+      assignedTechnicianId: val.assignedTechnicianId || undefined,
+      attachments: this.selectedFiles.length > 0 ? this.selectedFiles : undefined
     };
 
     this.ticketService.createTicket(dto).subscribe({

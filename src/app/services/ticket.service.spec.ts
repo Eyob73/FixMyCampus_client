@@ -25,30 +25,6 @@ describe('TicketService', () => {
 
   afterEach(() => {
     httpTesting.verify();
-import { describe, it, expect, beforeEach } from 'vitest';
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { TicketService } from './ticket.service';
-import { AuthService } from './auth.service';
-import { NotificationService } from './notification.service';
-
-describe('TicketService', () => {
-  let service: TicketService;
-  let authService: AuthService;
-
-  beforeEach(() => {
-    localStorage.clear();
-    TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        TicketService,
-        AuthService,
-        NotificationService
-      ]
-    });
-    service = TestBed.inject(TicketService);
-    authService = TestBed.inject(AuthService);
   });
 
   it('should be created', () => {
@@ -56,90 +32,118 @@ describe('TicketService', () => {
   });
 
   it('should request dashboard stats from backend API', () => {
-    const mockStats = {
-      totalAssigned: 7,
-      newAssigned: 3,
-      inProgress: 2,
-      resolved: 1,
-      closed: 1,
-      highPriority: 3,
-      avgResolutionHours: 4.2,
-      slaComplianceRate: 94,
-      priorityCounts: { critical: 1, high: 2, medium: 2, low: 2 },
-      statusCounts: { assigned: 3, inProgress: 2, resolved: 1, closed: 1 },
+    const mockStats: any = {
+      assignedTickets: 7,
+      openTickets: 3,
+      inProgressTickets: 2,
+      resolvedTickets: 1,
+      closedTickets: 1,
     };
 
     service.getDashboardStats().subscribe((stats) => {
-      expect(stats.totalAssigned).toBe(7);
-      expect(stats.highPriority).toBe(3);
+      expect(stats.assignedTickets).toBe(7);
     });
 
-    const req = httpTesting.expectOne(`${environment.apiUrl}/technician/dashboard/stats`);
+    const req = httpTesting.expectOne(`${environment.apiUrl}/Technician/dashboard`);
     expect(req.request.method).toBe('GET');
     req.flush(mockStats);
   });
 
-  it('should update ticket status via PATCH', () => {
-    const mockUpdatedTicket: any = {
-      id: 'T-1082',
-      status: 'IN_PROGRESS',
+  it('should send FormData when creating ticket with attachments', () => {
+    const fakeFile = new File(['fake-image-bytes'], 'test-leak.png', { type: 'image/png' });
+    const dto: any = {
+      title: 'Broken window',
+      description: 'Glass cracked in lecture hall',
+      category: 'STRUCTURAL',
+      building: 'Engineering Hall',
+      priority: 'MEDIUM',
+      attachments: [fakeFile],
     };
 
-    service.updateTicketStatus('T-1082', 'IN_PROGRESS', 'Arrived on site').subscribe((ticket) => {
-      expect(ticket.status).toBe('IN_PROGRESS');
+    service.createTicket(dto).subscribe((ticket) => {
+      expect(ticket.id).toBe('101');
     });
 
-    const req = httpTesting.expectOne(`${environment.apiUrl}/technician/tickets/T-1082/status`);
-    expect(req.request.method).toBe('PATCH');
-    expect(req.request.body.status).toBe('IN_PROGRESS');
-    req.flush(mockUpdatedTicket);
-  it('should retrieve tickets for authenticated reporter only', async () => {
-    const tickets = await firstValueFrom(service.getMyTickets());
-    expect(tickets.length).toBeGreaterThan(0);
-    const currentUser = authService.getCurrentUser();
-    for (const t of tickets) {
-      expect(t.reporterId).toBe(currentUser.id);
-    }
+    const req = httpTesting.expectOne(`${environment.apiUrl}/Tickets`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBe(true);
+    expect((req.request.body as FormData).has('title')).toBe(true);
+    expect((req.request.body as FormData).has('files')).toBe(true);
+    req.flush({
+      id: '101',
+      title: 'Broken window',
+      description: 'Glass cracked',
+      category: 'STRUCTURAL',
+      status: 'NEW',
+      priority: 'MEDIUM',
+      building: 'Engineering Hall',
+      createdAt: '2026-10-28T10:00:00Z',
+    });
   });
 
-  it('should calculate ticket statistics accurately', async () => {
-    const stats = await firstValueFrom(service.getTicketStats());
-    expect(stats.totalSubmitted).toBeGreaterThan(0);
-    expect(stats.openCount + stats.inProgressCount + stats.resolvedCount + stats.closedCount)
-      .toBe(stats.totalSubmitted);
+  it('should upload resolution images with multipart FormData to technician endpoint', () => {
+    const fakeEvidence = new File(['evidence-bytes'], 'fixed.jpg', { type: 'image/jpeg' });
+
+    service.uploadResolutionImages('ticket-77', [fakeEvidence]).subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+
+    const req = httpTesting.expectOne(`${environment.apiUrl}/Technician/tickets/ticket-77/images`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBe(true);
+    req.flush([{ id: 'img-1' }]);
   });
 
-  it('should create a new ticket with status "new"', async () => {
-    const newTicket = await firstValueFrom(
-      service.createTicket({
-        title: 'Broken Radiator Valve',
-        category: 'HVAC / Climate',
-        building: 'Science Building',
-        room: 'Room 101',
-        priority: 'high',
-        description: 'Radiator valve is leaking steam onto the carpet.'
-      })
-    );
+  it('should map returned images with category and download URLs', () => {
+    service.getTicketById('ticket-55').subscribe((ticket) => {
+      expect(ticket.images?.length).toBe(2);
+      expect(ticket.attachments?.length).toBe(2);
+      expect(ticket.images?.[0].category).toBe('ReportedIssue');
+      expect(ticket.images?.[1].category).toBe('ResolutionEvidence');
+      expect(ticket.attachments?.[0].fileUrl).toContain('/api/Tickets/ticket-55/images/img-1/file');
+    });
 
-    expect(newTicket.id).toBeDefined();
-    expect(newTicket.title).toBe('Broken Radiator Valve');
-    expect(newTicket.status).toBe('new');
-    expect(newTicket.reporterId).toBe(authService.getcurrentUser()?.id);
-    expect(newTicket.activities.length).toBe(1);
-  });
+    const req = httpTesting.expectOne(`${environment.apiUrl}/Tickets/ticket-55`);
+    expect(req.request.method).toBe('GET');
+    req.flush({
+      id: 'ticket-55',
+      title: 'Pipe Leak',
+      description: 'Water under sink',
+      category: 'PLUMBING',
+      status: 'RESOLVED',
+      priority: 'HIGH',
+      building: 'Main Hall',
+      createdAt: '2026-10-28T09:00:00Z',
+      images: [
+        {
+          id: 'img-1',
+          ticketId: 'ticket-55',
+          category: 1, // ReportedIssue
+          storagePath: 'uploads/img-1.png',
+          originalFileName: 'leak.png',
+          contentType: 'image/png',
+          fileSize: 1024,
+          uploaderId: 'user-1',
+          uploaderName: 'Alice Reporter',
+          uploadedAt: '2026-10-28T09:00:00Z',
+        },
+        {
+          id: 'img-2',
+          ticketId: 'ticket-55',
+          category: 2, // ResolutionEvidence
+          storagePath: 'uploads/img-2.jpg',
+          originalFileName: 'repaired.jpg',
+          contentType: 'image/jpeg',
+          fileSize: 2048,
+          uploaderId: 'tech-1',
+          uploaderName: 'Bob Technician',
+          uploadedAt: '2026-10-28T11:00:00Z',
+        },
+      ],
+    });
 
-  it('should add comment and update ticket thread', async () => {
-    const tickets = await firstValueFrom(service.getMyTickets());
-    const ticket = tickets[0];
-    const initialCommentCount = ticket.comments.length;
-
-    const comment = await firstValueFrom(
-      service.addComment(ticket.id, 'Here is additional information.')
-    );
-    expect(comment.content).toBe('Here is additional information.');
-    expect(comment.authorId).toBe(authService.getcurrentUser()?.id);
-
-    const updated = await firstValueFrom(service.getTicketById(ticket.id));
-    expect(updated?.comments.length).toBe(initialCommentCount + 1);
+    const reqHistory = httpTesting.expectOne(`${environment.apiUrl}/Tickets/ticket-55/history`);
+    expect(reqHistory.request.method).toBe('GET');
+    reqHistory.flush([]);
   });
 });

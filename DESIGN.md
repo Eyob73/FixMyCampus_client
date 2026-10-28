@@ -163,9 +163,9 @@ The color system uses a deliberate division between neutral canvas scaffolding, 
 ### Semantic Lifecycle Status Tokens
 Every status badge and pipeline indicator follows an explicit, immutable pairing of 10% tinted surface fill, 1-pixel solid boundary border, and high-contrast solid label text:
 - **New / Unassigned:** 
-  - Text & Icon: `#4F46E5` (Indigo-600)
-  - Surface Fill: `#EEF2FF` (Indigo-50)
-  - Border: `#C7D2FE` (Indigo-200)
+  - Text & Icon: `#2563EB` (Blue-600)
+  - Surface Fill: `#EFF6FF` (Blue-50)
+  - Border: `#BFDBFE` (Blue-200)
 - **Assigned / Queued:** 
   - Text & Icon: `#D97706` (Amber-600)
   - Surface Fill: `#FFFBEB` (Amber-50)
