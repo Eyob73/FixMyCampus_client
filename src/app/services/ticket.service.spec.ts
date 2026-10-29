@@ -146,4 +146,37 @@ describe('TicketService', () => {
     expect(reqHistory.request.method).toBe('GET');
     reqHistory.flush([]);
   });
+
+  it('should call check-duplicate endpoint with payload', () => {
+    const checkDto = {
+      title: 'Classroom projector broken',
+      description: 'Projector stopped working',
+      category: 'IT_SECURITY',
+      building: 'Science Hall',
+      room: '101'
+    };
+
+    service.checkDuplicate(checkDto).subscribe((res) => {
+      expect(res.isDuplicate).toBe(true);
+      expect(res.primaryMatch?.title).toBe('Classroom projector broken');
+    });
+
+    const req = httpTesting.expectOne(`${environment.apiUrl}/Tickets/check-duplicate`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body.title).toBe(checkDto.title);
+    req.flush({
+      isDuplicate: true,
+      hasPotentialDuplicates: false,
+      primaryMatch: {
+        ticketId: 't-1',
+        ticketNumber: 'T-001',
+        title: 'Classroom projector broken',
+        description: 'Projector stopped working',
+        status: 'NEW',
+        matchLevel: 'Confirmed'
+      },
+      matches: []
+    });
+  });
 });
+

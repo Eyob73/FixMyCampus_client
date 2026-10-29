@@ -451,11 +451,14 @@ export class TicketCreateModalComponent implements OnInit, OnChanges {
         this.ticketStore.loadTickets(); // refresh store
         this.onClose();
       },
-      error: () => {
+      error: (err) => {
         this.isSubmitting = false;
+        const msg = err?.status === 409
+          ? (err.error?.message || err.error?.Message || 'A matching active work order already exists for this location.')
+          : (err.error?.message || err.error?.Message || 'Please review input details and retry.');
         this.notificationStore.showToast({
           type: 'error',
-          message: 'Please review input details and retry.'
+          message: msg
         });
       }
     });

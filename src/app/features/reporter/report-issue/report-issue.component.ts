@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { TicketService } from '../../../services/ticket.service';
-import { TicketCategory, TicketPriority } from '../../../models/ticket.model';
+import { TicketCategory, TicketPriority, DuplicateTicketMatch, DuplicateCheckResponse } from '../../../models/ticket.model';
 import { MetadataService } from '../../../services/metadata.service';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
 import { FormFieldComponent } from '../../../components/form-field/form-field';
@@ -48,8 +48,14 @@ export class ReportIssueComponent {
 
   buildings = this.metadataService.buildings;
   categories = this.metadataService.categories;
+  protected readonly Math = Math;
 
   submitting = signal<boolean>(false);
+  checkingDuplicates = signal<boolean>(false);
+  confirmedDuplicate = signal<DuplicateTicketMatch | null>(null);
+  potentialDuplicates = signal<DuplicateTicketMatch[]>([]);
+  acknowledgedPotentialDuplicates = signal<boolean>(false);
+
   submitSuccess = signal<string | null>(null);
   submitError = signal<string | null>(null);
   selectedFiles = signal<FilePreview[]>([]);
@@ -66,6 +72,18 @@ export class ReportIssueComponent {
     description: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(2000)]],
     additionalDetails: ['']
   });
+
+  constructor() {
+    // Reset duplicate warnings if user modifies the problem details
+    this.form.valueChanges.subscribe(() => {
+      if (this.confirmedDuplicate() || this.potentialDuplicates().length > 0) {
+        this.confirmedDuplicate.set(null);
+        this.potentialDuplicates.set([]);
+        this.acknowledgedPotentialDuplicates.set(false);
+        this.submitError.set(null);
+      }
+    });
+  }
 
   isFieldInvalid(field: string): boolean {
     const control = this.form.get(field);
@@ -258,6 +276,89 @@ export class ReportIssueComponent {
       return;
     }
 
+    // Prevent submission if a confirmed duplicate is currently active
+    if (this.confirmedDuplicate()) {
+      this.submitError.set('This problem has already been reported and is currently active. Please review the existing issue.');
+      return;
+    }
+
+    // If potential duplicates are shown and user hasn't explicitly clicked to proceed
+    if (this.potentialDuplicates().length > 0 && !this.acknowledgedPotentialDuplicates()) {
+      this.submitError.set('Please review the potential duplicate issues found before proceeding.');
+      return;
+    }
+
+    const formValue = this.form.value;
+
+    // If user has already reviewed potential duplicates and chosen to proceed
+    if (this.acknowledgedPotentialDuplicates()) {
+      this.executeCreateTicket(true);
+      return;
+    }
+
+    // Step 1: Pre-check duplicates through backend service
+    this.submitting.set(true);
+    this.checkingDuplicates.set(true);
+    this.submitError.set(null);
+    this.submitSuccess.set(null);
+
+    this.ticketService
+      .checkDuplicate({
+        title: formValue.title!,
+        category: formValue.category!,
+        building: formValue.building!,
+        floor: formValue.floor?.trim() || undefined,
+        room: formValue.room!,
+        description: formValue.description!
+      })
+      .subscribe({
+        next: (res) => {
+          this.checkingDuplicates.set(false);
+
+          if (res.isDuplicate && res.primaryMatch) {
+            this.submitting.set(false);
+            this.confirmedDuplicate.set(res.primaryMatch);
+            this.potentialDuplicates.set([]);
+            this.submitError.set('An active report for this problem already exists in this location.');
+            return;
+          }
+
+          if (res.hasPotentialDuplicates && res.matches?.length > 0) {
+            this.submitting.set(false);
+            this.confirmedDuplicate.set(null);
+            this.potentialDuplicates.set(res.matches);
+            return;
+          }
+
+          // No duplicates detected, proceed directly
+          this.executeCreateTicket(false);
+        },
+        error: () => {
+          this.checkingDuplicates.set(false);
+          // Fallback to direct submission (backend will still enforce 409 conflict safety check)
+          this.executeCreateTicket(false);
+        }
+      });
+  }
+
+  proceedAnyway(): void {
+    this.acknowledgedPotentialDuplicates.set(true);
+    this.potentialDuplicates.set([]);
+    this.executeCreateTicket(true);
+  }
+
+  dismissDuplicateWarning(): void {
+    this.confirmedDuplicate.set(null);
+    this.potentialDuplicates.set([]);
+    this.acknowledgedPotentialDuplicates.set(false);
+    this.submitError.set(null);
+  }
+
+  navigateToExistingTicket(ticketId: string): void {
+    this.router.navigate(['/reporter/ticket', ticketId]);
+  }
+
+  private executeCreateTicket(ignorePotentialDuplicates: boolean): void {
     this.submitting.set(true);
     this.submitError.set(null);
     this.submitSuccess.set(null);
@@ -275,7 +376,8 @@ export class ReportIssueComponent {
         priority: formValue.priority as TicketPriority,
         description: formValue.description!,
         additionalDetails: formValue.additionalDetails || undefined,
-        attachments: filesToUpload
+        attachments: filesToUpload,
+        ignorePotentialDuplicates: ignorePotentialDuplicates
       })
       .subscribe({
         next: (createdTicket) => {
@@ -294,7 +396,30 @@ export class ReportIssueComponent {
         },
         error: (err) => {
           this.submitting.set(false);
-          const errorMsg = err?.error?.message || err?.error?.Message || 'An error occurred while submitting your ticket. Please try again.';
+
+          // Handle 409 Conflict with duplicate payload
+          if (err.status === 409 && err.error) {
+            const conflictData = err.error;
+            if (conflictData.duplicateTicket) {
+              if (conflictData.duplicateTicket.matchLevel === 'Confirmed') {
+                this.confirmedDuplicate.set(conflictData.duplicateTicket);
+                this.potentialDuplicates.set([]);
+              } else {
+                this.potentialDuplicates.set(
+                  conflictData.matches?.length > 0 ? conflictData.matches : [conflictData.duplicateTicket]
+                );
+              }
+            } else if (conflictData.matches?.length > 0) {
+              this.potentialDuplicates.set(conflictData.matches);
+            }
+            this.submitError.set(conflictData.message || 'This problem has already been reported.');
+            return;
+          }
+
+          const errorMsg =
+            err?.error?.message ||
+            err?.error?.Message ||
+            'An error occurred while submitting your ticket. Please try again.';
           this.submitError.set(errorMsg);
         }
       });
@@ -311,6 +436,10 @@ export class ReportIssueComponent {
       description: '',
       additionalDetails: ''
     });
+
+    this.confirmedDuplicate.set(null);
+    this.potentialDuplicates.set([]);
+    this.acknowledgedPotentialDuplicates.set(false);
 
     // Clean up preview URLs
     for (const f of this.selectedFiles()) {

@@ -88,6 +88,39 @@ export interface Ticket {
   };
 }
 
+export interface DuplicateTicketMatch {
+  ticketId: string;
+  ticketNumber: string;
+  title: string;
+  description: string;
+  status: TicketStatus;
+  category: string;
+  building: string;
+  floor?: string;
+  room?: string;
+  createdAt: string;
+  similarityScore: number;
+  matchLevel: 'Confirmed' | 'Potential';
+  reason: string;
+}
+
+export interface DuplicateCheckRequest {
+  title: string;
+  category: string;
+  building: string;
+  floor?: string;
+  room?: string;
+  description: string;
+}
+
+export interface DuplicateCheckResponse {
+  isDuplicate: boolean;
+  hasPotentialDuplicates: boolean;
+  message?: string;
+  primaryMatch?: DuplicateTicketMatch;
+  matches: DuplicateTicketMatch[];
+}
+
 export interface CreateTicketDto {
   title: string;
   description: string;
@@ -101,6 +134,7 @@ export interface CreateTicketDto {
   reporterEmail?: string;
   additionalDetails?: string;
   attachments?: File[];
+  ignorePotentialDuplicates?: boolean;
 }
 
 export interface UpdateTicketDto {

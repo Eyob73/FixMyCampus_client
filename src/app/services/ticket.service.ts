@@ -11,6 +11,9 @@ import {
   TicketResolution,
   TicketStats,
   CreateTicketDto,
+  DuplicateCheckRequest,
+  DuplicateCheckResponse,
+  DuplicateTicketMatch,
   TicketFilter,
   TicketComment,
   TicketImage,
@@ -296,6 +299,10 @@ export class TicketService {
     }
   }
 
+  checkDuplicate(dto: DuplicateCheckRequest): Observable<DuplicateCheckResponse> {
+    return this.http.post<DuplicateCheckResponse>(`${this.baseUrl}/check-duplicate`, dto);
+  }
+
   createTicket(dto: CreateTicketDto): Observable<Ticket> {
     if (dto.attachments && dto.attachments.length > 0) {
       const formData = new FormData();
@@ -306,6 +313,9 @@ export class TicketService {
       if (dto.room) formData.append('room', dto.room);
       formData.append('priority', dto.priority);
       formData.append('description', dto.description);
+      if (dto.ignorePotentialDuplicates !== undefined) {
+        formData.append('ignorePotentialDuplicates', String(dto.ignorePotentialDuplicates));
+      }
 
       for (const file of dto.attachments) {
         formData.append('files', file, file.name);
@@ -323,7 +333,8 @@ export class TicketService {
       floor: dto.floor,
       room: dto.room,
       priority: this.mapPriorityToInt(dto.priority),
-      description: dto.description
+      description: dto.description,
+      ignorePotentialDuplicates: dto.ignorePotentialDuplicates ?? false
     };
 
     return this.http.post<any>(`${this.baseUrl}`, payload).pipe(

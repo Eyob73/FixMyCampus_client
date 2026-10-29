@@ -46,6 +46,183 @@
     </div>
   }
 
+  <!-- Confirmed Duplicate Alert Banner -->
+  @if (confirmedDuplicate(); as dup) {
+    <div class="p-5 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-4 animate-in fade-in shadow-sm">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[24px]">content_copy</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-amber-200 text-amber-900 tracking-wider">
+                Active Duplicate Blocked
+              </span>
+              <span class="text-xs text-amber-800 font-semibold">
+                {{ dup.reason }}
+              </span>
+            </div>
+            <h3 class="text-base font-bold text-amber-950 mt-1">This problem has already been reported</h3>
+            <p class="text-xs text-amber-900 mt-0.5">
+              An active work order matching this problem is already open. Multiple tickets for the same issue are prevented to avoid duplicate technician dispatches.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="dismissDuplicateWarning()"
+          class="text-amber-800 hover:text-amber-950 p-1.5 rounded-lg hover:bg-amber-100 transition-colors"
+          title="Dismiss duplicate alert"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Matching Ticket Details Box -->
+      <div class="bg-white border border-amber-200 rounded-lg p-4 space-y-3 shadow-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono font-bold text-[#1E3A8A] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              #{{ dup.ticketNumber || dup.ticketId.slice(0, 8) }}
+            </span>
+            <span class="text-sm font-bold text-[#0F172A]">{{ dup.title }}</span>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 uppercase tracking-wider">
+            Status: {{ dup.status }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-[#444651]">
+          <div>
+            <span class="text-[#64748B] block text-[10px] uppercase font-semibold">Location</span>
+            <span class="font-medium text-[#0F172A]">
+              {{ dup.building }} {{ dup.floor ? '• ' + dup.floor : '' }} • Room {{ dup.room || 'N/A' }}
+            </span>
+          </div>
+          <div>
+            <span class="text-[#64748B] block text-[10px] uppercase font-semibold">Category</span>
+            <span class="font-medium text-[#0F172A]">{{ dup.category }}</span>
+          </div>
+          <div>
+            <span class="text-[#64748B] block text-[10px] uppercase font-semibold">Reported Date</span>
+            <span class="font-medium text-[#0F172A]">{{ dup.createdAt | date:'medium' }}</span>
+          </div>
+        </div>
+
+        <div class="text-xs text-[#334155] bg-slate-50 p-2.5 rounded border border-slate-100">
+          <span class="font-semibold text-slate-700">Problem Description: </span>
+          <span>{{ dup.description }}</span>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
+          <button
+            type="button"
+            (click)="navigateToExistingTicket(dup.ticketId)"
+            class="px-4 py-2 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white rounded text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition-colors cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-[16px]">visibility</span>
+            <span>View Existing Issue</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Potential Duplicates Review Panel -->
+  @if (potentialDuplicates().length > 0 && !confirmedDuplicate()) {
+    <div class="p-5 bg-blue-50/70 border-2 border-blue-200 rounded-xl space-y-4 animate-in fade-in shadow-sm">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-[#1E3A8A] text-white flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[24px]">fact_check</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-blue-200 text-blue-900 tracking-wider">
+                Review Similar Issues ({{ potentialDuplicates().length }})
+              </span>
+            </div>
+            <h3 class="text-base font-bold text-[#0F172A] mt-1">Similar active issues found in this location</h3>
+            <p class="text-xs text-[#444651] mt-0.5">
+              Please review the active tickets below. If your problem is already described, you can view the existing ticket instead of creating a redundant one. If your issue is different, you may proceed.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="dismissDuplicateWarning()"
+          class="text-[#64748B] hover:text-[#0F172A] p-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+          title="Dismiss"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- List of Potential Matches -->
+      <div class="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+        @for (match of potentialDuplicates(); track match.ticketId) {
+          <div class="bg-white border border-blue-200 rounded-lg p-3.5 space-y-2 hover:border-[#1E3A8A] transition-colors shadow-2xs">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-mono font-bold text-[#1E3A8A] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  #{{ match.ticketNumber || match.ticketId.slice(0, 8) }}
+                </span>
+                <span class="text-sm font-bold text-[#0F172A]">{{ match.title }}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">
+                  {{ match.status }}
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800">
+                  {{ Math.round(match.similarityScore * 100) }}% match
+                </span>
+              </div>
+            </div>
+
+            <p class="text-xs text-[#444651] line-clamp-2">{{ match.description }}</p>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-[#64748B]">
+              <span>{{ match.building }} {{ match.room ? '• Room ' + match.room : '' }} • {{ match.createdAt | date:'short' }}</span>
+              <button
+                type="button"
+                (click)="navigateToExistingTicket(match.ticketId)"
+                class="px-2.5 py-1 text-[#1E3A8A] hover:bg-blue-50 font-semibold rounded transition-colors inline-flex items-center space-x-1 cursor-pointer"
+              >
+                <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                <span>View Existing Issue</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Action Choice Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-blue-200">
+        <p class="text-xs text-[#64748B] m-0">
+          Is your problem genuinely different from the ones listed above?
+        </p>
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <button
+            type="button"
+            (click)="dismissDuplicateWarning()"
+            class="px-3.5 py-2 border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#334155] rounded text-xs font-semibold transition-colors flex-1 sm:flex-none cursor-pointer"
+          >
+            Review / Edit Details
+          </button>
+          <button
+            type="button"
+            (click)="proceedAnyway()"
+            class="px-4 py-2 bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white rounded text-xs font-semibold transition-colors shadow-xs flex-1 sm:flex-none inline-flex items-center justify-center space-x-1.5 cursor-pointer"
+          >
+            <span>My Issue is Different — Submit Anyway</span>
+            <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Form Body -->
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -425,12 +602,18 @@
         <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-[0_1px_2px_0_rgba(15,23,42,0.04)] space-y-3 sticky top-24">
           <button
             type="submit"
-            [disabled]="submitting()"
+            [disabled]="submitting() || !!confirmedDuplicate()"
             class="w-full h-[42px] bg-[#1E3A8A] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold rounded text-sm flex items-center justify-center space-x-2 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
           >
-            @if (submitting()) {
+            @if (checkingDuplicates()) {
+              <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span>Checking for duplicates...</span>
+            } @else if (submitting()) {
               <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
               <span>Submitting Request...</span>
+            } @else if (confirmedDuplicate()) {
+              <span class="material-symbols-outlined text-[18px]">block</span>
+              <span>Duplicate Issue Blocked</span>
             } @else {
               <span class="material-symbols-outlined text-[18px]">send</span>
               <span>Submit Issue Ticket</span>

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { of } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
@@ -10,7 +11,9 @@ describe('ReportIssueComponent', () => {
   let component: ReportIssueComponent;
 
   beforeEach(async () => {
-    localStorage.clear();
+    if (typeof localStorage !== 'undefined') {
+      localStorage.clear();
+    }
     await TestBed.configureTestingModule({
       imports: [ReportIssueComponent],
       providers: [
@@ -85,4 +88,98 @@ describe('ReportIssueComponent', () => {
     expect(component.selectedFiles().length).toBe(1);
     expect(component.selectedFiles()[0].name).toBe('img2.jpg');
   });
+
+  it('should intercept confirmed duplicate on submit and block submission', () => {
+    const ticketService = TestBed.inject(TicketService);
+    const mockMatch = {
+      ticketId: 'dup-123',
+      ticketNumber: 'T-DUP001',
+      title: 'Classroom projector broken',
+      description: 'Projector will not turn on',
+      status: 'NEW' as any,
+      category: 'IT_SECURITY',
+      building: 'Science Hall',
+      room: '101',
+      createdAt: '2026-10-28T10:00:00Z',
+      similarityScore: 0.85,
+      matchLevel: 'Confirmed' as const,
+      reason: 'Describes the same problem'
+    };
+
+    ticketService.checkDuplicate = () => of({
+      isDuplicate: true,
+      hasPotentialDuplicates: false,
+      primaryMatch: mockMatch,
+      matches: [mockMatch]
+    });
+
+    component.form.patchValue({
+      title: 'The classroom projector is broken',
+      category: 'IT_SECURITY',
+      building: 'Science Hall',
+      floor: '1',
+      room: '101',
+      priority: 'HIGH',
+      description: 'Projector in room 101 stopped working completely'
+    });
+
+    component.onSubmit();
+
+    expect(component.confirmedDuplicate()).toBeTruthy();
+    expect(component.confirmedDuplicate()?.ticketId).toBe('dup-123');
+    expect(component.submitting()).toBe(false);
+  });
+
+  it('should handle potential duplicate and allow proceeding anyway', () => {
+    const ticketService = TestBed.inject(TicketService);
+    const mockMatch = {
+      ticketId: 'pot-456',
+      ticketNumber: 'T-POT002',
+      title: 'Podium cable loose',
+      description: 'Cable loose near podium',
+      status: 'NEW' as any,
+      category: 'IT_SECURITY',
+      building: 'Science Hall',
+      room: '101',
+      createdAt: '2026-10-28T10:00:00Z',
+      similarityScore: 0.45,
+      matchLevel: 'Potential' as const,
+      reason: 'Similar wording'
+    };
+
+    let createdTicketDto: any = null;
+    ticketService.checkDuplicate = () => of({
+      isDuplicate: false,
+      hasPotentialDuplicates: true,
+      matches: [mockMatch]
+    });
+
+    ticketService.createTicket = (dto) => {
+      createdTicketDto = dto;
+      return of({ id: 'new-999', ticketNumber: 'T-999' } as any);
+    };
+
+    component.form.patchValue({
+      title: 'New projector bulb needed',
+      category: 'IT_SECURITY',
+      building: 'Science Hall',
+      floor: '1',
+      room: '101',
+      priority: 'MEDIUM',
+      description: 'Projector bulb is flickering and needs replacement soon'
+    });
+
+    component.onSubmit();
+
+    expect(component.potentialDuplicates().length).toBe(1);
+    expect(component.acknowledgedPotentialDuplicates()).toBe(false);
+
+    // Reporter clicks "My Issue is Different — Submit Anyway"
+    component.proceedAnyway();
+
+    expect(component.acknowledgedPotentialDuplicates()).toBe(true);
+    expect(createdTicketDto).toBeTruthy();
+    expect(createdTicketDto.ignorePotentialDuplicates).toBe(true);
+  });
 });
+
