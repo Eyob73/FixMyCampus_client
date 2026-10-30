@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TicketService } from '../../../services/ticket.service';
 import { NotificationStore } from '../../../store/notification.store';
 import {
@@ -13,19 +14,20 @@ import {
 } from '../../../models/ticket.model';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
-import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm-modal.component';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
+import { StartWorkDialogComponent } from '../../../ui/start-work-dialog/start-work-dialog.component';
 
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, StatusBadge, PriorityBadge, ConfirmModalComponent, PageContainerComponent],
+  imports: [CommonModule, FormsModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent, MatDialogModule],
   templateUrl: './ticket-list.component.html',
 })
 export class TicketListComponent implements OnInit {
   private readonly ticketService = inject(TicketService);
   private readonly notificationStore = inject(NotificationStore);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
   tickets = signal<Ticket[]>([]);
   pagination = signal<PaginatedTicketsResponse | null>(null);
@@ -139,9 +141,21 @@ export class TicketListComponent implements OnInit {
   }
 
   promptStartWork(ticket: Ticket): void {
-    this.pendingTicketToStart = ticket;
-    this.confirmModalMessage = `Are you ready to transition Ticket #${ticket.id} (${ticket.title}) to IN PROGRESS? This signals to facilities dispatch that physical work has begun.`;
-    this.confirmModalOpen = true;
+    const dialogRef = this.dialog.open(StartWorkDialogComponent, {
+      width: '460px',
+      panelClass: 'custom-dialog-container',
+      data: {
+        ticket,
+        message: `Are you ready to transition Ticket #${ticket.id} (${ticket.title}) to IN PROGRESS? This signals to facilities dispatch that physical work has begun.`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.pendingTicketToStart = ticket;
+        this.executeStartWork();
+      }
+    });
   }
 
   executeStartWork(): void {

@@ -15,7 +15,6 @@ import { MatButtonModule } from '@angular/material/button';
         </div>
       </div>
       <div class="text-lg font-bold text-slate-900 leading-tight w-full text-center">Sign Out</div>
-      <div class="text-xs text-slate-500 font-normal mt-1 w-full text-center">Session Confirmation</div>
     </div>
 
     <mat-dialog-content class="text-center !px-6 !py-2">

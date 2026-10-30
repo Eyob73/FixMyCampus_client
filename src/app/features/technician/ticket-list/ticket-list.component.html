@@ -334,15 +334,5 @@
     </div>
   </section>
 
-  <!-- Confirmation Modal for Start Work -->
-  <app-confirm-modal
-    [isOpen]="confirmModalOpen"
-    title="Start Work on Ticket"
-    [message]="confirmModalMessage"
-    confirmText="Yes, Start Work"
-    variant="primary"
-    [loading]="confirmLoading"
-    (confirm)="executeStartWork()"
-    (cancel)="confirmModalOpen = false"
-  />
 </app-page-container>
+

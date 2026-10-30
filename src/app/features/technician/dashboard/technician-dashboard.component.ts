@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TicketService } from '../../../services/ticket.service';
 import { DashboardStore } from '../../../store/dashboard.store';
 import { AuthService } from '../../../services/auth.service';
@@ -13,11 +14,12 @@ import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
 import { MatCardModule } from '@angular/material/card';
+import { StartWorkDialogComponent } from '../../../ui/start-work-dialog/start-work-dialog.component';
 
 @Component({
   selector: 'app-technician-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent, MatCardModule],
+  imports: [CommonModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent, MatCardModule, MatDialogModule],
   templateUrl: './technician-dashboard.component.html',
 })
 export class TechnicianDashboardComponent implements OnInit {
@@ -25,6 +27,7 @@ export class TechnicianDashboardComponent implements OnInit {
   readonly dashboardStore = inject(DashboardStore);
   readonly authService = inject(AuthService);
   private readonly notificationStore = inject(NotificationStore);
+  private readonly dialog = inject(MatDialog);
 
   readonly stats = this.dashboardStore.technicianStats;
   readonly recentTickets = computed(() => this.stats()?.recentTickets || []);
@@ -39,14 +42,27 @@ export class TechnicianDashboardComponent implements OnInit {
   }
 
   quickStartWork(ticket: Ticket): void {
-    this.ticketService.updateStatus(ticket.id, 'IN_PROGRESS', 'Technician started work via quick action.').subscribe({
-      next: () => {
-        this.notificationStore.showToast({ type: 'success', message: `Ticket #${ticket.id} status updated to IN PROGRESS.` });
-        this.refreshData();
-      },
-      error: () => {
-        this.notificationStore.showToast({ type: 'error', message: `Failed to update ticket #${ticket.id}.` });
-      },
+    const dialogRef = this.dialog.open(StartWorkDialogComponent, {
+      width: '460px',
+      panelClass: 'custom-dialog-container',
+      data: {
+        ticket,
+        message: `Are you ready to transition Ticket #${ticket.id} (${ticket.title}) to IN PROGRESS? This signals to facilities dispatch that physical work has begun.`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.ticketService.updateStatus(ticket.id, 'IN_PROGRESS', 'Technician started work via quick action.').subscribe({
+          next: () => {
+            this.notificationStore.showToast({ type: 'success', message: `Ticket #${ticket.id} status updated to IN PROGRESS.` });
+            this.refreshData();
+          },
+          error: () => {
+            this.notificationStore.showToast({ type: 'error', message: `Failed to update ticket #${ticket.id}.` });
+          },
+        });
+      }
     });
   }
 

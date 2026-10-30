@@ -16,15 +16,16 @@ import {
 type WorkNoteType = 'DIAGNOSIS' | 'WORK_PERFORMED' | 'MATERIALS_REQUIRED' | 'DELAY_REASON' | 'GENERAL';
 import { StatusBadge } from '../../../components/status-badge/status-badge';
 import { PriorityBadge } from '../../../components/priority-badge/priority-badge.component';
-import { ConfirmModalComponent } from '../../../components/confirm-modal/confirm-modal.component';
 import { PageContainerComponent } from '../../../layout/page-container/page-container';
 import { ImageLightboxDialogComponent } from '../../../ui/image-lightbox-dialog/image-lightbox-dialog.component';
 import { CameraCaptureDialogComponent, CameraCaptureResult } from '../../../ui/camera-capture-dialog/camera-capture-dialog.component';
+import { StartWorkDialogComponent } from '../../../ui/start-work-dialog/start-work-dialog.component';
+import { ResolveTicketDialogComponent, ResolveTicketDialogResult } from '../../../ui/resolve-ticket-dialog/resolve-ticket-dialog.component';
 
 @Component({
   selector: 'app-ticket-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, StatusBadge, PriorityBadge, ConfirmModalComponent, PageContainerComponent],
+  imports: [CommonModule, FormsModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent],
   templateUrl: './ticket-detail.component.html',
 })
 export class TicketDetailComponent implements OnInit {
@@ -110,7 +111,23 @@ export class TicketDetailComponent implements OnInit {
   }
 
   confirmStartWork(): void {
-    this.confirmStartModalOpen = true;
+    const current = this.ticket();
+    if (!current) return;
+
+    const dialogRef = this.dialog.open(StartWorkDialogComponent, {
+      width: '460px',
+      panelClass: 'custom-dialog-container',
+      data: {
+        ticket: current,
+        message: 'Are you ready to mark this ticket as IN PROGRESS? This documents that you are actively on site and working on resolution.'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.executeStartWork();
+      }
+    });
   }
 
   executeStartWork(): void {
@@ -180,14 +197,29 @@ export class TicketDetailComponent implements OnInit {
   }
 
   openResolutionModal(): void {
-    this.resolutionForm = {
-      description: '',
-      workPerformed: '',
-      materialsUsed: '',
-      additionalNotes: '',
-    };
-    this.resolutionError = false;
-    this.showResolutionModal = true;
+    const current = this.ticket();
+    if (!current) return;
+
+    const dialogRef = this.dialog.open(ResolveTicketDialogComponent, {
+      width: '540px',
+      maxWidth: '95vw',
+      panelClass: 'custom-dialog-container',
+      data: {
+        ticketId: current.id,
+        ticketNumber: current.ticketNumber || current.id,
+        ticketTitle: current.title,
+        initialDescription: this.resolutionForm.description,
+        initialWorkPerformed: this.resolutionForm.workPerformed,
+        initialMaterialsUsed: this.resolutionForm.materialsUsed,
+        initialAdditionalNotes: this.resolutionForm.additionalNotes,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: ResolveTicketDialogResult | null | undefined) => {
+      if (result) {
+        this.submitResolutionData(result);
+      }
+    });
   }
 
   closeResolutionModal(): void {
@@ -195,23 +227,13 @@ export class TicketDetailComponent implements OnInit {
     this.resolutionError = false;
   }
 
-  submitResolution(): void {
-    if (!this.resolutionForm.description.trim() || !this.resolutionForm.workPerformed.trim()) {
-      this.resolutionError = true;
-      return;
-    }
-
+  submitResolutionData(data: ResolveTicketDialogResult): void {
     const current = this.ticket();
     if (!current) return;
 
     this.submittingResolution.set(true);
     this.ticketService
-      .resolveTicket(current.id, {
-        resolutionDescription: this.resolutionForm.description.trim(),
-        workPerformed: this.resolutionForm.workPerformed.trim(),
-        materialsUsed: this.resolutionForm.materialsUsed.trim() || undefined,
-        additionalNotes: this.resolutionForm.additionalNotes.trim() || undefined,
-      })
+      .resolveTicket(current.id, data)
       .subscribe({
         next: () => {
           this.notificationStore.showToast({ type: 'success', message: `Ticket #${current.id} has been resolved!` });
@@ -225,6 +247,23 @@ export class TicketDetailComponent implements OnInit {
           this.submittingResolution.set(false);
         },
       });
+  }
+
+  submitResolution(): void {
+    if (!this.resolutionForm.description.trim() || !this.resolutionForm.workPerformed.trim()) {
+      this.resolutionError = true;
+      return;
+    }
+
+    const current = this.ticket();
+    if (!current) return;
+
+    this.submitResolutionData({
+      resolutionDescription: this.resolutionForm.description.trim(),
+      workPerformed: this.resolutionForm.workPerformed.trim(),
+      materialsUsed: this.resolutionForm.materialsUsed.trim() || undefined,
+      additionalNotes: this.resolutionForm.additionalNotes.trim() || undefined,
+    });
   }
 
   isMobileDevice(): boolean {

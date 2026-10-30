@@ -1,26 +1,5 @@
 <div
-  class="min-h-screen bg-background text-on-surface antialiased flex flex-col justify-between selection:bg-surface-container-high selection:text-primary">
-  <!-- Top Subtle Utility Bar (Institution Status) -->
-  <header
-    class="w-full border-b border-outline-variant bg-surface-container-lowest px-4 sm:px-6 py-2.5 flex items-center justify-between text-xs text-on-surface-variant">
-    <div class="flex items-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>
-      <span class="font-medium text-on-surface-variant">Campus Operations System: Normal Status</span>
-    </div>
-    <div class="hidden sm:flex items-center gap-4 text-xs">
-      <a class="hover:text-primary transition-colors duration-150 flex items-center gap-1 text-on-surface-variant"
-        href="#" (click)="$event.preventDefault()">
-        <span class="material-symbols-outlined text-[16px] text-outline">domain</span>
-        <span>University Physical Plant</span>
-      </a>
-      <span class="text-outline-variant">|</span>
-      <a class="hover:text-primary transition-colors duration-150 flex items-center gap-1 text-on-surface-variant"
-        href="#" (click)="$event.preventDefault()">
-        <span class="material-symbols-outlined text-[16px] text-outline">help_outline</span>
-        <span>Support Desk</span>
-      </a>
-    </div>
-  </header>
+  class="min-h-screen bg-background text-on-surface antialiased flex flex-col justify-center selection:bg-surface-container-high selection:text-primary">
 
   <!-- Centered Login Canvas -->
   <main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
@@ -152,22 +131,4 @@
     </div>
   </main>
 
-  <!-- Institutional Operations Footer -->
-  <footer class="w-full border-t border-outline-variant bg-surface-container-lowest py-3.5 px-4 sm:px-6">
-    <div
-      class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-on-surface-variant">
-      <div>
-        <span>© 2025 University Physical Plant &amp; Campus Services. All rights reserved.</span>
-      </div>
-      <div class="flex items-center gap-4">
-        <a class="hover:text-primary transition-colors" href="#" (click)="$event.preventDefault()">Privacy Notice</a>
-        <span>•</span>
-        <a class="hover:text-primary transition-colors" href="#" (click)="$event.preventDefault()">Terms of
-          Operations</a>
-        <span>•</span>
-        <a class="hover:text-primary transition-colors" href="#" (click)="$event.preventDefault()">Emergency
-          Protocol</a>
-      </div>
-    </div>
-  </footer>
 </div>
