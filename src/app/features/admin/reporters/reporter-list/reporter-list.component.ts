@@ -2,20 +2,23 @@ import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { StatusBadgeComponent } from '../../../../ui/badge/status-badge.component';
 import { NotificationStore } from '../../../../store/notification.store';
 import { ReporterStore } from '../../../../store/reporter.store';
 import { TicketStore } from '../../../../store/ticket.store';
-import { Reporter, ReporterRole, ReporterStatus, Ticket } from '../../../../models';
+import { Reporter, ReporterRole, ReporterStatus } from '../../../../models';
+import { ReporterDetailDialogComponent } from '../reporter-detail-dialog/reporter-detail-dialog.component';
 
 @Component({
   selector: 'app-reporter-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, FormsModule, StatusBadgeComponent, MatDialogModule],
   templateUrl: './reporter-list.component.html',
   styleUrl: './reporter-list.component.css'
 })
 export class ReporterListComponent implements OnInit {
+  private dialog = inject(MatDialog);
   private notificationStore = inject(NotificationStore);
   public reporterStore = inject(ReporterStore);
   public ticketStore = inject(TicketStore);
@@ -26,9 +29,6 @@ export class ReporterListComponent implements OnInit {
 
   searchQuery = signal<string>('');
   roleFilter = signal<ReporterRole | 'ALL'>('ALL');
-
-  selectedReporter = signal<Reporter | null>(null);
-  showDetailModal = false;
 
   filteredReporters = computed<Reporter[]>(() => {
     let list = this.reporterStore.reporters();
@@ -51,22 +51,24 @@ export class ReporterListComponent implements OnInit {
     return list;
   });
 
-  // History tickets for selected reporter
-  selectedReporterTickets = computed<Ticket[]>(() => {
-    const rep = this.selectedReporter();
-    if (!rep) return [];
-    return this.ticketStore.tickets().filter((t) => t.reporterId === rep.id || t.reporterEmail === rep.email);
-  });
-
   viewReporter(rep: Reporter): void {
-    this.selectedReporter.set(rep);
-    this.showDetailModal = true;
+    const tickets = this.ticketStore.tickets().filter(
+      (t) => t.reporterId === rep.id || t.reporterEmail === rep.email
+    );
+
+    this.dialog.open(ReporterDetailDialogComponent, {
+      width: '580px',
+      maxWidth: '95vw',
+      data: {
+        reporter: rep,
+        tickets
+      }
+    });
   }
 
   toggleReporterStatus(rep: Reporter): void {
     const nextStatus: ReporterStatus = rep.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     this.reporterStore.toggleReporterStatus({ id: rep.id, newStatus: nextStatus });
-    this.selectedReporter.update((r) => r ? { ...r, status: nextStatus } : null);
     this.notificationStore.showToast({
       type: 'success',
       message: `${rep.name} status set to ${nextStatus}.`

@@ -56,6 +56,14 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./features/admin/settings/settings.component').then((m) => m.SettingsComponent)
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./features/reporter/notifications/notifications.component').then(
+            (m) => m.NotificationsComponent
+          ),
+        title: 'FixMyCampus - Admin Notifications'
       }
     ]
   },
@@ -146,6 +154,14 @@ export const routes: Routes = [
             (m) => m.TicketDetailComponent
           ),
         title: 'Work Order Details | FixMyCampus'
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./features/reporter/notifications/notifications.component').then(
+            (m) => m.NotificationsComponent
+          ),
+        title: 'FixMyCampus - Technician Notifications'
       }
     ]
   },

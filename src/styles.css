@@ -218,3 +218,24 @@ body {
 .font-stat-numeric {
   font-feature-settings: 'tnum' on, 'cv05' on;
 }
+
+/* Ensure arrow icons and material symbols never receive hover underline/underscore */
+.material-symbols-outlined,
+.material-symbols,
+.material-icons,
+[class*="material-symbols"] {
+  display: inline-block;
+  text-decoration: none !important;
+}
+
+a:hover .material-symbols-outlined,
+a:hover .material-symbols,
+a:hover .material-icons,
+button:hover .material-symbols-outlined,
+button:hover .material-symbols,
+button:hover .material-icons,
+.group:hover .material-symbols-outlined,
+.group:hover .material-symbols,
+.group:hover .material-icons {
+  text-decoration: none !important;
+}

@@ -124,118 +124,108 @@
     </div>
   }
 
-  <!-- Operational Statistics & Velocity Section -->
+  <!-- Operational Statistics & Velocity Section (Chart.js) -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-[14px] mb-6 items-stretch">
-    <!-- Category Distribution -->
-    <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-[14px] p-5 !shadow-sm space-y-4 flex flex-col min-h-[105px]">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-xl">pie_chart</span>
-          <h3 class="text-[17px] font-semibold text-slate-900 m-0">Work Orders by Category</h3>
+    <!-- Category Distribution (Chart.js Doughnut) -->
+    <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-[14px] p-5 !shadow-sm flex flex-col justify-between min-h-[340px]">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-xl">pie_chart</span>
+            <h3 class="text-[17px] font-semibold text-slate-900 m-0">Work Orders by Category</h3>
+          </div>
+          <span class="text-[13.5px] font-medium text-slate-500">Total: {{ totalTicketsCount() }}</span>
         </div>
-        <span class="text-[13.5px] font-medium text-slate-500">Total: {{ ticketStore.tickets().length }}</span>
+
+        <div class="relative w-full h-[180px] flex items-center justify-center my-1">
+          <canvas #categoryCanvas></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span class="text-xl font-bold font-mono text-slate-900 leading-none">{{ totalTicketsCount() }}</span>
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Orders</span>
+          </div>
+        </div>
       </div>
 
-      <div class="space-y-3 flex-1">
+      <!-- Category Legend Grid -->
+      <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 pt-2.5 border-t border-slate-100 text-xs">
         @for (c of dashboardStore.categoryMetrics(); track c.category) {
-          <div class="space-y-1">
-            <div class="flex items-center justify-between text-xs font-medium">
-              <span class="text-slate-700 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full" [ngClass]="{
-                  'bg-sky-500': c.category === 'HVAC',
-                  'bg-blue-600': c.category === 'PLUMBING',
-                  'bg-amber-500': c.category === 'ELECTRICAL',
-                  'bg-emerald-500': c.category === 'STRUCTURAL',
-                  'bg-teal-600': c.category === 'IT_SECURITY'
-                }"></span>
-                {{ c.category }}
-              </span>
-              <span class="text-slate-500 font-semibold">{{ c.count }} ({{ c.percentage }}%)</span>
-            </div>
-            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                class="h-full rounded-full transition-all duration-500"
-                [style.width.%]="c.percentage"
-                [ngClass]="{
-                  'bg-sky-500': c.category === 'HVAC',
-                  'bg-blue-600': c.category === 'PLUMBING',
-                  'bg-amber-500': c.category === 'ELECTRICAL',
-                  'bg-emerald-500': c.category === 'STRUCTURAL',
-                  'bg-teal-600': c.category === 'IT_SECURITY'
-                }"
-              ></div>
-            </div>
+          <div class="flex items-center justify-between py-0.5">
+            <span class="text-slate-700 flex items-center gap-1.5 truncate">
+              <span class="w-2 h-2 rounded-full shrink-0" [style.backgroundColor]="getCategoryColor(c.category, $index)"></span>
+              <span class="truncate">{{ formatCategoryName(c.category) }}</span>
+            </span>
+            <span class="text-slate-500 font-semibold shrink-0 ml-1">{{ c.count }}</span>
           </div>
         }
       </div>
     </mat-card>
 
-    <!-- Priority Breakdown -->
-    <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-[14px] p-5 !shadow-sm space-y-4 flex flex-col min-h-[105px]">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-rose-600 text-xl">priority_high</span>
-          <h3 class="text-[17px] font-semibold text-slate-900 m-0">Severity Distribution</h3>
+    <!-- Priority Breakdown (Chart.js Horizontal Bar) -->
+    <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-[14px] p-5 !shadow-sm flex flex-col justify-between min-h-[340px]">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-600 text-xl">priority_high</span>
+            <h3 class="text-[17px] font-semibold text-slate-900 m-0">Severity Distribution</h3>
+          </div>
+          <span class="text-[13.5px] font-medium text-slate-500">Resolution SLA</span>
         </div>
-        <span class="text-[13.5px] font-medium text-slate-500">Resolution SLA</span>
+
+        <div class="relative w-full h-[180px] my-1">
+          <canvas #priorityCanvas></canvas>
+        </div>
       </div>
 
-      <div class="space-y-3.5 flex-1">
-        @for (p of dashboardStore.priorityMetrics(); track p.priority) {
-          <div class="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
-            <div class="flex items-center gap-2.5">
-              <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="p.color"></span>
-              <div>
-                <h4 class="text-[13.5px] font-semibold text-slate-800 m-0">{{ p.priority }}</h4>
-                <p class="text-[11px] text-slate-400 m-0 mt-0.5">
-                  {{ p.priority === 'CRITICAL' ? '< 4h response' : p.priority === 'HIGH' ? '< 12h response' : '< 48h response' }}
-                </p>
-              </div>
-            </div>
-            <span class="text-[1.1rem] font-bold text-slate-900 font-stat-numeric">{{ p.count }}</span>
-          </div>
-        }
+      <!-- Priority SLA Indicators -->
+      <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-slate-100 text-[11px]">
+        <div class="flex items-center justify-between p-1.5 rounded bg-rose-50 border border-rose-100">
+          <span class="font-semibold text-rose-700">CRITICAL</span>
+          <span class="text-rose-600 font-medium">&lt; 4h SLA</span>
+        </div>
+        <div class="flex items-center justify-between p-1.5 rounded bg-amber-50 border border-amber-100">
+          <span class="font-semibold text-amber-700">HIGH</span>
+          <span class="text-amber-600 font-medium">&lt; 12h SLA</span>
+        </div>
+        <div class="flex items-center justify-between p-1.5 rounded bg-sky-50 border border-sky-100">
+          <span class="font-semibold text-sky-700">MEDIUM</span>
+          <span class="text-sky-600 font-medium">&lt; 48h SLA</span>
+        </div>
+        <div class="flex items-center justify-between p-1.5 rounded bg-emerald-50 border border-emerald-100">
+          <span class="font-semibold text-emerald-700">LOW</span>
+          <span class="text-emerald-600 font-medium">Standard</span>
+        </div>
       </div>
     </mat-card>
 
-    <!-- Weekly Throughput Velocity -->
-    <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-[14px] p-5 !shadow-sm space-y-4 flex flex-col min-h-[105px]">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-emerald-600 text-xl">insights</span>
-          <h3 class="text-[17px] font-semibold text-slate-900 m-0">Weekly Throughput</h3>
+    <!-- Weekly Throughput Velocity (Chart.js Grouped Bar) -->
+    <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-[14px] p-5 !shadow-sm flex flex-col justify-between min-h-[340px]">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-600 text-xl">insights</span>
+            <h3 class="text-[17px] font-semibold text-slate-900 m-0">Weekly Throughput</h3>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] font-semibold">
+            <span class="flex items-center gap-1 text-primary">
+              <span class="w-2 h-2 rounded-full bg-blue-600"></span> Created
+            </span>
+            <span class="flex items-center gap-1 text-emerald-600">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Resolved
+            </span>
+          </div>
         </div>
-        <div class="flex items-center gap-3 text-[11px] font-semibold">
-          <span class="flex items-center gap-1 text-primary">
-            <span class="w-2 h-2 rounded-full bg-primary"></span> Created
-          </span>
-          <span class="flex items-center gap-1 text-emerald-600">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Resolved
-          </span>
+
+        <div class="relative w-full h-[180px] my-1">
+          <canvas #velocityCanvas></canvas>
         </div>
       </div>
 
-      <!-- Mini Bar Visualization -->
-      <div class="h-44 flex items-end justify-between gap-2 pt-4 px-2 flex-1">
-        @for (v of dashboardStore.weeklyVelocity(); track v.day) {
-          <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
-            <div class="w-full flex items-end justify-center gap-1 h-32">
-              <!-- Created Bar -->
-              <div
-                class="w-2.5 sm:w-3.5 bg-blue-300 rounded-t transition-all group-hover:bg-primary"
-                [style.height.%]="(v.created / 20) * 100"
-                [title]="'Created: ' + v.created"
-              ></div>
-              <!-- Resolved Bar -->
-              <div
-                class="w-2.5 sm:w-3.5 bg-emerald-400 rounded-t transition-all group-hover:bg-emerald-600"
-                [style.height.%]="(v.resolved / 20) * 100"
-                [title]="'Resolved: ' + v.resolved"
-              ></div>
-            </div>
-            <span class="text-[11px] font-medium text-slate-500">{{ v.day }}</span>
-          </div>
-        }
+      <!-- Velocity Metric Summary Footer -->
+      <div class="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs text-slate-500">
+        <span>7-day operational turnaround</span>
+        <span class="font-semibold text-slate-700 font-stat-numeric">
+          {{ weeklyResolvedTotal() }} resolved / {{ weeklyCreatedTotal() }} new
+        </span>
       </div>
     </mat-card>
   </div>
@@ -269,10 +259,10 @@
         <button
           type="button"
           (click)="viewAllTickets(selectedStatusFilter())"
-          class="text-[13px] font-bold text-primary hover:text-blue-900 hover:underline inline-flex items-center gap-1"
+          class="text-[13px] font-bold text-primary hover:text-blue-900 inline-flex items-center gap-1 group cursor-pointer"
         >
-          View Full Ticket Table
-          <span class="material-symbols-outlined text-[17px]">arrow_forward</span>
+          <span class="group-hover:underline">View Full Ticket Table</span>
+          <span class="material-symbols-outlined text-[17px] no-underline inline-block">arrow_forward</span>
         </button>
       </div>
     </div>

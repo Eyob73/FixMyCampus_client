@@ -439,7 +439,6 @@ export class ReportIssueComponent {
 
     this.confirmedDuplicate.set(null);
     this.potentialDuplicates.set([]);
-    this.acknowledgedPotentialDuplicates.set(false);
 
     // Clean up preview URLs
     for (const f of this.selectedFiles()) {

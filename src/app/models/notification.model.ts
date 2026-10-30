@@ -3,8 +3,14 @@ export interface AppNotification {
   userId: string;
   title: string;
   message: string;
-  type: 'ticket_assigned' | 'status_changed' | 'ticket_resolved' | 'ticket_closed' | 'new_comment' | 'ticket_created' | string;
+  type: 'NewIssueReported' | 'IssueAssigned' | 'IssueInProgress' | 'IssueResolved' | string;
   ticketId?: string;
   read: boolean;
+  isRead?: boolean;
   createdAt: string;
+  readAt?: string;
+  ticketTitle?: string;
+  ticketCategory?: string;
+  ticketBuilding?: string;
+  ticketStatus?: string;
 }

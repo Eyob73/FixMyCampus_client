@@ -75,6 +75,39 @@
     </mat-card>
   </div>
 
+  <!-- Chart.js Telemetry Analytics Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Chart 1: Technician Workload Comparison -->
+    <mat-card appearance="outlined" class="!bg-white !border-[#E2E8F0] !rounded-[14px] p-5 !shadow-sm">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-xl">bar_chart</span>
+          <h3 class="text-[16px] font-semibold text-slate-900 m-0">Technician Dispatch & Resolution Load</h3>
+        </div>
+        <span class="text-xs font-medium text-slate-500">Live Roster</span>
+      </div>
+      <div class="relative w-full h-[220px]">
+        <canvas #techLoadCanvas></canvas>
+      </div>
+    </mat-card>
+
+    <!-- Chart 2: 7-Day SLA Compliance Trend -->
+    <mat-card appearance="outlined" class="!bg-white !border-[#E2E8F0] !rounded-[14px] p-5 !shadow-sm">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-xl">show_chart</span>
+          <h3 class="text-[16px] font-semibold text-slate-900 m-0">7-Day SLA Compliance Trend</h3>
+        </div>
+        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+          96.4% Avg
+        </span>
+      </div>
+      <div class="relative w-full h-[220px]">
+        <canvas #slaTrendCanvas></canvas>
+      </div>
+    </mat-card>
+  </div>
+
   <!-- Technician Utilization Table -->
   <mat-card appearance="outlined" class="!bg-white !border-slate-200 !rounded-lg overflow-hidden !shadow-2xs space-y-4 p-5">
     <div class="flex items-center justify-between border-b border-slate-100 pb-3">

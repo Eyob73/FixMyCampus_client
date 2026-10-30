@@ -157,45 +157,31 @@
 
       <!-- 3. Workload Analytics & Distribution Visuals -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-[14px] items-stretch">
-        <!-- Left: Workload Pipeline Progress -->
-        <div class="bg-white border border-[#E2E8F0] rounded-[14px] p-5 shadow-sm lg:col-span-2 space-y-4 min-h-[105px] flex flex-col">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div>
-              <h3 class="text-[17px] font-semibold text-[#0F172A] m-0">Workload Lifecycle Distribution</h3>
-              <p class="text-[13.5px] text-[#64748B] m-0 mt-[3px]">Proportion of active vs completed maintenance tickets</p>
+        <!-- Left: Workload Pipeline Progress (Chart.js) -->
+        <div class="bg-white border border-[#E2E8F0] rounded-[14px] p-5 shadow-sm lg:col-span-2 flex flex-col justify-between min-h-[340px]">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-2">
+              <div>
+                <h3 class="text-[17px] font-semibold text-[#0F172A] m-0">Workload Lifecycle Distribution</h3>
+                <p class="text-[13.5px] text-[#64748B] m-0 mt-[3px]">Proportion of active vs completed maintenance tickets</p>
+              </div>
+              <span class="text-xs font-mono font-medium text-[#1E3A8A]">
+                {{ completionRate }}% Completion Rate
+              </span>
             </div>
-            <span class="text-xs font-mono font-medium text-[#1E3A8A]">
-              {{ completionRate }}% Completion Rate
-            </span>
+
+            <div class="relative w-full h-[180px] flex items-center justify-center my-1">
+              <canvas #lifecycleCanvas></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-xl font-bold font-mono text-slate-900 leading-none">{{ completionRate }}%</span>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Resolved</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Multi-segment Progress Bar -->
-          <div class="space-y-2">
-            <div class="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex">
-              <div
-                class="bg-[#D97706] transition-all duration-300"
-                [style.width.%]="assignedPercent"
-                title="Assigned: {{ stats()?.newAssigned }}"
-              ></div>
-              <div
-                class="bg-[#0284C7] transition-all duration-300"
-                [style.width.%]="inProgressPercent"
-                title="In Progress: {{ stats()?.inProgress }}"
-              ></div>
-              <div
-                class="bg-[#10B981] transition-all duration-300"
-                [style.width.%]="resolvedPercent"
-                title="Resolved: {{ stats()?.resolved }}"
-              ></div>
-              <div
-                class="bg-[#475569] transition-all duration-300"
-                [style.width.%]="closedPercent"
-                title="Closed: {{ stats()?.closed }}"
-              ></div>
-            </div>
-
-            <!-- Legend -->
-            <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[#64748B] pt-1">
+          <!-- Legend & Operational Notes -->
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[#64748B] py-2 border-t border-slate-100">
               <div class="flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 rounded-sm bg-[#D97706]"></span>
                 <span>Assigned ({{ stats()?.newAssigned ?? 0 }})</span>
@@ -213,89 +199,51 @@
                 <span>Closed ({{ stats()?.closed ?? 0 }})</span>
               </div>
             </div>
-          </div>
 
-          <!-- Operational Notes Callout -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <div class="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
-              <span class="text-xs text-[#64748B] block">Average Turnaround Time</span>
-              <span class="text-lg font-bold text-[#0F172A] font-mono">4.2 hours</span>
-              <p class="text-[11px] text-[#10B981] font-medium mt-0.5">Within 8hr campus SLA standard</p>
-            </div>
-            <div class="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
-              <span class="text-xs text-[#64748B] block">First-Time Resolution Rate</span>
-              <span class="text-lg font-bold text-[#0F172A] font-mono">94%</span>
-              <p class="text-[11px] text-[#10B981] font-medium mt-0.5">+2% above campus target</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div class="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
+                <span class="text-xs text-[#64748B] block">Average Turnaround Time</span>
+                <span class="text-lg font-bold text-[#0F172A] font-mono">4.2 hours</span>
+                <p class="text-[11px] text-[#10B981] font-medium mt-0.5">Within 8hr campus SLA standard</p>
+              </div>
+              <div class="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
+                <span class="text-xs text-[#64748B] block">First-Time Resolution Rate</span>
+                <span class="text-lg font-bold text-[#0F172A] font-mono">94%</span>
+                <p class="text-[11px] text-[#10B981] font-medium mt-0.5">+2% above campus target</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Priority Breakdown & Quick Actions -->
-        <div class="bg-white border border-[#E2E8F0] rounded-[14px] p-5 shadow-sm space-y-4 min-h-[105px] flex flex-col">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-[17px] font-semibold text-[#0F172A] m-0">Urgency Triage</h3>
-            <p class="text-[13.5px] text-[#64748B] m-0 mt-[3px]">Assigned tickets by priority severity</p>
+        <!-- Right: Priority Breakdown & Quick Actions (Chart.js) -->
+        <div class="bg-white border border-[#E2E8F0] rounded-[14px] p-5 shadow-sm flex flex-col justify-between min-h-[340px]">
+          <div>
+            <div class="border-b border-slate-100 pb-3 mb-2">
+              <h3 class="text-[17px] font-semibold text-[#0F172A] m-0">Urgency Triage</h3>
+              <p class="text-[13.5px] text-[#64748B] m-0 mt-[3px]">Assigned tickets by priority severity</p>
+            </div>
+
+            <div class="relative w-full h-[180px] my-1">
+              <canvas #urgencyCanvas></canvas>
+            </div>
           </div>
 
-          <div class="space-y-2.5 flex-1">
-            <!-- Critical -->
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-[#DC2626] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#DC2626]"></span>
-                Critical
-              </span>
-              <span class="font-bold font-mono text-[#0F172A]">{{ stats()?.priorityCounts?.critical ?? 0 }}</span>
+          <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-slate-100 text-[11px]">
+            <div class="flex items-center justify-between p-1.5 rounded bg-rose-50 border border-rose-100">
+              <span class="font-semibold text-rose-700">Critical</span>
+              <span class="font-bold text-rose-700 font-mono">{{ stats()?.priorityCounts?.critical ?? 0 }}</span>
             </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                class="bg-[#DC2626] h-full"
-                [style.width.%]="calcPriorityPercent(stats()?.priorityCounts?.critical)"
-              ></div>
+            <div class="flex items-center justify-between p-1.5 rounded bg-amber-50 border border-amber-100">
+              <span class="font-semibold text-amber-700">High</span>
+              <span class="font-bold text-amber-700 font-mono">{{ stats()?.priorityCounts?.high ?? 0 }}</span>
             </div>
-
-            <!-- High -->
-            <div class="flex items-center justify-between text-xs pt-1">
-              <span class="font-medium text-[#C2410C] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#EA580C]"></span>
-                High
-              </span>
-              <span class="font-bold font-mono text-[#0F172A]">{{ stats()?.priorityCounts?.high ?? 0 }}</span>
+            <div class="flex items-center justify-between p-1.5 rounded bg-sky-50 border border-sky-100">
+              <span class="font-semibold text-sky-700">Medium</span>
+              <span class="font-bold text-sky-700 font-mono">{{ stats()?.priorityCounts?.medium ?? 0 }}</span>
             </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                class="bg-[#EA580C] h-full"
-                [style.width.%]="calcPriorityPercent(stats()?.priorityCounts?.high)"
-              ></div>
-            </div>
-
-            <!-- Medium -->
-            <div class="flex items-center justify-between text-xs pt-1">
-              <span class="font-medium text-[#0369A1] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#0284C7]"></span>
-                Medium
-              </span>
-              <span class="font-bold font-mono text-[#0F172A]">{{ stats()?.priorityCounts?.medium ?? 0 }}</span>
-            </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                class="bg-[#0284C7] h-full"
-                [style.width.%]="calcPriorityPercent(stats()?.priorityCounts?.medium)"
-              ></div>
-            </div>
-
-            <!-- Low -->
-            <div class="flex items-center justify-between text-xs pt-1">
-              <span class="font-medium text-[#475569] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#64748B]"></span>
-                Low
-              </span>
-              <span class="font-bold font-mono text-[#0F172A]">{{ stats()?.priorityCounts?.low ?? 0 }}</span>
-            </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                class="bg-[#64748B] h-full"
-                [style.width.%]="calcPriorityPercent(stats()?.priorityCounts?.low)"
-              ></div>
+            <div class="flex items-center justify-between p-1.5 rounded bg-slate-50 border border-slate-200">
+              <span class="font-semibold text-slate-700">Low</span>
+              <span class="font-bold text-slate-700 font-mono">{{ stats()?.priorityCounts?.low ?? 0 }}</span>
             </div>
           </div>
 

@@ -47,11 +47,18 @@
       <button
         type="button"
         (click)="toggleNotifs()"
-        class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+        class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors focus:outline-hidden"
         title="Notifications"
+        aria-label="View notifications"
       >
         <span class="material-symbols-outlined text-xl">notifications</span>
-        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+        @if (unreadCount() > 0) {
+          <span
+            class="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-white shadow-2xs"
+          >
+            {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+          </span>
+        }
       </button>
 
       <!-- Notifications Panel -->
@@ -59,48 +66,90 @@
         <div
           class="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-4 space-y-3 animate-fade-in"
         >
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-            <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-base text-primary">notifications</span>
-              Notifications
-            </h4>
-            <span class="text-[11px] font-semibold text-primary cursor-pointer hover:underline">Mark all read</span>
+              <h4 class="text-sm font-bold text-slate-900">Notifications</h4>
+              @if (unreadCount() > 0) {
+                <span class="px-1.5 py-0.5 text-[10px] font-semibold bg-rose-50 text-rose-600 rounded-full border border-rose-100">
+                  {{ unreadCount() }} unread
+                </span>
+              }
+            </div>
+            @if (unreadCount() > 0) {
+              <button
+                type="button"
+                (click)="markAllAsRead()"
+                class="text-[11px] font-semibold text-primary hover:text-blue-900 cursor-pointer hover:underline"
+              >
+                Mark all read
+              </button>
+            }
           </div>
 
-          <div class="space-y-2 max-h-72 overflow-y-auto">
-            @for (n of notificationsList().slice(0, 4); track n.id) {
-              <a
-                [routerLink]="n.ticketId ? ['/ticket', n.ticketId] : '/notifications'"
-                (click)="closeMenus()"
-                class="block p-2.5 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors flex items-start gap-3"
-                [ngClass]="n.read ? 'opacity-75' : 'bg-slate-50'"
+          <div class="space-y-1.5 max-h-80 overflow-y-auto">
+            @for (n of notificationsList().slice(0, 5); track n.id) {
+              <div
+                (click)="onNotificationClick(n)"
+                class="p-2.5 rounded-lg transition-colors flex items-start gap-3 cursor-pointer group"
+                [ngClass]="n.read || n.isRead ? 'hover:bg-slate-50' : 'bg-blue-50/40 hover:bg-blue-50/70'"
               >
-                <span
-                  class="material-symbols-outlined text-base shrink-0 mt-0.5"
-                  [ngClass]="n.read ? 'text-slate-400' : 'text-primary'"
+                <!-- Type Icon -->
+                <div
+                  class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border mt-0.5"
+                  [ngClass]="getIconStyle(n.type)"
                 >
-                  {{ n.type === 'ticket_resolved' ? 'task_alt' : (n.type === 'ticket_assigned' ? 'person_pin' : 'notifications') }}
-                </span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-medium text-slate-800 leading-snug truncate">{{ n.title }}</p>
-                  <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">{{ n.message }}</p>
-                  <span class="text-[10px] text-slate-400 mt-1 block">{{ n.createdAt | date:'MMM d, h:mm a' }}</span>
+                  <span class="material-symbols-outlined text-base">{{ getIcon(n.type) }}</span>
                 </div>
-              </a>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-1">
+                    <p class="text-xs font-semibold text-slate-800 leading-snug truncate group-hover:text-primary transition-colors">
+                      {{ n.title }}
+                    </p>
+                    @if (!n.read && !n.isRead) {
+                      <span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+                    }
+                  </div>
+                  <p class="text-[11px] text-slate-600 line-clamp-2 mt-0.5 leading-snug">
+                    {{ n.message }}
+                  </p>
+                  <div class="flex items-center justify-between mt-1 text-[10px] text-slate-400">
+                    <span>{{ n.createdAt | date:'MMM d, h:mm a' }}</span>
+                    @if (!n.read && !n.isRead) {
+                      <button
+                        type="button"
+                        (click)="markItemAsRead(n, $event)"
+                        class="text-primary hover:underline font-medium hover:text-blue-800"
+                        title="Mark as read"
+                      >
+                        Mark read
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
             } @empty {
-              <div class="p-6 text-center text-xs text-slate-500">
-                No notifications yet.
+              <div class="py-8 text-center space-y-2">
+                <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                  <span class="material-symbols-outlined text-xl">notifications_none</span>
+                </div>
+                <p class="text-xs font-medium text-slate-700">No notifications yet</p>
+                <p class="text-[11px] text-slate-400">We'll alert you when there is activity on your tickets.</p>
               </div>
             }
           </div>
 
-          <button
-            type="button"
-            (click)="goToTickets()"
-            class="w-full py-1.5 text-center text-xs font-semibold text-primary hover:bg-blue-50 rounded transition-colors"
-          >
-            View Ticket Feed
-          </button>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              (click)="goToNotificationsPage()"
+              class="flex-1 py-1.5 text-center text-xs font-semibold text-primary hover:bg-blue-50 rounded transition-colors"
+            >
+              View All Notifications
+            </button>
+          </div>
         </div>
       }
     </div>

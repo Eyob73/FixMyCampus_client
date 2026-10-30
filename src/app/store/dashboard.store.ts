@@ -30,8 +30,50 @@ export const DashboardStore = signalStore(
     const categoryMetrics = computed<CategoryMetric[]>(() => {
       const all = ticketStore.tickets();
       const counts: Record<string, number> = {};
+
+      const normalizeCategory = (cat: string): string => {
+        if (!cat) return 'Other';
+        const upper = cat.trim().toUpperCase();
+        switch (upper) {
+          case 'PLUMBING':
+            return 'Plumbing';
+          case 'ELECTRICAL':
+            return 'Electrical';
+          case 'HVAC':
+          case 'HVAC_CLIMATE':
+          case 'HVAC / CLIMATE':
+            return 'HVAC / Climate';
+          case 'STRUCTURAL':
+          case 'STRUCTURAL & DOORS':
+          case 'STRUCTURAL_DOORS':
+            return 'Structural & Doors';
+          case 'IT_SECURITY':
+          case 'NETWORK & WI-FI':
+          case 'NETWORK_WIFI':
+            return 'Network & Wi-Fi';
+          case 'EQUIPMENT':
+            return 'Equipment';
+          case 'FURNITURE':
+            return 'Furniture';
+          case 'GROUNDS':
+          case 'CLEANING & GROUNDS':
+          case 'CLEANING_GROUNDS':
+            return 'Cleaning & Grounds';
+          case 'SAFETY':
+          case 'SAFETY & LOCKS':
+          case 'SAFETY_LOCKS':
+            return 'Safety & Locks';
+          case 'GENERAL':
+          case 'OTHER':
+            return 'Other';
+          default:
+            return cat.trim().replace(/\b\w/g, (c) => c.toUpperCase());
+        }
+      };
+
       all.forEach((t) => {
-        counts[t.category] = (counts[t.category] || 0) + 1;
+        const canonical = normalizeCategory(t.category);
+        counts[canonical] = (counts[canonical] || 0) + 1;
       });
 
       const total = all.length || 1;

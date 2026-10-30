@@ -43,11 +43,14 @@ export class SidebarComponent {
   }
 
   get navItems(): NavItem[] {
+    const unread = this.unreadCount();
+
     if (this.authService.isTechnician()) {
       const newAssigned = this.dashboardStore.technicianStats()?.newAssigned ?? 0;
       return [
         { label: 'Dashboard', route: '/technician/dashboard', icon: 'dashboard' },
         { label: 'My Tickets', route: '/technician/tickets', icon: 'confirmation_number', badge: newAssigned > 0 ? newAssigned : undefined },
+        { label: 'Notifications', route: '/technician/notifications', icon: 'notifications', badge: unread > 0 ? unread : undefined }
       ];
     }
 
@@ -56,7 +59,7 @@ export class SidebarComponent {
         { label: 'Dashboard', icon: 'dashboard', route: '/reporter/dashboard' },
         { label: 'Report Issue', icon: 'add_circle', route: '/reporter/report-issue' },
         { label: 'My Tickets', icon: 'confirmation_number', route: '/reporter/my-tickets' },
-        { label: 'Notifications', icon: 'notifications', route: '/reporter/notifications', showBadge: true },
+        { label: 'Notifications', icon: 'notifications', route: '/reporter/notifications', badge: unread > 0 ? unread : undefined },
         { label: 'Profile', icon: 'person', route: '/reporter/profile' }
       ];
     }
@@ -69,6 +72,7 @@ export class SidebarComponent {
       { label: 'Technicians', route: '/admin/technicians', icon: 'engineering' },
       { label: 'Reporters', route: '/admin/reporters', icon: 'group' },
       { label: 'Buildings', route: '/admin/buildings', icon: 'domain' },
+      { label: 'Notifications', route: '/admin/notifications', icon: 'notifications', badge: unread > 0 ? unread : undefined },
       { label: 'Reports & Metrics', route: '/admin/reports', icon: 'analytics' },
       { label: 'Settings', route: '/admin/settings', icon: 'settings' }
     ];

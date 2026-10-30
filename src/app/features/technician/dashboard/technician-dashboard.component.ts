@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, effect, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Chart, registerables } from 'chart.js';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TicketService } from '../../../services/ticket.service';
 import { DashboardStore } from '../../../store/dashboard.store';
@@ -16,13 +17,22 @@ import { PageContainerComponent } from '../../../layout/page-container/page-cont
 import { MatCardModule } from '@angular/material/card';
 import { StartWorkDialogComponent } from '../../../ui/start-work-dialog/start-work-dialog.component';
 
+Chart.register(...registerables);
+
 @Component({
   selector: 'app-technician-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule, StatusBadge, PriorityBadge, PageContainerComponent, MatCardModule, MatDialogModule],
   templateUrl: './technician-dashboard.component.html',
 })
-export class TechnicianDashboardComponent implements OnInit {
+export class TechnicianDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('lifecycleCanvas') lifecycleCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('urgencyCanvas') urgencyCanvas?: ElementRef<HTMLCanvasElement>;
+
+  private lifecycleChart?: Chart<'doughnut'>;
+  private urgencyChart?: Chart<'bar'>;
+  private isViewInitialized = false;
+
   readonly ticketService = inject(TicketService);
   readonly dashboardStore = inject(DashboardStore);
   readonly authService = inject(AuthService);
@@ -33,8 +43,162 @@ export class TechnicianDashboardComponent implements OnInit {
   readonly recentTickets = computed(() => this.stats()?.recentTickets || []);
   readonly loading = this.dashboardStore.isLoading;
 
+  constructor() {
+    effect(() => {
+      const s = this.stats();
+      if (this.isViewInitialized && s) {
+        this.updateLifecycleChart(s);
+        this.updateUrgencyChart(s);
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.refreshData();
+  }
+
+  ngAfterViewInit(): void {
+    this.isViewInitialized = true;
+    const s = this.stats();
+    if (s) {
+      this.updateLifecycleChart(s);
+      this.updateUrgencyChart(s);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.lifecycleChart?.destroy();
+    this.urgencyChart?.destroy();
+  }
+
+  private updateLifecycleChart(s: any): void {
+    if (!this.lifecycleCanvas?.nativeElement) return;
+    const ctx = this.lifecycleCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const labels = ['Assigned', 'In Progress', 'Resolved', 'Closed'];
+    const data = [
+      s.newAssigned || 0,
+      s.inProgress || 0,
+      s.resolved || 0,
+      s.closed || 0
+    ];
+    const bgColors = ['#d97706', '#0284c7', '#10b981', '#475569'];
+
+    if (this.lifecycleChart) {
+      this.lifecycleChart.data.datasets[0].data = data;
+      this.lifecycleChart.update();
+      return;
+    }
+
+    this.lifecycleChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [
+          {
+            data,
+            backgroundColor: bgColors,
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '72%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0f172a',
+            titleFont: { family: 'Inter, sans-serif', size: 12, weight: 'bold' },
+            bodyFont: { family: 'Inter, sans-serif', size: 12 },
+            padding: 10,
+            cornerRadius: 8,
+            boxPadding: 4,
+            callbacks: {
+              label: (item) => ` ${item.label}: ${item.raw} tickets`
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private updateUrgencyChart(s: any): void {
+    if (!this.urgencyCanvas?.nativeElement) return;
+    const ctx = this.urgencyCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const labels = ['Critical', 'High', 'Medium', 'Low'];
+    const data = [
+      s.priorityCounts?.critical || 0,
+      s.priorityCounts?.high || 0,
+      s.priorityCounts?.medium || 0,
+      s.priorityCounts?.low || 0
+    ];
+    const bgColors = ['#dc2626', '#ea580c', '#0284c7', '#64748b'];
+
+    if (this.urgencyChart) {
+      this.urgencyChart.data.datasets[0].data = data;
+      this.urgencyChart.update();
+      return;
+    }
+
+    this.urgencyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            data,
+            backgroundColor: bgColors,
+            borderRadius: 6,
+            barPercentage: 0.6,
+            categoryPercentage: 0.8
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0f172a',
+            titleFont: { family: 'Inter, sans-serif', size: 12, weight: 'bold' },
+            bodyFont: { family: 'Inter, sans-serif', size: 12 },
+            padding: 10,
+            cornerRadius: 8,
+            boxPadding: 4,
+            callbacks: {
+              label: (item) => ` ${item.raw} assigned tickets`
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: '#f1f5f9' },
+            ticks: {
+              stepSize: 1,
+              color: '#64748b',
+              font: { family: 'Inter, sans-serif', size: 11 }
+            }
+          },
+          y: {
+            grid: { display: false },
+            ticks: {
+              color: '#334155',
+              font: { family: 'Inter, sans-serif', size: 11, weight: 'bold' }
+            }
+          }
+        }
+      }
+    });
   }
 
   refreshData(): void {
