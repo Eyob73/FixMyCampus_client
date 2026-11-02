@@ -7,6 +7,7 @@ import { StatusBadgeComponent } from '../../../../ui/badge/status-badge.componen
 import { NotificationStore } from '../../../../store/notification.store';
 import { TechnicianStore } from '../../../../store/technician.store';
 import { TicketStore } from '../../../../store/ticket.store';
+import { TicketService } from '../../../../services/ticket.service';
 import { Technician, Ticket, TicketPriority, TicketStatus, TicketAttachment } from '../../../../models';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,6 +27,7 @@ export class TicketDetailComponent implements OnInit {
   public technicianStore = inject(TechnicianStore);
   private notificationStore = inject(NotificationStore);
   private dialog = inject(MatDialog);
+  private ticketService = inject(TicketService);
 
   // We can use the ticketStore.selectedTicket directly in template, or keep local signal
   // Let's use ticketStore.selectedTicket
@@ -210,11 +212,22 @@ export class TicketDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
-        this.notificationStore.showToast({
-          type: 'success',
-          message: 'Ticket Deleted'
+        this.ticketService.deleteTicket(t.id).subscribe({
+          next: () => {
+            this.ticketStore.removeTicket(t.id);
+            this.notificationStore.showToast({
+              type: 'success',
+              message: 'Ticket deleted successfully.'
+            });
+            this.router.navigate(['/admin/tickets']);
+          },
+          error: (err) => {
+            this.notificationStore.showToast({
+              type: 'error',
+              message: err?.error?.message || 'Failed to delete ticket.'
+            });
+          }
         });
-        this.router.navigate(['/admin/tickets']);
       }
     });
   }
@@ -313,7 +326,7 @@ export class UpdateStatusDialogComponent {
         <p class="text-sm text-slate-700">
           Are you sure you want to delete ticket #<strong>{{ data.ticketNumber }}</strong>?
         </p>
-        <p class="text-xs text-slate-500 mt-2">This action cannot be undone.</p>
+        <p class="text-xs text-slate-500 mt-2">This ticket will be deleted.</p>
       </div>
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="p-4 pt-0">

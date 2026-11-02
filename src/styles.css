@@ -239,3 +239,18 @@ button:hover .material-icons,
 .group:hover .material-icons {
   text-decoration: none !important;
 }
+
+/* Custom styling for notification MatMenu */
+.notification-mat-menu.mat-mdc-menu-panel {
+  max-width: none !important;
+  border-radius: 0.75rem !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.notification-mat-menu .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+

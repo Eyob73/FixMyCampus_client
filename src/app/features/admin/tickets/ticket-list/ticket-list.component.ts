@@ -159,22 +159,34 @@ export class TicketListComponent implements OnInit, AfterViewInit {
     this.selectedTicketIds.set(new Set());
   }
 
-  openDeletePrompt(ticketNumber: string, event: Event): void {
+  openDeletePrompt(ticketId: string, event: Event): void {
     event.stopPropagation();
     const dialogRef = this.dialog.open(DeleteTicketListDialogComponent, {
       width: '400px',
-      data: { ticketNumber }
+      data: { ticketNumber: ticketId }
     });
 
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
-        this.ticketService.deleteTicket(ticketNumber).subscribe({
+        this.ticketService.deleteTicket(ticketId).subscribe({
           next: () => {
             this.notificationStore.showToast({
               type: 'success',
-              message: `Ticket #${ticketNumber} has been removed.`
+              message: 'Ticket has been deleted successfully.'
             });
-            this.ticketStore.loadTickets(); // reload
+            this.ticketStore.removeTicket(ticketId);
+            this.dataSource.data = this.dataSource.data.filter(t => t.id !== ticketId && t.ticketNumber !== ticketId);
+            this.selectedTicketIds.update(set => {
+              const next = new Set(set);
+              next.delete(ticketId);
+              return next;
+            });
+          },
+          error: (err) => {
+            this.notificationStore.showToast({
+              type: 'error',
+              message: err?.error?.message || 'Failed to delete ticket.'
+            });
           }
         });
       }
@@ -276,9 +288,9 @@ export class BulkStatusDialogComponent {
     <mat-dialog-content>
       <div class="pt-2">
         <p class="text-sm text-slate-700">
-          Are you sure you want to permanently delete ticket #<strong>{{ data.ticketNumber }}</strong>?
+          Are you sure you want to delete ticket #<strong>{{ data.ticketNumber }}</strong>?
         </p>
-        <p class="text-xs text-slate-500 mt-2">This action cannot be undone.</p>
+        <p class="text-xs text-slate-500 mt-2">This ticket will be deleted.</p>
       </div>
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="p-4 pt-0">

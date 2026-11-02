@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { NotificationStore } from '../../store/notification.store';
 import { AuthService } from '../../services/auth.service';
 import { TicketStore } from '../../store/ticket.store';
@@ -12,7 +13,7 @@ import { AppNotification } from '../../models/notification.model';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatDialogModule],
+  imports: [CommonModule, RouterModule, FormsModule, MatDialogModule, MatMenuModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
   host: {
@@ -20,6 +21,7 @@ import { AppNotification } from '../../models/notification.model';
   }
 })
 export class HeaderComponent {
+  @ViewChild(MatMenuTrigger) notifMenuTrigger?: MatMenuTrigger;
   @Output() toggleSidebar = new EventEmitter<void>();
   @Output() openNewTicket = new EventEmitter<void>();
 
@@ -30,10 +32,8 @@ export class HeaderComponent {
   dialog = inject(MatDialog);
 
   searchQuery = '';
-  showNotifMenu = signal<boolean>(false);
   showUserMenu = signal<boolean>(false);
   showHelpModal = signal<boolean>(false);
-  showNotifications = false;
 
   unreadCount = this.notificationStore.unreadCount;
   notificationsList = this.notificationStore.notifications;
@@ -59,25 +59,24 @@ export class HeaderComponent {
   }
 
   toggleNotifs(): void {
-    this.showNotifMenu.update(v => !v);
-    this.showUserMenu.set(false);
-    this.showNotifications = !this.showNotifications;
+    if (this.notifMenuTrigger?.menuOpen) {
+      this.notifMenuTrigger.closeMenu();
+    } else {
+      this.notifMenuTrigger?.openMenu();
+    }
   }
 
   closeNotifs(): void {
-    this.showNotifications = false;
-    this.showNotifMenu.set(false);
+    this.notifMenuTrigger?.closeMenu();
   }
 
   toggleUser(): void {
     this.showUserMenu.update(v => !v);
-    this.showNotifMenu.set(false);
   }
 
   closeMenus(): void {
-    this.showNotifMenu.set(false);
+    this.notifMenuTrigger?.closeMenu();
     this.showUserMenu.set(false);
-    this.showNotifications = false;
   }
 
   toggleHelpModal(): void {

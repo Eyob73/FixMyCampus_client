@@ -228,5 +228,16 @@ export const TicketStore = signalStore(
         ))
       )
     ),
+
+    // Remove ticket (e.g. on soft delete)
+    removeTicket: (ticketId: string) => {
+      patchState(store, (state) => ({
+        tickets: state.tickets.filter(t => t.id !== ticketId && t.ticketNumber !== ticketId),
+        selectedTicket: state.selectedTicket?.id === ticketId || state.selectedTicket?.ticketNumber === ticketId
+          ? null
+          : state.selectedTicket,
+        lastUpdated: new Date()
+      }));
+    },
   }))
 );

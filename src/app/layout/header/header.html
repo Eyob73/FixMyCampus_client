@@ -46,7 +46,7 @@
     <div class="relative">
       <button
         type="button"
-        (click)="toggleNotifs()"
+        [matMenuTriggerFor]="notifMenu"
         class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors focus:outline-hidden"
         title="Notifications"
         aria-label="View notifications"
@@ -61,10 +61,11 @@
         }
       </button>
 
-      <!-- Notifications Panel -->
-      @if (showNotifications) {
+      <!-- Notifications Panel in MatMenu -->
+      <mat-menu #notifMenu="matMenu" xPosition="before" class="notification-mat-menu">
         <div
-          class="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-4 space-y-3 animate-fade-in"
+          (click)="$event.stopPropagation()"
+          class="w-80 sm:w-96 bg-white border border-slate-200 rounded-xl shadow-xl p-4 space-y-3"
         >
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div class="flex items-center gap-2">
@@ -151,7 +152,7 @@
             </button>
           </div>
         </div>
-      }
+      </mat-menu>
     </div>
 
     <!-- User Avatar & Role Badge -->
