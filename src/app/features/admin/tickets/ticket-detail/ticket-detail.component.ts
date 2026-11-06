@@ -331,7 +331,7 @@ export class UpdateStatusDialogComponent {
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="p-4 pt-0">
       <button mat-button mat-dialog-close class="text-slate-600">Cancel</button>
-      <button mat-flat-button color="warn" [mat-dialog-close]="true">Delete</button>
+      <button mat-flat-button color="warn" [mat-dialog-close]="true" class="!bg-red-600 hover:!bg-red-700 !text-white font-medium">Delete Ticket</button>
     </mat-dialog-actions>
   `
 })
