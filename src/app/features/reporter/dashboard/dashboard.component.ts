@@ -51,13 +51,23 @@ export class DashboardComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      const tickets = this.ticketStore.tickets();
+      let tickets = this.ticketStore.tickets();
+      const user = this.currentUser();
+
+      // Ensure data is strictly scoped to the logged-in reporter
+      if (user) {
+        tickets = tickets.filter(t =>
+          (user.id && t.reporterId === user.id) ||
+          (user.email && t.reporterEmail?.toLowerCase() === user.email.toLowerCase())
+        );
+      }
+
       this.allRecentTickets.set(tickets.slice(0, 10)); // Just use first 10 for recent
       
       const st = {
         totalSubmitted: tickets.length,
         openCount: tickets.filter(t => t.status === 'NEW').length,
-        inProgressCount: tickets.filter(t => t.status === 'IN_PROGRESS').length,
+        inProgressCount: tickets.filter(t => t.status === 'IN_PROGRESS' || t.status === 'ASSIGNED').length,
         resolvedCount: tickets.filter(t => t.status === 'RESOLVED').length,
         closedCount: tickets.filter(t => t.status === 'CLOSED').length
       };
@@ -72,7 +82,7 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    this.ticketStore.loadTickets();
+    this.ticketStore.loadMyTickets();
   }
 
   onStatusChange(val: string): void {

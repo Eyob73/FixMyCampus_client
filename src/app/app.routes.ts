@@ -42,8 +42,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/technicians/technician-list/technician-list.component').then((m) => m.TechnicianListComponent)
       },
       {
+        path: 'technicians/:id',
+        loadComponent: () => import('./features/admin/technicians/technician-detail/technician-detail.component').then((m) => m.TechnicianDetailComponent)
+      },
+      {
         path: 'reporters',
         loadComponent: () => import('./features/admin/reporters/reporter-list/reporter-list.component').then((m) => m.ReporterListComponent)
+      },
+      {
+        path: 'reporters/:id',
+        loadComponent: () => import('./features/admin/reporters/reporter-detail/reporter-detail.component').then((m) => m.ReporterDetailComponent)
       },
       {
         path: 'buildings',

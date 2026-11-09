@@ -1,182 +1,157 @@
-import { Component, computed, signal, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { StatusBadgeComponent } from '../../../../ui/badge/status-badge.component';
-import { ConfirmModalComponent } from '../../../../ui/confirm-modal/confirm-modal.component';
 import { NotificationStore } from '../../../../store/notification.store';
 import { TechnicianStore } from '../../../../store/technician.store';
-import { TicketStore } from '../../../../store/ticket.store';
-import { CreateTechnicianDto, Technician, TechnicianStatus, Ticket } from '../../../../models';
 import { TechnicianService } from '../../../../services/technician.service';
+import { Technician, TechnicianStatus } from '../../../../models';
+import { TechnicianDetailDialogComponent } from '../technician-detail-dialog/technician-detail-dialog.component';
+import { TechnicianFormDialogComponent } from '../technician-form-dialog/technician-form-dialog.component';
+import { TechnicianDeleteDialogComponent } from '../technician-delete-dialog/technician-delete-dialog.component';
 
 @Component({
   selector: 'app-technician-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, StatusBadgeComponent, ConfirmModalComponent, MatDialogModule, MatButtonModule],
+  imports: [CommonModule, RouterModule, FormsModule, StatusBadgeComponent, MatDialogModule],
   templateUrl: './technician-list.component.html',
   styleUrl: './technician-list.component.css'
 })
 export class TechnicianListComponent implements OnInit {
-  public technicianStore = inject(TechnicianStore);
-  public ticketStore = inject(TicketStore);
-  private notificationStore = inject(NotificationStore);
-  private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
+  private notificationStore = inject(NotificationStore);
   private technicianService = inject(TechnicianService);
+  public technicianStore = inject(TechnicianStore);
 
-  searchQuery = signal<string>('');
-  statusFilter = signal<TechnicianStatus | 'ALL'>('ALL');
-
-  // Modals
-  @ViewChild('addTechDialogTemplate') addTechDialogTemplate!: TemplateRef<any>;
-  @ViewChild('techDetailDialogTemplate') techDetailDialogTemplate!: TemplateRef<any>;
-  private addDialogRef: MatDialogRef<any> | null = null;
-  private detailDialogRef: MatDialogRef<any> | null = null;
-  
-  addForm!: FormGroup;
-  isSubmitting = signal<boolean>(false);
-  errorMessage = signal<string | null>(null);
-
-  selectedTechnician = signal<Technician | null>(null);
-
-  showDeleteModal = false;
-  technicianToDelete: Technician | null = null;
-
-  filteredTechnicians = computed<Technician[]>(() => {
-    let list = this.technicianStore.technicians();
-    const query = this.searchQuery().toLowerCase().trim();
-    const status = this.statusFilter();
-
-    if (query) {
-      list = list.filter(
-        (t: Technician) =>
-          t.name.toLowerCase().includes(query) ||
-          t.specialty.toLowerCase().includes(query) ||
-          t.department.toLowerCase().includes(query) ||
-          t.email.toLowerCase().includes(query)
-      );
-    }
-
-    if (status !== 'ALL') {
-      list = list.filter((t: Technician) => t.status === status);
-    }
-
-    return list;
-  });
-
-  // Tickets assigned to currently selected technician
-  selectedTechTickets = computed<Ticket[]>(() => {
-    const tech = this.selectedTechnician();
-    if (!tech) return [];
-    return this.ticketStore.tickets().filter((t: Ticket) => t.assignedTechnicianId === tech.id);
-  });
-
-  constructor() {
-    this.initForm();
-  }
+  // Local filter models
+  searchQuery = '';
+  statusFilter = 'ALL';
+  departmentFilter = 'ALL';
+  sortBy = 'createdAt';
+  sortDescending = true;
+  pageSize = 10;
 
   ngOnInit(): void {
-    this.technicianStore.loadTechnicians();
-    this.ticketStore.loadTickets();
-  }
-
-  private initForm(): void {
-    this.addForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      department: ['HVAC & Climate Systems', Validators.required],
-      specialty: ['', Validators.required],
-      status: ['AVAILABLE' as TechnicianStatus, Validators.required]
+    this.technicianStore.loadTechnicians({
+      page: 1,
+      pageSize: this.pageSize,
+      sortBy: this.sortBy,
+      sortDescending: this.sortDescending
     });
   }
 
-  openDetail(tech: Technician): void {
-    this.selectedTechnician.set(tech);
-    this.detailDialogRef = this.dialog.open(this.techDetailDialogTemplate, {
-      width: '500px',
-      panelClass: 'custom-dialog-container'
+  onSearchChange(query: string): void {
+    this.searchQuery = query;
+    this.technicianStore.setSearch(query);
+  }
+
+  onStatusChange(status: string): void {
+    this.statusFilter = status;
+    this.technicianStore.setStatusFilter(status);
+  }
+
+  onDepartmentChange(dept: string): void {
+    this.departmentFilter = dept;
+    this.technicianStore.setDepartmentFilter(dept);
+  }
+
+  onSortChange(sortField: string): void {
+    this.sortBy = sortField;
+    this.technicianStore.setSorting(sortField);
+  }
+
+  toggleSortDirection(): void {
+    this.sortDescending = !this.sortDescending;
+    this.technicianStore.loadTechnicians({
+      sortDescending: this.sortDescending,
+      page: 1
     });
   }
 
-  closeDetail(): void {
-    if (this.detailDialogRef) {
-      this.detailDialogRef.close();
-      this.detailDialogRef = null;
-    }
-    this.selectedTechnician.set(null);
+  onPageChange(page: number): void {
+    this.technicianStore.setPage(page);
   }
 
-  openAddModal(): void {
-    this.addForm.reset();
-    this.initForm();
-    this.errorMessage.set(null);
-    this.isSubmitting.set(false);
-    this.addDialogRef = this.dialog.open(this.addTechDialogTemplate, {
-      width: '500px',
-      panelClass: 'custom-dialog-container',
-      disableClose: true // force using buttons
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.technicianStore.setPageSize(size);
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'TC';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
+  openCreateTechnician(): void {
+    const dialogRef = this.dialog.open(TechnicianFormDialogComponent, {
+      width: '560px',
+      maxWidth: '95vw',
+      data: {}
     });
-  }
 
-  closeAddModal(): void {
-    if (this.addDialogRef) {
-      this.addDialogRef.close();
-      this.addDialogRef = null;
-    }
-  }
-
-  submitNewTech(): void {
-    if (this.addForm.invalid) return;
-
-    this.isSubmitting.set(true);
-    this.errorMessage.set(null);
-    const dto: CreateTechnicianDto = this.addForm.value;
-
-    this.technicianService.createTechnician(dto).subscribe({
-      next: (newTech: Technician) => {
-        this.isSubmitting.set(false);
-        this.notificationStore.showToast({
-          type: 'success',
-          message: `${newTech.name} added to staff roster.`
-        });
-        this.technicianStore.loadTechnicians(); // Refresh list from backend
-        this.closeAddModal();
-      },
-      error: (err: any) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(err?.error?.message || 'Failed to add technician. Please try again.');
-        this.notificationStore.showToast({
-          type: 'error',
-          message: 'Error creating technician.'
-        });
+    dialogRef.afterClosed().subscribe((created) => {
+      if (created) {
+        this.technicianStore.loadTechnicians({ page: 1 });
       }
     });
   }
 
-  promptDelete(tech: Technician, event: Event): void {
-    event.stopPropagation();
-    this.technicianToDelete = tech;
-    this.showDeleteModal = true;
+  openEditTechnician(tech: Technician): void {
+    const dialogRef = this.dialog.open(TechnicianFormDialogComponent, {
+      width: '560px',
+      maxWidth: '95vw',
+      data: { technician: tech }
+    });
+
+    dialogRef.afterClosed().subscribe((updated) => {
+      if (updated) {
+        this.technicianStore.loadTechnicians();
+      }
+    });
   }
 
-  confirmDelete(): void {
-    if (!this.technicianToDelete) return;
-    const techId = this.technicianToDelete.id;
-    const name = this.technicianToDelete.name;
-
-    this.technicianStore.deleteTechnician(techId);
-    this.notificationStore.showToast({
-      type: 'success',
-      message: `${name} removed from roster.`
+  openDeleteTechnician(tech: Technician): void {
+    const dialogRef = this.dialog.open(TechnicianDeleteDialogComponent, {
+      width: '480px',
+      maxWidth: '95vw',
+      data: { technician: tech }
     });
-    this.showDeleteModal = false;
-    if (this.selectedTechnician()?.id === techId) {
-      this.closeDetail();
-    }
-    this.technicianToDelete = null;
+
+    dialogRef.afterClosed().subscribe((deleted) => {
+      if (deleted) {
+        this.technicianStore.loadTechnicians();
+      }
+    });
+  }
+
+  viewTechnicianDetails(tech: Technician): void {
+    this.dialog.open(TechnicianDetailDialogComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: {
+        technician: tech
+      }
+    });
+  }
+
+  navigateToTechnician(tech: Technician): void {
+    this.router.navigate(['/admin/technicians', tech.id]);
+  }
+
+  updateTechnicianStatus(tech: Technician, newStatus: string): void {
+    if (tech.status === newStatus) return;
+
+    this.technicianStore.toggleTechnicianStatus({
+      id: tech.id,
+      newStatus
+    });
+
+    this.notificationStore.showToast({
+      type: 'info',
+      message: `Updated ${tech.name} status to ${newStatus}.`
+    });
   }
 }

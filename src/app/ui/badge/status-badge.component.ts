@@ -53,6 +53,10 @@ export class StatusBadgeComponent {
       case 'ACTIVE':
       case 'OPERATIONAL':
         return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'SUSPENDED':
+        return 'bg-amber-50 text-amber-800 border-amber-300';
+      case 'DEACTIVATED':
+        return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'BUSY':
       case 'MAINTENANCE_SURGE':
         return 'bg-rose-50 text-rose-700 border-rose-200';
@@ -92,6 +96,10 @@ export class StatusBadgeComponent {
       case 'ACTIVE':
       case 'OPERATIONAL':
         return 'bg-emerald-500';
+      case 'SUSPENDED':
+        return 'bg-amber-500';
+      case 'DEACTIVATED':
+        return 'bg-rose-500';
       case 'BUSY':
       case 'MAINTENANCE_SURGE':
         return 'bg-rose-500';

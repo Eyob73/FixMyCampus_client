@@ -1,263 +1,391 @@
 <div class="space-y-6">
-  <!-- Header -->
+  <!-- Header Section -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-      <h2 class="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-        <span>Campus Maintenance Technicians</span>
-        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
-          {{ technicianStore.technicians().length }} Staff
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight m-0">Technician Management</h1>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+          {{ technicianStore.totalTechnicians() }} Staff
         </span>
-      </h2>
-      <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-        Manage field personnel, assign work orders, and monitor technician workload.
+      </div>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0">
+        Manage campus maintenance personnel, monitor work order loads, and administer staff assignments.
       </p>
     </div>
 
-    <button type="button" (click)="openAddModal()"
-      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-900 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
-      <span class="material-symbols-outlined text-base">person_add</span>
-      Add Technician
-    </button>
-  </div>
-
-  <!-- Search & Filter Bar -->
-  <div
-    class="bg-white border border-slate-200 rounded-lg p-3 lg:p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
-    <div class="relative flex-1 min-w-[240px] max-w-md">
-      <span
-        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-      <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-        placeholder="Search technician name, specialty, or email..."
-        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded text-sm focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary" />
-    </div>
-
     <div class="flex items-center gap-2">
-      <label class="text-xs font-semibold text-slate-500">Status:</label>
-      <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)"
-        class="border border-slate-300 rounded px-3 py-2 bg-white text-xs font-semibold text-slate-700 cursor-pointer">
-        <option value="ALL">All Statuses</option>
-        <option value="AVAILABLE">Available</option>
-        <option value="BUSY">Busy</option>
-        <option value="ON_CALL">On Call</option>
-        <option value="OFF_DUTY">Off Duty</option>
-      </select>
+      <button
+        type="button"
+        (click)="openCreateTechnician()"
+        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-dark rounded-lg transition-colors shadow-2xs cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-base">person_add</span>
+        <span>Add Technician</span>
+      </button>
     </div>
   </div>
 
-  <!-- Technician Roster Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-    @for (tech of filteredTechnicians(); track tech.id) {
-    <div (click)="openDetail(tech)"
-      class="bg-white border border-slate-200 rounded-lg p-5 shadow-2xs hover:border-primary hover:shadow-md transition-all duration-150 cursor-pointer flex flex-col justify-between space-y-4 group">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div
-            class="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0 group-hover:ring-2 group-hover:ring-primary transition-all">
-            <span class="material-symbols-outlined text-slate-500 text-2xl">person</span>
-          </div>
-          <div class="min-w-0">
-            <h3 class="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
-              {{ tech.name }}
-            </h3>
-            <p class="text-xs text-slate-500 truncate">{{ tech.specialty }}</p>
-            <span class="text-[11px] text-slate-400 block truncate">{{ tech.department }}</span>
-          </div>
-        </div>
+  <!-- Statistics Cards Section -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total Technicians -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between">
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Total Staff</span>
+        <div class="text-2xl font-bold text-slate-900 mt-1">{{ technicianStore.totalTechnicians() }}</div>
+        <span class="text-[11px] text-slate-500">Active roster</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-2xl">engineering</span>
+      </div>
+    </div>
 
-        <app-status-badge [status]="tech.status"></app-status-badge>
+    <!-- Available -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between">
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Available</span>
+        <div class="text-2xl font-bold text-emerald-600 mt-1">{{ technicianStore.availableTechnicians() }}</div>
+        <span class="text-[11px] text-emerald-600 font-medium">Ready for dispatch</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-2xl">check_circle</span>
+      </div>
+    </div>
+
+    <!-- Busy / Under Assignment -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between">
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Busy</span>
+        <div class="text-2xl font-bold text-amber-600 mt-1">{{ technicianStore.busyTechnicians() }}</div>
+        <span class="text-[11px] text-amber-600 font-medium">On active work orders</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-2xl">pending_actions</span>
+      </div>
+    </div>
+
+    <!-- Off Duty / Standby -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between">
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Standby / Off Duty</span>
+        <div class="text-2xl font-bold text-slate-700 mt-1">
+          {{ technicianStore.offDutyTechnicians() + technicianStore.onCallTechnicians() }}
+        </div>
+        <span class="text-[11px] text-slate-500 font-medium">On call & off duty</span>
+      </div>
+      <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-2xl">schedule</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="bg-white border border-slate-200 rounded-xl p-3 lg:p-4 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+    <!-- Search Box -->
+    <div class="relative flex-1 min-w-[260px] max-w-md">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+      <input
+        type="text"
+        [ngModel]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search by name, email, specialty..."
+        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+      />
+    </div>
+
+    <!-- Filter & Sort Controls -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <!-- Status Filter -->
+      <div class="flex items-center gap-1.5">
+        <label class="text-xs font-semibold text-slate-500">Status:</label>
+        <select
+          [ngModel]="statusFilter"
+          (ngModelChange)="onStatusChange($event)"
+          class="border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700 cursor-pointer focus:outline-hidden focus:border-primary"
+        >
+          <option value="ALL">All Statuses</option>
+          <option value="AVAILABLE">Available</option>
+          <option value="BUSY">Busy</option>
+          <option value="ON_CALL">On Call</option>
+          <option value="OFF_DUTY">Off Duty</option>
+        </select>
       </div>
 
-      <div class="grid grid-cols-3 gap-2 py-2 px-3 bg-slate-50 rounded border border-slate-100 text-center">
-        <div>
-          <span class="text-[10px] text-slate-400 font-bold uppercase block">Active</span>
-          <span class="text-sm font-bold text-slate-800">{{ tech.activeTicketsCount }}</span>
-        </div>
-        <div>
-          <span class="text-[10px] text-slate-400 font-bold uppercase block">Resolved</span>
-          <span class="text-sm font-bold text-emerald-700">{{ tech.resolvedTicketsCount }}</span>
-        </div>
-        <div>
-          <span class="text-[10px] text-slate-400 font-bold uppercase block">Rating</span>
-          <span class="text-sm font-bold text-amber-600 flex items-center justify-center gap-0.5">
-            ★ {{ tech.rating || 4.9 }}
+      <!-- Department Filter -->
+      <div class="flex items-center gap-1.5">
+        <label class="text-xs font-semibold text-slate-500">Department:</label>
+        <select
+          [ngModel]="departmentFilter"
+          (ngModelChange)="onDepartmentChange($event)"
+          class="border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700 cursor-pointer focus:outline-hidden focus:border-primary"
+        >
+          <option value="ALL">All Departments</option>
+          <option value="HVAC & Climate Systems">HVAC & Climate Systems</option>
+          <option value="Electrical Engineering">Electrical Engineering</option>
+          <option value="Plumbing & Water">Plumbing & Water</option>
+          <option value="Structural & Carpentry">Structural & Carpentry</option>
+          <option value="IT & Network Infrastructure">IT & Network Infrastructure</option>
+          <option value="General Maintenance">General Maintenance</option>
+        </select>
+      </div>
+
+      <!-- Sort By -->
+      <div class="flex items-center gap-1.5">
+        <label class="text-xs font-semibold text-slate-500">Sort By:</label>
+        <select
+          [ngModel]="sortBy"
+          (ngModelChange)="onSortChange($event)"
+          class="border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700 cursor-pointer focus:outline-hidden focus:border-primary"
+        >
+          <option value="createdAt">Joined Date</option>
+          <option value="name">Full Name</option>
+          <option value="email">Email</option>
+          <option value="status">Status</option>
+          <option value="department">Department</option>
+          <option value="tickets">Active Work Orders</option>
+        </select>
+
+        <button
+          type="button"
+          (click)="toggleSortDirection()"
+          [title]="sortDescending ? 'Sort Ascending' : 'Sort Descending'"
+          class="p-1.5 text-slate-600 hover:text-primary hover:bg-slate-100 rounded-lg border border-slate-300 bg-white transition-colors cursor-pointer"
+        >
+          <span class="material-symbols-outlined text-sm">
+            {{ sortDescending ? 'arrow_downward' : 'arrow_upward' }}
           </span>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-        <span class="truncate">{{ tech.phone }}</span>
-        <div class="flex items-center gap-1">
-          <button type="button" (click)="promptDelete(tech, $event)"
-            class="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors" title="Remove from roster">
-            <span class="material-symbols-outlined text-base">delete</span>
-          </button>
-          <span class="text-primary font-semibold"><span class="group-hover:underline">View Load</span> <span class="no-underline inline-block">&rarr;</span></span>
-        </div>
+        </button>
       </div>
     </div>
-    } @empty {
-    <div class="col-span-full py-16 text-center text-slate-400 space-y-2 bg-white rounded-lg border border-slate-200">
-      <span class="material-symbols-outlined text-4xl text-slate-300">engineering</span>
-      <p class="text-sm font-semibold text-slate-700">No technicians found.</p>
-      <p class="text-xs text-slate-400">Try modifying search keywords or status filter.</p>
-    </div>
-    }
   </div>
 
-  <!-- Detail Modal -->
-  <ng-template #techDetailDialogTemplate>
-    @if (selectedTechnician(); as tech) {
-    <!-- Modal Header -->
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-      <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-slate-500 text-xl">person</span>
-        </div>
-        <div class="min-w-0">
-          <h3 class="text-base font-bold text-slate-900 m-0 truncate">{{ tech.name }}</h3>
-          <p class="text-xs text-primary font-medium m-0 truncate">{{ tech.specialty }}</p>
-        </div>
+  <!-- Error State Alert -->
+  @if (technicianStore.error()) {
+    <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-rose-600 text-lg">error</span>
+        <span>{{ technicianStore.error() }}</span>
       </div>
-      <button mat-icon-button (click)="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0">
-        <span class="material-symbols-outlined">close</span>
+      <button
+        type="button"
+        (click)="technicianStore.loadTechnicians()"
+        class="px-2.5 py-1 bg-white border border-rose-300 text-rose-700 rounded text-xs font-semibold hover:bg-rose-100 transition-colors cursor-pointer"
+      >
+        Retry
       </button>
     </div>
+  }
 
-    <!-- Modal Content -->
-    <mat-dialog-content class="!p-6 !pt-4 custom-scrollbar">
-      <div class="space-y-6">
-        <div class="space-y-3 text-xs">
-          <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-500">Status:</span>
-            <app-status-badge [status]="tech.status"></app-status-badge>
-          </div>
-          <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-500">Email:</span>
-            <a [href]="'mailto:' + tech.email" class="text-primary font-medium hover:underline truncate">{{ tech.email
-              }}</a>
-          </div>
-          <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-500">Phone:</span>
-            <span class="font-semibold text-slate-800">{{ tech.phone }}</span>
-          </div>
-          <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-500">Department:</span>
-            <span class="text-slate-800 truncate">{{ tech.department }}</span>
-          </div>
-        </div>
+  <!-- Technicians Table Card -->
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+    @if (technicianStore.isLoading()) {
+      <div class="py-16 text-center space-y-3">
+        <span class="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin inline-block"></span>
+        <p class="text-xs text-slate-500 m-0">Loading maintenance staff roster...</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[900px]">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th class="py-3 px-4">Technician</th>
+              <th class="py-3 px-4">Email</th>
+              <th class="py-3 px-4">Phone</th>
+              <th class="py-3 px-4">Department</th>
+              <th class="py-3 px-4 text-center">Active Orders</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4">Rating</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs">
+            @for (tech of technicianStore.technicians(); track tech.id) {
+              <tr class="hover:bg-slate-50/80 transition-colors group">
+                <!-- Technician Name and Avatar -->
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-primary border border-blue-100 flex items-center justify-center font-bold text-xs shrink-0">
+                      {{ getInitials(tech.name) }}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="font-bold text-slate-900 group-hover:text-primary transition-colors cursor-pointer" (click)="viewTechnicianDetails(tech)">
+                        {{ tech.name }}
+                      </div>
+                      <div class="text-[11px] text-slate-500 truncate">
+                        {{ tech.specialty || 'General Trade' }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
 
-        <!-- Assigned Tickets -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
-            <span>Assigned Work Orders</span>
-            <span class="text-primary font-semibold font-mono">{{ selectedTechTickets().length }}</span>
-          </h4>
+                <!-- Email -->
+                <td class="py-3.5 px-4 text-slate-600 font-medium">
+                  <a [href]="'mailto:' + tech.email" class="hover:text-primary transition-colors">
+                    {{ tech.email }}
+                  </a>
+                </td>
 
-          <div class="space-y-2">
-            @for (ticket of selectedTechTickets(); track ticket.id) {
-            <a [routerLink]="['/admin/tickets', ticket.ticketNumber]" (click)="closeDetail()"
-              class="p-3 rounded-lg border border-slate-200 hover:border-primary block transition-all group">
-              <div class="flex items-center justify-between text-xs mb-1">
-                <span class="font-mono font-bold text-primary">{{ ticket.ticketNumber }}</span>
-                <app-status-badge [status]="ticket.status"></app-status-badge>
-              </div>
-              <h5 class="text-xs font-bold text-slate-800 group-hover:text-primary transition-colors truncate">
-                {{ ticket.title }}
-              </h5>
-              <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                <span class="material-symbols-outlined text-xs">domain</span>
-                {{ ticket.building }}
-              </p>
-            </a>
+                <!-- Phone -->
+                <td class="py-3.5 px-4 text-slate-500">
+                  {{ tech.phone || '—' }}
+                </td>
+
+                <!-- Department -->
+                <td class="py-3.5 px-4 text-slate-700 font-medium">
+                  {{ tech.department || 'General' }}
+                </td>
+
+                <!-- Active Work Orders -->
+                <td class="py-3.5 px-4 text-center">
+                  <span
+                    (click)="viewTechnicianDetails(tech)"
+                    class="inline-flex items-center gap-1 font-bold px-2.5 py-0.5 rounded-full text-xs cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all"
+                    [ngClass]="tech.activeTicketsCount > 0 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-500'"
+                    [title]="'View active tickets assigned to ' + tech.name"
+                  >
+                    <span class="material-symbols-outlined text-xs">engineering</span>
+                    <span>{{ tech.activeTicketsCount }} active</span>
+                  </span>
+                </td>
+
+                <!-- Status Badge with Quick Toggle Menu -->
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2">
+                    <app-status-badge [status]="tech.status"></app-status-badge>
+
+                    <!-- Quick Status Dropdown -->
+                    <select
+                      [ngModel]="tech.status"
+                      (ngModelChange)="updateTechnicianStatus(tech, $event)"
+                      class="text-[11px] py-0.5 px-1.5 border border-slate-200 rounded bg-slate-50 text-slate-700 cursor-pointer focus:outline-hidden hover:bg-white"
+                      title="Quick change staff availability"
+                    >
+                      <option value="AVAILABLE">Available</option>
+                      <option value="BUSY">Busy</option>
+                      <option value="ON_CALL">On Call</option>
+                      <option value="OFF_DUTY">Off Duty</option>
+                    </select>
+                  </div>
+                </td>
+
+                <!-- Rating -->
+                <td class="py-3.5 px-4 text-amber-600 font-bold">
+                  ★ {{ tech.rating || 5.0 }}
+                </td>
+
+                <!-- Action Buttons -->
+                <td class="py-3.5 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      (click)="viewTechnicianDetails(tech)"
+                      title="View Details"
+                      class="p-1.5 text-slate-500 hover:text-primary hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <span class="material-symbols-outlined text-lg">visibility</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="openEditTechnician(tech)"
+                      title="Edit Technician"
+                      class="p-1.5 text-slate-500 hover:text-primary hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <span class="material-symbols-outlined text-lg">edit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="openDeleteTechnician(tech)"
+                      title="Delete Technician"
+                      class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
             } @empty {
-            <p class="text-xs text-slate-400 py-6 text-center bg-slate-50 rounded-lg">
-              No active tickets assigned currently.
-            </p>
+              <tr>
+                <td colspan="8" class="py-16 text-center">
+                  <div class="max-w-xs mx-auto space-y-2">
+                    <span class="material-symbols-outlined text-4xl text-slate-300">engineering</span>
+                    <h3 class="text-sm font-bold text-slate-800 m-0">No technicians found</h3>
+                    <p class="text-xs text-slate-500 m-0">
+                      No maintenance personnel matched the current filters or query.
+                    </p>
+                    <button
+                      type="button"
+                      (click)="openCreateTechnician()"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors mt-2 cursor-pointer"
+                    >
+                      <span class="material-symbols-outlined text-sm">person_add</span>
+                      <span>Add First Technician</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
             }
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
-    </mat-dialog-content>
 
-    <mat-dialog-actions align="end" class="!px-6 !py-4 border-t border-slate-100 bg-slate-50/50">
-      <button mat-button (click)="closeDetail()" class="!text-slate-600 font-medium">Close</button>
-    </mat-dialog-actions>
-    }
-  </ng-template>
-
-  <!-- Add Technician Modal -->
-  <ng-template #addTechDialogTemplate>
-    <!-- Modal Header -->
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-blue-100 text-primary flex items-center justify-center">
-          <span class="material-symbols-outlined text-xl">person_add</span>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-slate-900 m-0 leading-tight">Add Maintenance Specialist</h3>
-        </div>
-      </div>
-      <button mat-icon-button (click)="closeAddModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-
-    <!-- Modal Content -->
-    <mat-dialog-content class="!p-6 !pt-4 custom-scrollbar">
-      <form [formGroup]="addForm" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
-          <input type="text" formControlName="name" placeholder="e.g. Liam Gallagher"
-            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
+      <!-- Server-side / Store Pagination Footer -->
+      <div class="p-4 border-t border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div class="text-slate-500">
+          Showing
+          <strong class="text-slate-800">
+            {{ technicianStore.totalCount() === 0 ? 0 : (technicianStore.page() - 1) * technicianStore.pageSize() + 1 }}
+          </strong>
+          to
+          <strong class="text-slate-800">
+            {{ technicianStore.page() * technicianStore.pageSize() > technicianStore.totalCount() ? technicianStore.totalCount() : technicianStore.page() * technicianStore.pageSize() }}
+          </strong>
+          of
+          <strong class="text-slate-800">{{ technicianStore.totalCount() }}</strong>
+          technicians
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Email *</label>
-            <input type="email" formControlName="email" placeholder="name@facilities.campus.edu"
-              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone *</label>
-            <input type="text" formControlName="phone" placeholder="(555) 000-0000"
-              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Specialty *</label>
-            <input type="text" formControlName="specialty" placeholder="e.g. Master Plumber"
-              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
-            <select formControlName="status"
-              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded focus:bg-white">
-              <option value="AVAILABLE">Available</option>
-              <option value="BUSY">Busy</option>
-              <option value="ON_CALL">On Call</option>
-              <option value="OFF_DUTY">Off Duty</option>
+        <div class="flex items-center gap-3">
+          <!-- Page Size Selector -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500">Per page:</span>
+            <select
+              [ngModel]="pageSize"
+              (ngModelChange)="onPageSizeChange($event)"
+              class="border border-slate-300 rounded px-2 py-1 bg-white text-xs font-semibold text-slate-700 cursor-pointer focus:outline-hidden"
+            >
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
             </select>
           </div>
+
+          <!-- Page Navigation Buttons -->
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              (click)="onPageChange(technicianStore.page() - 1)"
+              [disabled]="technicianStore.page() <= 1"
+              class="px-2.5 py-1 text-xs font-semibold border border-slate-300 rounded bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              Previous
+            </button>
+
+            <span class="px-2 font-semibold text-slate-600">
+              Page {{ technicianStore.page() }} of {{ technicianStore.totalPages() === 0 ? 1 : technicianStore.totalPages() }}
+            </span>
+
+            <button
+              type="button"
+              (click)="onPageChange(technicianStore.page() + 1)"
+              [disabled]="technicianStore.page() >= technicianStore.totalPages() || technicianStore.totalPages() === 0"
+              class="px-2.5 py-1 text-xs font-semibold border border-slate-300 rounded bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
         </div>
-      </form>
-    </mat-dialog-content>
-
-    <!-- Modal Actions -->
-    <mat-dialog-actions align="end" class="!px-6 !py-4 border-t border-slate-100 bg-slate-50/50">
-      <button mat-button (click)="closeAddModal()" class="!text-slate-600">Cancel</button>
-      <button mat-flat-button color="primary" [disabled]="addForm.invalid" (click)="submitNewTech()"
-        class="!rounded-lg !px-6">
-        Save Technician
-      </button>
-    </mat-dialog-actions>
-  </ng-template>
-
-  <!-- Delete Modal -->
-  <app-confirm-modal [isOpen]="showDeleteModal" title="Remove Technician"
-    [message]="'Are you sure you want to remove ' + technicianToDelete?.name + ' from the staff roster?'"
-    confirmText="Remove" [isDanger]="true" (confirm)="confirmDelete()"
-    (cancel)="showDeleteModal = false"></app-confirm-modal>
+      </div>
+    }
+  </div>
 </div>

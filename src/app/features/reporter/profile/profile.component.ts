@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -43,6 +43,27 @@ export class ProfileComponent implements OnInit {
     commentNotifications: [true]
   });
 
+  constructor() {
+    effect(() => {
+      let tickets = this.ticketStore.tickets();
+      const user = this.currentUser();
+      if (user) {
+        tickets = tickets.filter(t =>
+          (user.id && t.reporterId === user.id) ||
+          (user.email && t.reporterEmail?.toLowerCase() === user.email.toLowerCase())
+        );
+      }
+      const st = {
+        totalSubmitted: tickets.length,
+        openCount: tickets.filter(t => t.status === 'NEW').length,
+        inProgressCount: tickets.filter(t => t.status === 'IN_PROGRESS' || t.status === 'ASSIGNED').length,
+        resolvedCount: tickets.filter(t => t.status === 'RESOLVED').length,
+        closedCount: tickets.filter(t => t.status === 'CLOSED').length
+      };
+      this.stats.set(st);
+    }, { allowSignalWrites: true });
+  }
+
   ngOnInit(): void {
     const user = this.currentUser();
     if (user) {
@@ -57,15 +78,7 @@ export class ProfileComponent implements OnInit {
       });
     }
 
-    const tickets = this.ticketStore.tickets();
-    const st = {
-      totalSubmitted: tickets.length,
-      openCount: tickets.filter(t => t.status === 'NEW').length,
-      inProgressCount: tickets.filter(t => t.status === 'IN_PROGRESS').length,
-      resolvedCount: tickets.filter(t => t.status === 'RESOLVED').length,
-      closedCount: tickets.filter(t => t.status === 'CLOSED').length
-    };
-    this.stats.set(st);
+    this.ticketStore.loadMyTickets();
   }
 
   onSubmit(): void {

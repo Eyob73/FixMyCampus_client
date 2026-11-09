@@ -23,8 +23,31 @@ export interface CreateTechnicianDto {
   department: string;
   specialty: string;
   status: TechnicianStatus;
+  password?: string;
 }
 
 export interface UpdateTechnicianDto extends Partial<CreateTechnicianDto> {
   id: string;
+}
+
+export interface TechnicianQueryParameters {
+  search?: string;
+  status?: string;
+  department?: string;
+  sortBy?: string;
+  sortDescending?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface TechnicianStats {
+  totalTechnicians: number;
+  availableTechnicians: number;
+  busyTechnicians: number;
+  onCallTechnicians: number;
+  offDutyTechnicians: number;
+}
+
+export interface TechnicianDetail extends Technician {
+  assignedTickets?: any[];
 }
