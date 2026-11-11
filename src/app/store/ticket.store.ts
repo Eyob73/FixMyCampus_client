@@ -30,7 +30,23 @@ export const TicketStore = signalStore(
     inProgressTicketsCount: computed(() => tickets().filter(t => t.status === 'IN_PROGRESS').length),
     resolvedTicketsCount: computed(() => tickets().filter(t => t.status === 'RESOLVED').length),
   })),
-  withMethods((store, ticketService = inject(TicketService)) => ({
+  withMethods((store, ticketService = inject(TicketService)) => {
+    const mergeUpdatedTicket = (state: TicketState, updatedTicket: Ticket): Ticket => {
+      const existing = state.selectedTicket?.id === updatedTicket.id
+        ? state.selectedTicket
+        : state.tickets.find(t => t.id === updatedTicket.id);
+
+      const activityLog = updatedTicket.activityLog && updatedTicket.activityLog.length > 0
+        ? updatedTicket.activityLog
+        : (existing?.activityLog ?? []);
+
+      return {
+        ...updatedTicket,
+        activityLog
+      };
+    };
+
+    return {
     // Load all tickets
     loadTickets: rxMethod<void>(
       pipe(
@@ -209,6 +225,35 @@ export const TicketStore = signalStore(
       )
     ),
 
+    // Add internal operations note (admin-only, returns Observable without toggling full-page isLoading)
+    addInternalNote: (ticketId: string, note: string) =>
+      ticketService.addInternalNote(ticketId, note).pipe(
+        tap((updatedTicket) =>
+          patchState(store, (state) => {
+            const merged = mergeUpdatedTicket(state, updatedTicket);
+            return {
+              tickets: state.tickets.map(t => t.id === merged.id ? merged : t),
+              selectedTicket: state.selectedTicket?.id === merged.id ? merged : state.selectedTicket,
+              lastUpdated: new Date()
+            };
+          })
+        )
+      ),
+
+    // Merge an updated ticket into store state while preserving loaded activityLog
+    upsertTicket: (updatedTicket: Ticket) => {
+      patchState(store, (state) => {
+        const merged = mergeUpdatedTicket(state, updatedTicket);
+        return {
+          tickets: state.tickets.some(t => t.id === merged.id)
+            ? state.tickets.map(t => t.id === merged.id ? merged : t)
+            : state.tickets,
+          selectedTicket: state.selectedTicket?.id === merged.id ? merged : state.selectedTicket,
+          lastUpdated: new Date()
+        };
+      });
+    },
+
     // Assign Technician
     assignTechnician: rxMethod<{ id: string; techId: string; techName: string; techSpecialty: string }>(
       pipe(
@@ -239,5 +284,6 @@ export const TicketStore = signalStore(
         lastUpdated: new Date()
       }));
     },
-  }))
+  };
+  })
 );

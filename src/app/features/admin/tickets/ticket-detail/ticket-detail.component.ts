@@ -48,6 +48,8 @@ export class TicketDetailComponent implements OnInit {
 
   // Note composer
   newNoteText = '';
+  submittingNote = signal<boolean>(false);
+  noteError = signal<string | null>(null);
 
   // Modals
 
@@ -66,6 +68,9 @@ export class TicketDetailComponent implements OnInit {
   }
 
   loadTicket(id: string): void {
+    this.newNoteText = '';
+    this.submittingNote.set(false);
+    this.noteError.set(null);
     this.ticketStore.loadTicketById(id);
   }
 
@@ -165,13 +170,29 @@ export class TicketDetailComponent implements OnInit {
   addNote(): void {
     const text = this.newNoteText.trim();
     const t = this.ticket();
-    if (!text || !t) return;
+    if (!text || !t || this.submittingNote()) return;
 
-    this.ticketStore.addComment({ ticketId: t.id, content: text });
-    this.newNoteText = '';
-    this.notificationStore.showToast({
-      type: 'success',
-      message: 'Internal Note Added'
+    this.submittingNote.set(true);
+    this.noteError.set(null);
+
+    this.ticketStore.addInternalNote(t.id, text).subscribe({
+      next: () => {
+        this.newNoteText = '';
+        this.submittingNote.set(false);
+        this.notificationStore.showToast({
+          type: 'success',
+          message: 'Internal Note Added'
+        });
+      },
+      error: (err) => {
+        this.submittingNote.set(false);
+        const msg = err?.error?.message || 'Failed to add internal note.';
+        this.noteError.set(msg);
+        this.notificationStore.showToast({
+          type: 'error',
+          message: msg
+        });
+      }
     });
   }
 

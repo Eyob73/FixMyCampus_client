@@ -178,5 +178,32 @@ describe('TicketService', () => {
       matches: []
     });
   });
+
+  it('should post admin internal note to internal-notes endpoint and map returned internalNotes', () => {
+    service.addInternalNote('ticket-99', 'Gate code 4412').subscribe((ticket) => {
+      expect(ticket.id).toBe('ticket-99');
+      expect(ticket.internalNotes).toEqual([
+        '2026-11-11 14:30 UTC (Admin): Gate code 4412'
+      ]);
+    });
+
+    const req = httpTesting.expectOne(`${environment.apiUrl}/Tickets/ticket-99/internal-notes`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ note: 'Gate code 4412' });
+    req.flush({
+      id: 'ticket-99',
+      title: 'Broken HVAC',
+      description: 'Compressor noise',
+      category: 'HVAC',
+      status: 'Assigned',
+      priority: 'High',
+      building: 'Engineering Hall',
+      createdAt: '2026-11-10T09:00:00Z',
+      updatedAt: '2026-11-11T14:30:00Z',
+      internalNotes: ['2026-11-11 14:30 UTC (Admin): Gate code 4412'],
+      comments: [],
+      images: []
+    });
+  });
 });
 
