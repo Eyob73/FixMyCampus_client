@@ -45,24 +45,24 @@ describe('AuthService', () => {
       token: 'jwt-valid-token-123',
       user: {
         id: 'usr-1',
-        name: 'Jane Doe',
-        email: 'jane@univ.edu',
+        name: 'Abebe Kebede',
+        email: 'Abebe@univ.edu',
         role: 'ADMIN',
         isActive: true
       }
     };
 
-    service.login({ email: 'jane@univ.edu', password: 'secretPassword', rememberMe: false }).subscribe((res) => {
+    service.login({ email: 'Abebe@univ.edu', password: 'secretPassword', rememberMe: false }).subscribe((res) => {
       expect(res.token).toBe('jwt-valid-token-123');
       expect(res.user.role).toBe('ADMIN');
       expect(service.isAuthenticated()).toBe(true);
-      expect(service.currentUser()?.email).toBe('jane@univ.edu');
+      expect(service.currentUser()?.email).toBe('Abebe@univ.edu');
       expect(service.isAdmin()).toBe(true);
     });
 
     const req = httpTesting.expectOne(`${environment.apiUrl}/auth/login`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body.email).toBe('jane@univ.edu');
+    expect(req.request.body.email).toBe('Abebe@univ.edu');
     req.flush(mockResponse);
 
     // Ensure session storage received token, and password was NEVER stored
@@ -97,7 +97,7 @@ describe('AuthService', () => {
   });
 
   it('should fail and log development warning when backend returns an unknown or unsupported role', () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
     const mockResponse = {
       token: 'jwt-unknown-role',
       user: {
@@ -216,8 +216,8 @@ describe('AuthService', () => {
       expiresIn: 900,
       user: {
         id: 'usr-1',
-        name: 'Jane Doe',
-        email: 'jane@univ.edu',
+        name: 'Abebe Kebede',
+        email: 'Abebe@univ.edu',
         role: 'ADMIN',
         isActive: true
       }

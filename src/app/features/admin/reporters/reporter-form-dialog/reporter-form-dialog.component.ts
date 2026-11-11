@@ -58,7 +58,7 @@ export interface ReporterFormDialogData {
             <input
               type="text"
               formControlName="firstName"
-              placeholder="e.g. Jane"
+              placeholder="e.g. Abebe"
               class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
               [ngClass]="{ 'border-rose-400 bg-rose-50/30': isFieldInvalid('firstName') }"
             />
@@ -74,7 +74,7 @@ export interface ReporterFormDialogData {
             <input
               type="text"
               formControlName="lastName"
-              placeholder="e.g. Doe"
+              placeholder="e.g. Kebede"
               class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
               [ngClass]="{ 'border-rose-400 bg-rose-50/30': isFieldInvalid('lastName') }"
             />
@@ -93,7 +93,7 @@ export interface ReporterFormDialogData {
             <input
               type="email"
               formControlName="email"
-              placeholder="jane.doe@campus.edu"
+              placeholder="Abebe.@campus.edu"
               class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:bg-white focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
               [ngClass]="{ 'border-rose-400 bg-rose-50/30': isFieldInvalid('email') }"
             />
